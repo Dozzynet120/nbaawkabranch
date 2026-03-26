@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Election Voting System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .animate-slide-in { animation: slideIn 0.6s ease-out forwards; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .vote-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .vote-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .candidate-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .candidate-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .candidate-card.selected {
+            border: 3px solid #6366f1;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+        }
+
+        .progress-bar {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .live-indicator {
+            position: relative;
+        }
+
+        .live-indicator::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        .hidden-section {
+            display: none;
+        }
+
+        .fade-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6366f1;
+            border-radius: 4px;
+        }
+
+        .admin-card {
+            transition: all 0.3s ease;
+        }
+        .admin-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="showSection('hero-section')">
+                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-vote-yea text-white text-lg"></i>
+                        </div>
+                        <span class="font-bold text-xl text-slate-800">Elect<span class="text-indigo-600">Vote</span></span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div id="user-info" class="hidden items-center gap-3">
+                        <span class="text-sm text-slate-600">Welcome, <span id="username-display" class="font-semibold text-indigo-600"></span></span>
+                        <button onclick="logout()" class="text-sm text-red-500 hover:text-red-700 transition">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                        </button>
+                    </div>
+                    <div id="nav-auth" class="flex gap-2">
+                        <button onclick="showSection('login-section')" class="px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                            Member Login
+                        </button>
+                        <div class="relative group">
+                            <button onclick="handleAdminAccess()" class="px-4 py-2 text-sm font-medium bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition">
+                                <i class="fas fa-shield-alt mr-2"></i>Admin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Hero Section (Default View) -->
+        <section id="hero-section" class="text-center py-16 animate-slide-in">
+            <div class="relative inline-block mb-8">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full blur-3xl opacity-30 animate-float"></div>
+                <div class="relative w-32 h-32 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center mx-auto shadow-2xl">
+                    <i class="fas fa-poll text-white text-5xl"></i>
+                </div>
+            </div>
+            <h1 class="text-5xl font-bold mb-6 text-slate-800">
+                Secure <span class="gradient-text">Digital Elections</span>
+            </h1>
+            <p class="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
+                Cast your vote securely and transparently. View real-time results and participate in democracy from anywhere.
+            </p>
+            <div class="flex justify-center gap-4 flex-wrap">
+                <button onclick="showSection('public-dashboard-section')" class="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition">
+                    <i class="fas fa-chart-line mr-2"></i>View Live Results
+                </button>
+                <button onclick="showSection('login-section')" class="px-8 py-4 bg-white text-indigo-600 border-2 border-indigo-600 rounded-xl font-semibold hover:bg-indigo-50 transition">
+                    <i class="fas fa-vote-yea mr-2"></i>Cast Your Vote
+                </button>
+            </div>
+
+            <!-- Live Stats Preview -->
+            <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">
+                    <div class="text-3xl font-bold text-indigo-600" id="total-votes-hero">0</div>
+                    <div class="text-slate-500 mt-1">Total Votes Cast</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">
+                    <div class="text-3xl font-bold text-purple-600" id="active-positions-hero">0</div>
+                    <div class="text-slate-500 mt-1">Active Positions</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">
+                    <div class="flex items-center justify-center gap-2">
+                        <div class="w-3 h-3 bg-green-500 rounded-full live-indicator"></div>
+                        <div class="text-3xl font-bold text-green-600">LIVE</div>
+                    </div>
+                    <div class="text-slate-500 mt-1">Real-time Updates</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Member Login Section -->
+        <section id="login-section" class="hidden-section max-w-md mx-auto">
+            <div class="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-lock text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">Member Login</h2>
+                    <p class="text-slate-500 mt-2">Enter your credentials to access voting</p>
+                </div>
+
+                <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Member ID</label>
+                        <div class="relative">
+                            <i class="fas fa-id-card absolute left-3 top-3 text-slate-400"></i>
+                            <input type="text" id="member-id" required 
+                                class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                placeholder="Enter your member ID">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-3 top-3 text-slate-400"></i>
+                            <input type="password" id="member-password" required 
+                                class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                placeholder="Enter your password">
+                        </div>
+                    </div>
+
+                    <button type="submit" 
+                        class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition">
+                        Login to Vote
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <button onclick="showSection('hero-section')" class="text-slate-500 hover:text-indigo-600 transition">
+                        <i class="fas fa-arrow-left mr-1"></i> Back to Home
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Voting Section -->
+        <section id="voting-section" class="hidden-section">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Cast Your Vote</h2>
+                <p class="text-slate-600">Select your preferred candidates for each position</p>
+            </div>
+
+            <!-- Positions Container -->
+            <div id="positions-container" class="space-y-8">
+                <!-- Generated dynamically by JavaScript -->
+            </div>
+
+            <!-- Submit Vote Button -->
+            <div class="mt-8 text-center">
+                <button onclick="submitVotes()" 
+                    class="px-12 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    id="submit-vote-btn">
+                    <i class="fas fa-check-circle mr-2"></i>Submit My Vote
+                </button>
+                <p class="mt-4 text-sm text-slate-500">
+                    <i class="fas fa-shield-alt mr-1"></i> Your vote is encrypted and anonymous
+                </p>
+            </div>
+        </section>
+
+        <!-- Vote Success Modal -->
+        <div id="vote-success-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full text-center transform scale-100 transition-transform">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-green-600 text-4xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">Vote Cast Successfully!</h3>
+                <p class="text-slate-600 mb-6">Thank you for participating in the election. Your vote has been recorded securely.</p>
+                <div class="bg-slate-50 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-slate-500">Receipt ID</p>
+                    <p class="font-mono font-bold text-slate-800" id="vote-receipt-id">#RCP-XXXX</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="showSection('public-dashboard-section'); closeModal('vote-success-modal');" 
+                        class="flex-1 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">
+                        View Results
+                    </button>
+                    <button onclick="logout(); closeModal('vote-success-modal');" 
+                        class="flex-1 py-3 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50 transition">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Setup/Registration Section -->
+        <section id="admin-setup-section" class="hidden-section max-w-md mx-auto">
+            <div class="bg-slate-900 rounded-2xl shadow-2xl p-8 border border-slate-700">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-600">
+                        <i class="fas fa-user-plus text-indigo-400 text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white">Admin Registration</h2>
+                    <p class="text-slate-400 mt-2">Create admin account (Limited to 4 admins)</p>
+                    <div class="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-indigo-900 rounded-full">
+                        <span class="text-xs text-indigo-300">Available slots:</span>
+                        <span class="text-sm font-bold text-white" id="admin-slots">4</span>
+                    </div>
+                </div>
+
+                <form id="admin-setup-form" onsubmit="handleAdminRegistration(event)" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Admin ID</label>
+                        <div class="relative">
+                            <i class="fas fa-user-shield absolute left-3 top-3 text-slate-500"></i>
+                            <input type="text" id="new-admin-id" required 
+                                class="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                placeholder="Choose admin ID">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Full Name</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-3 top-3 text-slate-500"></i>
+                            <input type="text" id="new-admin-name" required 
+                                class="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                placeholder="Enter full name">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Password</label>
+                        <div class="relative">
+                            <i class="fas fa-key absolute left-3 top-3 text-slate-500"></i>
+                            <input type="password" id="new-admin-password" required minlength="6"
+                                class="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                placeholder="Create password (min 6 chars)">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Confirm Password</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-3 top-3 text-slate-500"></i>
+                            <input type="password" id="new-admin-confirm" required 
+                                class="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                placeholder="Confirm password">
+                        </div>
+                    </div>
+
+                    <button type="submit" 
+                        class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition">
+                        <i class="fas fa-user-plus mr-2"></i>Register as Admin
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <button onclick="showSection('hero-section')" class="text-slate-400 hover:text-white transition">
+                        <i class="fas fa-arrow-left mr-1"></i> Back to Home
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Login Section -->
+        <section id="admin-login-section" class="hidden-section max-w-md mx-auto">
+            <div class="bg-slate-900 rounded-2xl shadow-2xl p-8 border border-slate-700">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-600">
+                        <i class="fas fa-shield-alt text-indigo-400 text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white">Admin Access</h2>
+                    <p class="text-slate-400 mt-2">Login to manage elections</p>
+                </div>
+
+                <form id="admin-login-form" onsubmit="handleAdminLogin(event)" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Admin ID</label>
+                        <div class="relative">
+                            <i class="fas fa-user-shield absolute left-3 top-3 text-slate-500"></i>
+                            <input type="text" id="admin-id" required 
+                                class="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                placeholder="Enter admin ID">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Password</label>
+                        <div class="relative">
+                            <i class="fas fa-key absolute left-3 top-3 text-slate-500"></i>
+                            <input type="password" id="admin-password" required 
+                                class="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                placeholder="Enter password">
+                        </div>
+                    </div>
+
+                    <button type="submit" 
+                        class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition">
+                        <i class="fas fa-lock mr-2"></i>Access Dashboard
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center space-y-2">
+                    <button onclick="showSection('hero-section')" class="text-slate-400 hover:text-white transition block w-full">
+                        <i class="fas fa-arrow-left mr-1"></i> Back to Home
+                    </button>
+                    <button onclick="showSection('admin-setup-section')" class="text-indigo-400 hover:text-indigo-300 transition text-sm">
+                        Register as New Admin (if slots available)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Dashboard Section -->
+        <section id="admin-dashboard-section" class="hidden-section">
+            <!-- Admin Header -->
+            <div class="bg-slate-900 rounded-2xl p-6 mb-8 border border-slate-700">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-shield-alt text-indigo-400"></i>
+                            Admin Dashboard
+                        </h2>
+                        <p class="text-slate-400 mt-1">Manage elections, positions, and candidates</p>
+                    </div>
+                    <div class="flex items-center gap-4 flex-wrap">
+                        <div class="flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-lg border border-slate-700">
+                            <div class="w-2 h-2 bg-green-500 rounded-full live-indicator"></div>
+                            <span class="text-sm text-slate-300">System Active</span>
+                        </div>
+                        <button onclick="showSection('admin-manage-section')" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm">
+                            <i class="fas fa-users-cog mr-2"></i>Manage Admins
+                        </button>
+                        <button onclick="exportResults()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition text-sm">
+                            <i class="fas fa-download mr-2"></i>Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-vote-yea text-indigo-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-bold text-slate-800" id="admin-total-votes">0</div>
+                    <div class="text-sm text-slate-500">Total Votes</div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-bold text-slate-800" id="admin-total-voters">0</div>
+                    <div class="text-sm text-slate-500">Registered Voters</div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-percentage text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-bold text-slate-800" id="admin-turnout">0%</div>
+                    <div class="text-sm text-slate-500">Voter Turnout</div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg border border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-clock text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-bold text-slate-800" id="last-vote-time">--:--</div>
+                    <div class="text-sm text-slate-500">Last Vote Cast</div>
+                </div>
+            </div>
+
+            <!-- Election Setup Section -->
+            <div class="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden mb-8">
+                <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-indigo-50 to-white flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-cog text-indigo-600"></i>
+                        Election Setup
+                    </h3>
+                    <span class="text-sm text-slate-500" id="positions-count">0 positions configured</span>
+                </div>
+                
+                <div class="p-6">
+                    <!-- Add Position Form -->
+                    <div class="bg-slate-50 rounded-xl p-6 mb-6 border border-slate-200">
+                        <h4 class="font-bold text-slate-800 mb-4">Add New Position</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <input type="text" id="new-position-title" placeholder="Position Title (e.g., President)" 
+                                class="px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <input type="text" id="new-position-desc" placeholder="Description (optional)" 
+                                class="px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <button onclick="addPosition()" class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">
+                            <i class="fas fa-plus mr-2"></i>Add Position
+                        </button>
+                    </div>
+
+                    <!-- Positions List -->
+                    <div id="admin-positions-list" class="space-y-6">
+                        <!-- Generated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Results Table -->
+            <div class="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden mb-8">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-slate-800">Detailed Vote Log</h3>
+                    <div class="flex gap-2">
+                        <button onclick="refreshAdminData()" class="p-2 text-slate-400 hover:text-indigo-600 transition">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Position</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Candidate</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Votes</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-results-table" class="divide-y divide-slate-100">
+                            <!-- Generated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Activity Log -->
+            <div class="bg-white rounded-xl shadow-lg border border-slate-100 p-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Recent Voting Activity</h3>
+                <div id="activity-log" class="space-y-3 max-h-64 overflow-y-auto">
+                    <!-- Generated dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Management Section -->
+        <section id="admin-manage-section" class="hidden-section">
+            <div class="bg-white rounded-2xl shadow-xl p-8 border border-slate-100 max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-users-cog text-indigo-600"></i>
+                            Admin Management
+                        </h2>
+                        <p class="text-slate-500 mt-1">Manage administrator accounts (Max 4)</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-slate-500">Current Admins</div>
+                        <div class="text-2xl font-bold text-indigo-600"><span id="current-admin-count">0</span>/4</div>
+                    </div>
+                </div>
+
+                <!-- Current Admins List -->
+                <div id="admin-list" class="space-y-4 mb-8">
+                    <!-- Generated dynamically -->
+                </div>
+
+                <!-- Warning Message -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 mt-1"></i>
+                        <div>
+                            <h4 class="font-semibold text-yellow-800">Important Notice</h4>
+                            <p class="text-sm text-yellow-700 mt-1">
+                                Only 4 admins are allowed at any time. To add a new admin, you must first remove an existing admin. 
+                                Admin removal is permanent and cannot be undone.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="showSection('admin-dashboard-section')" class="px-6 py-3 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Public Dashboard Section -->
+        <section id="public-dashboard-section" class="hidden-section">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-100 rounded-full mb-4">
+                    <div class="w-2 h-2 bg-green-500 rounded-full live-indicator"></div>
+                    <span class="text-sm font-semibold text-green-700">Live Results</span>
+                </div>
+                <h2 class="text-4xl font-bold text-slate-800 mb-2">Election Results</h2>
+                <p class="text-slate-600">Real-time updates as votes come in</p>
+            </div>
+
+            <!-- Public Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 max-w-4xl mx-auto">
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center">
+                    <div class="text-4xl font-bold text-indigo-600 mb-1" id="public-total-votes">0</div>
+                    <div class="text-slate-500">Total Votes Cast</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center">
+                    <div class="text-4xl font-bold text-purple-600 mb-1" id="public-positions">0</div>
+                    <div class="text-slate-500">Positions</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center">
+                    <div class="text-4xl font-bold text-blue-600 mb-1" id="public-candidates">0</div>
+                    <div class="text-slate-500">Candidates</div>
+                </div>
+            </div>
+
+            <!-- Results by Position -->
+            <div id="public-results-container" class="space-y-8">
+                <!-- Generated dynamically -->
+            </div>
+
+            <!-- Auto-refresh indicator -->
+            <div class="mt-8 text-center">
+                <div class="inline-flex items-center gap-2 text-sm text-slate-400">
+                    <i class="fas fa-sync-alt fa-spin"></i>
+                    <span>Auto-refreshing every 5 seconds</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-info-circle text-indigo-400"></i>
+            <span id="toast-message">Notification</span>
+        </div>
+    </div>
+
+    <script>
+        // Application State
+        const state = {
+            currentUser: null,
+            currentAdmin: null,
+            isAdmin: false,
+            hasVoted: false,
+            selectedVotes: {},
+            positions: [], // Now dynamic - loaded from storage
+            votes: {},
+            voteLog: [],
+            totalRegisteredVoters: 0,
+            admins: [], // Array of admin objects {id, name, password}
+            voters: {} // Object of voter objects {id: {password, name, voted}}
+        };
+
+        // Initialize from localStorage if available
+        function initFromStorage() {
+            const savedAdmins = localStorage.getItem('electvote_admins');
+            const savedPositions = localStorage.getItem('electvote_positions');
+            const savedVoters = localStorage.getItem('electvote_voters');
+            const savedVotes = localStorage.getItem('electvote_votes');
+            const savedVoteLog = localStorage.getItem('electvote_votelog');
+
+            if (savedAdmins) state.admins = JSON.parse(savedAdmins);
+            if (savedPositions) state.positions = JSON.parse(savedPositions);
+            if (savedVoters) {
+                state.voters = JSON.parse(savedVoters);
+                state.totalRegisteredVoters = Object.keys(state.voters).length;
+            }
+            if (savedVotes) state.votes = JSON.parse(savedVotes);
+            if (savedVoteLog) state.voteLog = JSON.parse(savedVoteLog).map(log => ({
+                ...log,
+                timestamp: new Date(log.timestamp)
+            }));
+
+            // Initialize votes structure for any positions without votes
+            state.positions.forEach(pos => {
+                if (!state.votes[pos.id]) {
+                    state.votes[pos.id] = {};
+                    pos.candidates.forEach(cand => {
+                        if (state.votes[pos.id][cand.id] === undefined) {
+                            state.votes[pos.id][cand.id] = 0;
+                        }
+                    });
+                }
+            });
+        }
+
+        // Save to localStorage
+        function saveToStorage() {
+            localStorage.setItem('electvote_admins', JSON.stringify(state.admins));
+            localStorage.setItem('electvote_positions', JSON.stringify(state.positions));
+            localStorage.setItem('electvote_voters', JSON.stringify(state.voters));
+            localStorage.setItem('electvote_votes', JSON.stringify(state.votes));
+            localStorage.setItem('electvote_votelog', JSON.stringify(state.voteLog.map(log => ({
+                ...log,
+                timestamp: log.timestamp.toISOString()
+            }))));
+        }
+
+        // Navigation Functions
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('hidden-section');
+                section.classList.remove('fade-in');
+            });
+
+            // Show target section
+            const target = document.getElementById(sectionId);
+            target.classList.remove('hidden-section');
+            target.classList.add('fade-in');
+
+            // Update navigation visibility
+            updateNavVisibility();
+
+            // Special handling for specific sections
+            if (sectionId === 'voting-section') {
+                renderVotingInterface();
+            } else if (sectionId === 'admin-dashboard-section') {
+                updateAdminDashboard();
+            } else if (sectionId === 'public-dashboard-section') {
+                updatePublicDashboard();
+            } else if (sectionId === 'hero-section') {
+                updateHeroStats();
+            } else if (sectionId === 'admin-setup-section') {
+                updateAdminSlots();
+            } else if (sectionId === 'admin-manage-section') {
+                renderAdminList();
+            }
+        }
+
+        function updateNavVisibility() {
+            const userInfo = document.getElementById('user-info');
+            const navAuth = document.getElementById('nav-auth');
+
+            if (state.currentUser) {
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+                navAuth.classList.add('hidden');
+                document.getElementById('username-display').textContent = state.currentUser.name;
+            } else if (state.isAdmin) {
+                userInfo.classList.remove('hidden');
+                userInfo.classList.add('flex');
+                navAuth.classList.add('hidden');
+                document.getElementById('username-display').textContent = state.currentAdmin.name;
+            } else {
+                userInfo.classList.add('hidden');
+                userInfo.classList.remove('flex');
+                navAuth.classList.remove('hidden');
+            }
+        }
+
+        // Admin Access Handler
+        function handleAdminAccess() {
+            if (state.admins.length === 0) {
+                // No admins registered yet - redirect to setup
+                showSection('admin-setup-section');
+            } else {
+                showSection('admin-login-section');
+            }
+        }
+
+        // Admin Registration
+        function updateAdminSlots() {
+            const slots = 4 - state.admins.length;
+            document.getElementById('admin-slots').textContent = slots;
+            
+            const form = document.getElementById('admin-setup-form');
+            if (slots <= 0) {
+                form.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-lock text-slate-600 text-4xl mb-4"></i>
+                        <p class="text-slate-400">Admin slots are full (4/4).<br>Contact existing admins to make space.</p>
+                        <button onclick="showSection('admin-login-section')" class="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                            Go to Login
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function handleAdminRegistration(e) {
+            e.preventDefault();
+            
+            if (state.admins.length >= 4) {
+                showToast('Admin limit reached (4 maximum)', 'error');
+                return;
+            }
+
+            const id = document.getElementById('new-admin-id').value.trim();
+            const name = document.getElementById('new-admin-name').value.trim();
+            const password = document.getElementById('new-admin-password').value;
+            const confirm = document.getElementById('new-admin-confirm').value;
+
+            // Validation
+            if (state.admins.find(a => a.id === id)) {
+                showToast('Admin ID already exists', 'error');
+                return;
+            }
+
+            if (password !== confirm) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            // Add admin
+            state.admins.push({ id, name, password });
+            saveToStorage();
+
+            showToast(`Admin ${name} registered successfully!`);
+            showSection('admin-login-section');
+        }
+
+        // Admin Login
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const id = document.getElementById('admin-id').value;
+            const password = document.getElementById('admin-password').value;
+
+            const admin = state.admins.find(a => a.id === id && a.password === password);
+
+            if (admin) {
+                state.isAdmin = true;
+                state.currentAdmin = admin;
+                state.currentUser = null;
+                showToast(`Welcome, ${admin.name}!`);
+                showSection('admin-dashboard-section');
+            } else {
+                showToast('Invalid admin credentials', 'error');
+            }
+        }
+
+        // Admin Management
+        function renderAdminList() {
+            const container = document.getElementById('admin-list');
+            const countEl = document.getElementById('current-admin-count');
+            
+            countEl.textContent = state.admins.length;
+            container.innerHTML = '';
+
+            state.admins.forEach((admin, index) => {
+                const div = document.createElement('div');
+                div.className = 'admin-card flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200';
+                
+                const isCurrentAdmin = state.currentAdmin && state.currentAdmin.id === admin.id;
+                const canDelete = state.admins.length > 1; // Prevent deleting last admin
+
+                div.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-shield text-indigo-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-800">${admin.name}</h4>
+                            <p class="text-sm text-slate-500">ID: ${admin.id}</p>
+                            ${isCurrentAdmin ? '<span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full mt-1 inline-block">You</span>' : ''}
+                        </div>
+                    </div>
+                    ${canDelete && !isCurrentAdmin ? `
+                        <button onclick="removeAdmin('${admin.id}')" 
+                            class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition text-sm font-semibold">
+                            <i class="fas fa-trash-alt mr-2"></i>Remove
+                        </button>
+                    ` : canDelete && isCurrentAdmin ? `
+                        <span class="text-sm text-slate-400 italic">Cannot remove yourself</span>
+                    ` : `
+                        <span class="text-sm text-slate-400 italic">Last admin - cannot remove</span>
+                    `}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function removeAdmin(adminId) {
+            if (!confirm('Are you sure you want to remove this admin? This action cannot be undone.')) return;
+
+            const adminToRemove = state.admins.find(a => a.id === adminId);
+            if (!adminToRemove) return;
+
+            state.admins = state.admins.filter(a => a.id !== adminId);
+            saveToStorage();
+
+            showToast(`Admin ${adminToRemove.name} removed successfully`);
+            renderAdminList();
+        }
+
+        // Election Setup Functions
+        function addPosition() {
+            const title = document.getElementById('new-position-title').value.trim();
+            const desc = document.getElementById('new-position-desc').value.trim();
+
+            if (!title) {
+                showToast('Please enter a position title', 'error');
+                return;
+            }
+
+            const position = {
+                id: 'pos_' + Date.now(),
+                title: title,
+                description: desc || 'No description provided',
+                candidates: []
+            };
+
+            state.positions.push(position);
+            state.votes[position.id] = {};
+            
+            saveToStorage();
+            
+            document.getElementById('new-position-title').value = '';
+            document.getElementById('new-position-desc').value = '';
+            
+            showToast(`Position "${title}" added`);
+            renderAdminPositions();
+        }
+
+        function removePosition(posId) {
+            if (!confirm('Delete this position and all its candidates?')) return;
+
+            state.positions = state.positions.filter(p => p.id !== posId);
+            delete state.votes[posId];
+            
+            saveToStorage();
+            renderAdminPositions();
+            showToast('Position removed');
+        }
+
+        function addCandidate(posId) {
+            const input = document.getElementById(`candidate-name-${posId}`);
+            const partyInput = document.getElementById(`candidate-party-${posId}`);
+            const name = input.value.trim();
+            const party = partyInput.value.trim();
+
+            if (!name) {
+                showToast('Please enter candidate name', 'error');
+                return;
+            }
+
+            const position = state.positions.find(p => p.id === posId);
+            const candidate = {
+                id: 'cand_' + Date.now(),
+                name: name,
+                party: party || 'Independent',
+                color: ['indigo', 'purple', 'pink', 'blue', 'green', 'yellow'][position.candidates.length % 6]
+            };
+
+            position.candidates.push(candidate);
+            state.votes[posId][candidate.id] = 0;
+            
+            saveToStorage();
+            
+            input.value = '';
+            partyInput.value = '';
+            
+            showToast(`Candidate "${name}" added`);
+            renderAdminPositions();
+        }
+
+        function removeCandidate(posId, candId) {
+            const position = state.positions.find(p => p.id === posId);
+            position.candidates = position.candidates.filter(c => c.id !== candId);
+            delete state.votes[posId][candId];
+            
+            saveToStorage();
+            renderAdminPositions();
+            showToast('Candidate removed');
+        }
+
+        function renderAdminPositions() {
+            const container = document.getElementById('admin-positions-list');
+            const countEl = document.getElementById('positions-count');
+            
+            countEl.textContent = `${state.positions.length} position${state.positions.length !== 1 ? 's' : ''}`;
+            
+            if (state.positions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400">
+                        <i class="fas fa-inbox text-4xl mb-2"></i>
+                        <p>No positions configured yet. Add your first position above.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            state.positions.forEach((pos, index) => {
+                const div = document.createElement('div');
+                div.className = 'border border-slate-200 rounded-xl p-4 bg-white';
+                
+                let candidatesHtml = '';
+                if (pos.candidates.length === 0) {
+                    candidatesHtml = '<p class="text-sm text-slate-400 italic">No candidates added yet</p>';
+                } else {
+                    candidatesHtml = '<div class="space-y-2">';
+                    pos.candidates.forEach(cand => {
+                        candidatesHtml += `
+                            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-lg">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-${cand.color}-100 flex items-center justify-center text-xs font-bold text-${cand.color}-600">
+                                        ${cand.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-slate-800">${cand.name}</span>
+                                        <span class="text-xs text-slate-500 ml-2">${cand.party}</span>
+                                    </div>
+                                </div>
+                                <button onclick="removeCandidate('${pos.id}', '${cand.id}')" class="text-red-500 hover:text-red-700 text-sm">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        `;
+                    });
+                    candidatesHtml += '</div>';
+                }
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 class="font-bold text-lg text-slate-800">${pos.title}</h4>
+                            <p class="text-sm text-slate-500">${pos.description}</p>
+                        </div>
+                        <button onclick="removePosition('${pos.id}')" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="bg-slate-50 rounded-lg p-3 mb-3">
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" id="candidate-name-${pos.id}" placeholder="Candidate Name" 
+                                class="flex-1 px-3 py-2 border border-slate-300 rounded text-sm">
+                            <input type="text" id="candidate-party-${pos.id}" placeholder="Party (optional)" 
+                                class="flex-1 px-3 py-2 border border-slate-300 rounded text-sm">
+                        </div>
+                        <button onclick="addCandidate('${pos.id}')" class="w-full py-2 bg-indigo-100 text-indigo-700 rounded text-sm font-semibold hover:bg-indigo-200 transition">
+                            <i class="fas fa-plus mr-1"></i>Add Candidate
+                        </button>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Candidates (${pos.candidates.length})</p>
+                        ${candidatesHtml}
+                    </div>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+
+        // Authentication Functions
+        function handleLogin(e) {
+            e.preventDefault();
+            const id = document.getElementById('member-id').value.trim();
+            const password = document.getElementById('member-password').value;
+
+            if (state.voters[id] && state.voters[id].password === password) {
+                if (state.voters[id].voted) {
+                    showToast('You have already cast your vote!', 'error');
+                    return;
+                }
+
+                state.currentUser = { id, name: state.voters[id].name };
+                state.hasVoted = state.voters[id].voted;
+                showToast(`Welcome, ${state.voters[id].name}!`);
+                showSection('voting-section');
+            } else {
+                showToast('Invalid credentials. Please try again.', 'error');
+            }
+        }
+
+        function logout() {
+            state.currentUser = null;
+            state.currentAdmin = null;
+            state.isAdmin = false;
+            state.hasVoted = false;
+            state.selectedVotes = {};
+            document.getElementById('login-form').reset();
+            document.getElementById('admin-login-form').reset();
+            showToast('Logged out successfully');
+            showSection('hero-section');
+        }
+
+        // Voting Interface
+        function renderVotingInterface() {
+            const container = document.getElementById('positions-container');
+            container.innerHTML = '';
+
+            if (state.positions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-clipboard-list text-slate-300 text-5xl mb-4"></i>
+                        <p class="text-slate-500">No active elections at this time.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            state.positions.forEach((position, index) => {
+                if (position.candidates.length === 0) return; // Skip positions with no candidates
+
+                const positionDiv = document.createElement('div');
+                positionDiv.className = 'bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden animate-slide-in';
+                positionDiv.style.animationDelay = `${index * 0.1}s`;
+
+                let candidatesHtml = '';
+                position.candidates.forEach(candidate => {
+                    const isSelected = state.selectedVotes[position.id] === candidate.id;
+                    candidatesHtml += `
+                        <div class="candidate-card rounded-xl border-2 ${isSelected ? 'border-indigo-600 bg-indigo-50' : 'border-slate-200'} p-4 flex items-center gap-4"
+                             onclick="selectCandidate('${position.id}', '${candidate.id}')">
+                            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-${candidate.color}-400 to-${candidate.color}-600 flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
+                                ${candidate.name.split(' ').map(n => n[0]).join('')}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-slate-800">${candidate.name}</h4>
+                                <p class="text-sm text-slate-500">${candidate.party}</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full border-2 ${isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-slate-300'} flex items-center justify-center">
+                                ${isSelected ? '<i class="fas fa-check text-white text-sm"></i>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                positionDiv.innerHTML = `
+                    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+                        <h3 class="text-xl font-bold text-slate-800">${position.title}</h3>
+                        <p class="text-sm text-slate-500">${position.description}</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${candidatesHtml}
+                    </div>
+                `;
+
+                container.appendChild(positionDiv);
+            });
+        }
+
+        function selectCandidate(positionId, candidateId) {
+            state.selectedVotes[positionId] = candidateId;
+            renderVotingInterface();
+            const position = state.positions.find(p => p.id === positionId);
+            showToast(`Selected ${position.candidates.find(c => c.id === candidateId).name} for ${position.title}`);
+        }
+
+        function submitVotes() {
+            // Check if all positions have been voted for
+            const availablePositions = state.positions.filter(p => p.candidates.length > 0);
+            const missingPositions = availablePositions.filter(p => !state.selectedVotes[p.id]);
+
+            if (missingPositions.length > 0) {
+                showToast(`Please select candidates for: ${missingPositions.map(p => p.title).join(', ')}`, 'error');
+                return;
+            }
+
+            // Record votes
+            Object.entries(state.selectedVotes).forEach(([positionId, candidateId]) => {
+                if (state.votes[positionId] && state.votes[positionId][candidateId] !== undefined) {
+                    state.votes[positionId][candidateId]++;
+                }
+            });
+
+            // Log the vote
+            const receiptId = 'RCP-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            state.voteLog.unshift({
+                timestamp: new Date(),
+                voter: state.currentUser.id,
+                receipt: receiptId,
+                votes: {...state.selectedVotes}
+            });
+
+            // Mark user as voted
+            state.voters[state.currentUser.id].voted = true;
+            saveToStorage();
+            state.hasVoted = true;
+
+            // Show success modal
+            document.getElementById('vote-receipt-id').textContent = '#' + receiptId;
+            document.getElementById('vote-success-modal').classList.remove('hidden');
+
+            // Broadcast update to all dashboards
+            broadcastUpdate();
+        }
+
+        // Admin Dashboard
+        function updateAdminDashboard() {
+            renderAdminPositions();
+            
+            // Calculate totals
+            let totalVotes = 0;
+            let totalCandidates = 0;
+            state.positions.forEach(pos => {
+                Object.values(state.votes[pos.id] || {}).forEach(count => {
+                    totalVotes += count;
+                });
+                totalCandidates += pos.candidates.length;
+            });
+
+            // Update stats
+            document.getElementById('admin-total-votes').textContent = totalVotes;
+            document.getElementById('admin-total-voters').textContent = state.totalRegisteredVoters;
+            document.getElementById('admin-turnout').textContent = 
+                state.totalRegisteredVoters > 0 ? Math.round((totalVotes / state.totalRegisteredVoters) * 100) + '%' : '0%';
+
+            if (state.voteLog.length > 0) {
+                const lastVote = state.voteLog[0].timestamp;
+                document.getElementById('last-vote-time').textContent = 
+                    lastVote.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+
+            // Update results table
+            const tbody = document.getElementById('admin-results-table');
+            tbody.innerHTML = '';
+
+            state.positions.forEach(pos => {
+                const positionTotal = Object.values(state.votes[pos.id] || {}).reduce((a, b) => a + b, 0);
+
+                pos.candidates.forEach((cand, idx) => {
+                    const votes = state.votes[pos.id]?.[cand.id] || 0;
+                    const percentage = positionTotal > 0 ? ((votes / positionTotal) * 100).toFixed(1) : 0;
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-slate-50 transition';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                            ${idx === 0 ? pos.title : ''}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-full bg-${cand.color}-100 flex items-center justify-center text-xs font-bold text-${cand.color}-600">
+                                    ${cand.name.charAt(0)}
+                                </div>
+                                ${cand.name}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center font-semibold text-slate-900">
+                            ${votes}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-${cand.color}-500 rounded-full" style="width: ${percentage}%"></div>
+                                </div>
+                                <span class="text-xs font-medium w-10">${percentage}%</span>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+
+            // Update activity log
+            const activityContainer = document.getElementById('activity-log');
+            activityContainer.innerHTML = '';
+
+            if (state.voteLog.length === 0) {
+                activityContainer.innerHTML = '<p class="text-slate-400 text-center py-4">No voting activity yet</p>';
+            } else {
+                state.voteLog.slice(0, 10).forEach((log) => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100';
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-vote-yea text-indigo-600 text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-slate-800">Vote cast by Member ${log.voter}</p>
+                                <p class="text-xs text-slate-500">${log.timestamp.toLocaleTimeString()}</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-mono text-slate-400">${log.receipt}</span>
+                    `;
+                    activityContainer.appendChild(div);
+                });
+            }
+        }
+
+        function refreshAdminData() {
+            updateAdminDashboard();
+            showToast('Dashboard refreshed');
+        }
+
+        function exportResults() {
+            let csv = 'Position,Candidate,Party,Votes,Percentage\n';
+
+            state.positions.forEach(pos => {
+                const positionTotal = Object.values(state.votes[pos.id] || {}).reduce((a, b) => a + b, 0);
+                pos.candidates.forEach(cand => {
+                    const votes = state.votes[pos.id]?.[cand.id] || 0;
+                    const percentage = positionTotal > 0 ? ((votes / positionTotal) * 100).toFixed(1) : 0;
+                    csv += `"${pos.title}","${cand.name}","${cand.party}",${votes},${percentage}%\n`;
+                });
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `election-results-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            showToast('Results exported successfully');
+        }
+
+        // Public Dashboard
+        function updatePublicDashboard() {
+            let totalVotes = 0;
+            let totalCandidates = 0;
+
+            state.positions.forEach(pos => {
+                Object.values(state.votes[pos.id] || {}).forEach(count => totalVotes += count);
+                totalCandidates += pos.candidates.length;
+            });
+
+            document.getElementById('public-total-votes').textContent = totalVotes;
+            document.getElementById('public-positions').textContent = state.positions.length;
+            document.getElementById('public-candidates').textContent = totalCandidates;
+
+            const container = document.getElementById('public-results-container');
+            container.innerHTML = '';
+
+            if (state.positions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-white rounded-2xl shadow-lg">
+                        <i class="fas fa-clipboard-list text-slate-300 text-5xl mb-4"></i>
+                        <p class="text-slate-500">No active elections at this time.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            state.positions.forEach((position) => {
+                if (position.candidates.length === 0) return;
+
+                const positionTotal = Object.values(state.votes[position.id] || {}).reduce((a, b) => a + b, 0);
+                const sortedCandidates = [...position.candidates].sort((a, b) => 
+                    (state.votes[position.id]?.[b.id] || 0) - (state.votes[position.id]?.[a.id] || 0)
+                );
+
+                let candidatesHtml = '';
+                sortedCandidates.forEach((cand, cIdx) => {
+                    const votes = state.votes[position.id]?.[cand.id] || 0;
+                    const percentage = positionTotal > 0 ? ((votes / positionTotal) * 100).toFixed(1) : 0;
+                    const isLeader = cIdx === 0 && votes > 0;
+
+                    candidatesHtml += `
+                        <div class="relative">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-${cand.color}-400 to-${cand.color}-600 flex items-center justify-center text-white font-bold">
+                                        ${cand.name.split(' ').map(n => n[0]).join('')}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 ${isLeader ? 'text-lg' : ''}">
+                                            ${cand.name}
+                                            ${isLeader ? '<i class="fas fa-crown text-yellow-500 ml-2"></i>' : ''}
+                                        </h4>
+                                        <p class="text-xs text-slate-500">${cand.party}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-slate-800 ${isLeader ? 'text-indigo-600' : ''}">${votes}</div>
+                                    <div class="text-sm text-slate-500">votes</div>
+                                </div>
+                            </div>
+                            <div class="h-4 bg-slate-100 rounded-full overflow-hidden relative">
+                                <div class="progress-bar h-full bg-gradient-to-r from-${cand.color}-500 to-${cand.color}-600 rounded-full relative" 
+                                     style="width: ${percentage}%">
+                                    ${percentage > 20 ? `<span class="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">${percentage}%</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const div = document.createElement('div');
+                div.className = 'bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden';
+                div.innerHTML = `
+                    <div class="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white flex justify-between items-center">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">${position.title}</h3>
+                            <p class="text-sm text-slate-500">${positionTotal} votes cast</p>
+                        </div>
+                        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-chart-bar text-indigo-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        ${candidatesHtml}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Hero Stats
+        function updateHeroStats() {
+            let total = 0;
+            state.positions.forEach(pos => {
+                Object.values(state.votes[pos.id] || {}).forEach(count => total += count);
+            });
+            document.getElementById('total-votes-hero').textContent = total;
+            document.getElementById('active-positions-hero').textContent = state.positions.length;
+        }
+
+        // Utility Functions
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            toastMessage.textContent = message;
+
+            const icon = toast.querySelector('i');
+            if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle text-red-400';
+            } else if (type === 'success') {
+                icon.className = 'fas fa-check-circle text-green-400';
+            } else {
+                icon.className = 'fas fa-info-circle text-indigo-400';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function broadcastUpdate() {
+            if (!document.getElementById('public-dashboard-section').classList.contains('hidden-section')) {
+                updatePublicDashboard();
+            }
+            if (!document.getElementById('admin-dashboard-section').classList.contains('hidden-section')) {
+                updateAdminDashboard();
+            }
+            updateHeroStats();
+        }
+
+        // Initialize Demo Data (only if empty)
+        function initDemoData() {
+            // Add demo voters if none exist
+            if (Object.keys(state.voters).length === 0) {
+                state.voters = {
+                    'VOTER001': { password: 'vote2024', name: 'John Smith', voted: false },
+                    'VOTER002': { password: 'vote2024', name: 'Sarah Johnson', voted: false },
+                    'VOTER003': { password: 'vote2024', name: 'Michael Brown', voted: false },
+                    'VOTER004': { password: 'vote2024', name: 'Emily Davis', voted: false },
+                    'VOTER005': { password: 'vote2024', name: 'Robert Wilson', voted: false }
+                };
+                state.totalRegisteredVoters = 5;
+            }
+
+            // Add demo positions if none exist
+            if (state.positions.length === 0) {
+                state.positions = [
+                    {
+                        id: 'pos_1',
+                        title: 'President',
+                        description: 'Head of the Organization',
+                        candidates: [
+                            { id: 'c1', name: 'Alice Johnson', party: 'Progressive Party', color: 'indigo' },
+                            { id: 'c2', name: 'Bob Williams', party: 'Unity Coalition', color: 'purple' },
+                            { id: 'c3', name: 'Carol Martinez', party: 'Future Forward', color: 'pink' }
+                        ]
+                    },
+                    {
+                        id: 'pos_2',
+                        title: 'Vice President',
+                        description: 'Deputy Head of the Organization',
+                        candidates: [
+                            { id: 'c4', name: 'David Lee', party: 'Progressive Party', color: 'indigo' },
+                            { id: 'c5', name: 'Emma Thompson', party: 'Unity Coalition', color: 'purple' }
+                        ]
+                    }
+                ];
+
+                // Initialize votes structure
+                state.positions.forEach(pos => {
+                    state.votes[pos.id] = {};
+                    pos.candidates.forEach(cand => {
+                        state.votes[pos.id][cand.id] = Math.floor(Math.random() * 15);
+                    });
+                });
+            }
+
+            saveToStorage();
+        }
+
+        // Simulate real-time updates
+        setInterval(() => {
+            if (Math.random() > 0.8 && state.positions.length > 0) {
+                const randomPos = state.positions[Math.floor(Math.random() * state.positions.length)];
+                if (randomPos.candidates.length > 0) {
+                    const randomCand = randomPos.candidates[Math.floor(Math.random() * randomPos.candidates.length)];
+                    if (!state.votes[randomPos.id]) state.votes[randomPos.id] = {};
+                    if (state.votes[randomPos.id][randomCand.id] === undefined) {
+                        state.votes[randomPos.id][randomCand.id] = 0;
+                    }
+                    state.votes[randomPos.id][randomCand.id]++;
+
+                    state.voteLog.unshift({
+                        timestamp: new Date(),
+                        voter: 'SIM' + Math.floor(Math.random() * 1000),
+                        receipt: 'RCP-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+                        votes: { [randomPos.id]: randomCand.id }
+                    });
+
+                    if (state.voteLog.length > 50) state.voteLog.pop();
+                    
+                    saveToStorage();
+                    broadcastUpdate();
+                }
+            }
+        }, 8000);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initFromStorage();
+            initDemoData();
+            updateHeroStats();
+        });
+    </script>
+</body>
+</html>

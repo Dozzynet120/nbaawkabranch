@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership | Join NBA Awka Branch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nba: {
+                            gold: '#D4AF37',
+                            darkgold: '#B8960C',
+                            navy: '#1B365D',
+                            darknavy: '#0F1F33',
+                            cream: '#F5F5DC',
+                            lightgray: '#F8F9FA'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .fade-in { animation: fadeIn 0.6s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .float { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .gradient-text { background: linear-gradient(135deg, #D4AF37 0%, #1B365D 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .pulse-gold { animation: pulseGold 2s infinite; }
+        @keyframes pulseGold { 0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); } 50% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); } }
+    </style>
+</head>
+<body class="bg-white font-sans">
+
+    <!-- Navigation -->
+    <nav class="bg-nba-navy text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <a href="index.html" class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden">
+                        <img src="img/logo1.png" alt="NBA Awka Logo" class="w-30 h-30 object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-balance-scale text-nba-navy text-xl\'></i>'">
+                    </div>
+                    <div>
+                        <h1 class="font-serif font-bold text-xl leading-tight">NBA AWKA</h1>
+                        <p class="text-xs text-gray-300">Nigerian Bar Association</p>
+                    </div>
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="hover:text-nba-gold transition">Home</a>
+                    <a href="about.html" class="hover:text-nba-gold transition">About</a>
+                    <a href="join.html" class="text-nba-gold font-medium">Join NBA</a>
+                    <a href="blog.html" class="hover:text-nba-gold transition">Blog</a>
+                    <a href="membershiplogin.html" class="px-4 py-2 bg-nba-gold text-nba-navy rounded hover:bg-yellow-500 transition">Member Login</a>
+                </div>
+                <button class="md:hidden text-2xl" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative bg-nba-navy overflow-hidden">
+        <div class="absolute inset-0">
+            <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1920&q=80" alt="Law Library" class="w-full h-full object-cover opacity-20">
+            <div class="absolute inset-0 bg-gradient-to-br from-nba-navy via-nba-navy/95 to-nba-darknavy"></div>
+        </div>
+        <div class="container mx-auto px-4 py-24 relative z-10">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="inline-block mb-6 float">
+                    <div class="w-20 h-20 bg-nba-gold/20 rounded-full flex items-center justify-center border-2 border-nba-gold/40">
+                        <i class="fas fa-user-tie text-nba-gold text-3xl"></i>
+                    </div>
+                </div>
+                <h1 class="font-serif text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+                    Elevate Your Legal <span class="text-nba-gold">Career</span>
+                </h1>
+                <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+                    Join the most prestigious network of legal professionals in Anambra State. 
+                    Together, we shape the future of law, justice, and professional excellence.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#join" class="px-8 py-4 bg-nba-gold text-nba-navy font-bold rounded-lg hover:bg-yellow-500 transition pulse-gold flex items-center">
+                        <i class="fas fa-user-plus mr-2"></i>Apply for Membership
+                    </a>
+                    <a href="#benefits" class="px-8 py-4 border-2 border-nba-gold text-nba-gold font-bold rounded-lg hover:bg-nba-gold hover:text-nba-navy transition">
+                        Explore Benefits
+                    </a>
+                </div>
+                <div class="mt-12 flex flex-wrap justify-center gap-8 text-center">
+                    <div>
+                        <div class="text-3xl font-bold text-nba-gold">500+</div>
+                        <div class="text-gray-400 text-sm">Active Members</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-nba-gold">40</div>
+                        <div class="text-gray-400 text-sm">Years of Excellence</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-nba-gold">25+</div>
+                        <div class="text-gray-400 text-sm">Annual Events</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold text-nba-gold">100%</div>
+                        <div class="text-gray-400 text-sm">Professional Growth</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
+    </section>
+
+    <!-- Why Join Section -->
+    <section id="why-join" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-nba-gold font-semibold tracking-wider uppercase text-sm">Why Choose Us</span>
+                <h2 class="font-serif text-4xl font-bold text-nba-navy mt-3 mb-4">Why Join NBA Awka Branch?</h2>
+                <p class="text-gray-600 text-lg">Becoming a member of our distinguished branch opens doors to unparalleled opportunities for professional growth, networking, and making a meaningful impact in the legal landscape of Anambra State and beyond.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="card-hover bg-nba-lightgray rounded-2xl p-8 border border-gray-100">
+                    <div class="w-14 h-14 bg-nba-navy rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-graduation-cap text-nba-gold text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-nba-navy mb-3">Continuous Legal Education</h3>
+                    <p class="text-gray-600 leading-relaxed">Access exclusive Continuing Legal Education (CLE) programs, workshops, and seminars led by renowned legal experts. Stay ahead with cutting-edge knowledge in emerging areas of law.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="card-hover bg-nba-lightgray rounded-2xl p-8 border border-gray-100">
+                    <div class="w-14 h-14 bg-nba-navy rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-network-wired text-nba-gold text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-nba-navy mb-3">Elite Networking</h3>
+                    <p class="text-gray-600 leading-relaxed">Connect with Senior Advocates of Nigeria, respected judges, accomplished law firms, and fellow practitioners. Build relationships that advance your career and practice.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="card-hover bg-nba-lightgray rounded-2xl p-8 border border-gray-100">
+                    <div class="w-14 h-14 bg-nba-navy rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-gavel text-nba-gold text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-nba-navy mb-3">Practice Support</h3>
+                    <p class="text-gray-600 leading-relaxed">Receive comprehensive support for your practice including access to law reports, practice directions, precedents, and a dedicated law library at our Bar Centre.</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="card-hover bg-nba-lightgray rounded-2xl p-8 border border-gray-100">
+                    <div class="w-14 h-14 bg-nba-navy rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-shield-alt text-nba-gold text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-nba-navy mb-3">Professional Protection</h3>
+                    <p class="text-gray-600 leading-relaxed">Benefit from our robust welfare schemes, professional indemnity arrangements, and legal defense support for members facing professional challenges.</p>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="card-hover bg-nba-lightgray rounded-2xl p-8 border border-gray-100">
+                    <div class="w-14 h-14 bg-nba-navy rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-bullhorn text-nba-gold text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-nba-navy mb-3">Advocacy & Voice</h3>
+                    <p class="text-gray-600 leading-relaxed">Be part of a collective voice that influences legal policy, court reforms, and legislative changes. We advocate for better working conditions for lawyers nationwide.</p>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="card-hover bg-nba-lightgray rounded-2xl p-8 border border-gray-100">
+                    <div class="w-14 h-14 bg-nba-navy rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-hands-helping text-nba-gold text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-nba-navy mb-3">Community Impact</h3>
+                    <p class="text-gray-600 leading-relaxed">Participate in our pro bono services, legal aid programs, and community outreach initiatives. Make a difference while building your professional reputation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What We Do Section -->
+    <section id="what-we-do" class="py-20 bg-nba-lightgray">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-nba-gold font-semibold tracking-wider uppercase text-sm">Our Functions</span>
+                <h2 class="font-serif text-4xl font-bold text-nba-navy mt-3 mb-4">What NBA Awka Branch Does</h2>
+                <p class="text-gray-600 text-lg">Our branch is dedicated to serving members and the community through various essential functions and programs.</p>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Function 1 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col md:flex-row">
+                    <div class="md:w-1/3 relative">
+                        <img src="img/w15.jpeg" alt="Education" class="w-full h-full object-cover min-h-[250px]">
+                        <div class="absolute inset-0 bg-nba-navy/20"></div>
+                    </div>
+                    <div class="md:w-2/3 p-8 md:p-10 flex flex-col justify-center">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-nba-gold/20 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-chalkboard-teacher text-nba-navy text-xl"></i>
+                            </div>
+                            <h3 class="font-serif text-2xl font-bold text-nba-navy">Professional Development & Education</h3>
+                        </div>
+                        <p class="text-gray-600 leading-relaxed mb-4">We organize regular Continuing Legal Education (CLE) programs, workshops, and training sessions to ensure our members remain at the forefront of legal practice. From emerging technologies in law to advanced litigation techniques, we provide comprehensive learning opportunities that enhance professional competence.</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Monthly CLE workshops with certified certificates</li>
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Annual Law Week with national and international speakers</li>
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Specialized training in arbitration, mediation, and ADR</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Function 2 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col md:flex-row-reverse">
+                    <div class="md:w-1/3 relative">
+                        <img src="img/w16.jpeg" alt="Welfare" class="w-full h-full object-cover min-h-[250px]">
+                        <div class="absolute inset-0 bg-nba-navy/20"></div>
+                    </div>
+                    <div class="md:w-2/3 p-8 md:p-10 flex flex-col justify-center">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-nba-gold/20 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-heart text-nba-navy text-xl"></i>
+                            </div>
+                            <h3 class="font-serif text-2xl font-bold text-nba-navy">Welfare & Member Support</h3>
+                        </div>
+                        <p class="text-gray-600 leading-relaxed mb-4">The welfare of our members is paramount. We maintain comprehensive welfare programs that support members through difficult times, celebrate their successes, and ensure no member faces challenges alone. Our welfare committee is always available to assist with health, financial, and personal matters.</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Medical assistance and health insurance schemes</li>
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Financial support for distressed members</li>
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Celebration of member milestones and achievements</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Function 3 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col md:flex-row">
+                    <div class="md:w-1/3 relative">
+                        <img src="img/w4.jpeg" alt="Advocacy" class="w-full h-full object-cover min-h-[250px]">
+                        <div class="absolute inset-0 bg-nba-navy/20"></div>
+                    </div>
+                    <div class="md:w-2/3 p-8 md:p-10 flex flex-col justify-center">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-nba-gold/20 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-balance-scale text-nba-navy text-xl"></i>
+                            </div>
+                            <h3 class="font-serif text-2xl font-bold text-nba-navy">Legal Advocacy & Reform</h3>
+                        </div>
+                        <p class="text-gray-600 leading-relaxed mb-4">We actively engage in advocacy for legal and judicial reforms, working with the judiciary, legislature, and executive arms of government to improve the administration of justice. Our branch serves as a bridge between the legal profession and the public, promoting access to justice for all.</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Engagement with Anambra State Judiciary on court reforms</li>
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Participation in legislative drafting and review</li>
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Public legal education and awareness campaigns</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Function 4 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col md:flex-row-reverse">
+                    <div class="md:w-1/3 relative">
+                        <img src="img/w5.jpeg" alt="Networking" class="w-full h-full object-cover min-h-[250px]">
+                        <div class="absolute inset-0 bg-nba-navy/20"></div>
+                    </div>
+                    <div class="md:w-2/3 p-8 md:p-10 flex flex-col justify-center">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-nba-gold/20 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-users text-nba-navy text-xl"></i>
+                            </div>
+                            <h3 class="font-serif text-2xl font-bold text-nba-navy">Networking & Social Integration</h3>
+                        </div>
+                        <p class="text-gray-600 leading-relaxed mb-4">We foster a vibrant community where lawyers can build lasting professional and personal relationships. Through our various social events, interest groups, and committees, members find opportunities to collaborate, mentor, and grow together in a supportive environment.</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Monthly Bar meetings and networking dinners</li>
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Young Lawyers Forum for career development</li>
+                            <li class="flex items-center"><i class="fas fa-check text-nba-gold mr-3"></i> Sports and recreational activities for members</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Membership Categories -->
+    <section id="categories" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-nba-gold font-semibold tracking-wider uppercase text-sm">Membership Types</span>
+                <h2 class="font-serif text-4xl font-bold text-nba-navy mt-3 mb-4">Who Can Join Us</h2>
+                <p class="text-gray-600 text-lg">We welcome legal professionals at all stages of their careers. Choose the membership category that best describes your status.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Full Membership -->
+                <div class="bg-nba-navy rounded-2xl p-8 text-white relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-nba-gold/10 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
+                    <div class="relative z-10">
+                        <div class="w-14 h-14 bg-nba-gold rounded-xl flex items-center justify-center mb-6">
+                            <i class="fas fa-user-tie text-nba-navy text-2xl"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold mb-3">Full Membership</h3>
+                        <p class="text-gray-300 text-sm mb-4">For practicing lawyers called to the Nigerian Bar with active practicing certificates.</p>
+                        <ul class="space-y-2 text-sm text-gray-300 mb-6">
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Voting rights</li>
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Committee participation</li>
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Full welfare benefits</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Associate Membership -->
+                <div class="bg-white border-2 border-nba-navy rounded-2xl p-8 relative overflow-hidden group hover:bg-nba-navy hover:text-white transition-colors">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-nba-gold/10 rounded-full -mr-16 -mt-16"></div>
+                    <div class="relative z-10">
+                        <div class="w-14 h-14 bg-nba-gold rounded-xl flex items-center justify-center mb-6 group-hover:bg-white">
+                            <i class="fas fa-briefcase text-nba-navy text-2xl"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold mb-3 text-nba-navy group-hover:text-white">Associate</h3>
+                        <p class="text-gray-600 text-sm mb-4 group-hover:text-gray-300">For corporate counsel, government lawyers, and academics not in private practice.</p>
+                        <ul class="space-y-2 text-sm text-gray-600 mb-6 group-hover:text-gray-300">
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Access to events</li>
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Networking opportunities</li>
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Reduced welfare benefits</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Young Lawyers -->
+                <div class="bg-white border-2 border-gray-200 rounded-2xl p-8 relative overflow-hidden group hover:border-nba-gold transition">
+                    <div class="relative z-10">
+                        <div class="w-14 h-14 bg-nba-gold/20 rounded-xl flex items-center justify-center mb-6">
+                            <i class="fas fa-graduation-cap text-nba-navy text-2xl"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold mb-3 text-nba-navy">Young Lawyers</h3>
+                        <p class="text-gray-600 text-sm mb-4">For lawyers with less than 7 years post-call experience. Special mentoring programs included.</p>
+                        <ul class="space-y-2 text-sm text-gray-600 mb-6">
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Mentorship program</li>
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Career workshops</li>
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Discounted rates</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Senior Members -->
+                <div class="bg-white border-2 border-gray-200 rounded-2xl p-8 relative overflow-hidden group hover:border-nba-navy transition">
+                    <div class="relative z-10">
+                        <div class="w-14 h-14 bg-nba-navy/10 rounded-xl flex items-center justify-center mb-6">
+                            <i class="fas fa-crown text-nba-navy text-2xl"></i>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold mb-3 text-nba-navy">Senior Members</h3>
+                        <p class="text-gray-600 text-sm mb-4">For lawyers with 25+ years experience and SANs. Honorary recognition and privileges.</p>
+                        <ul class="space-y-2 text-sm text-gray-600 mb-6">
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Honorary status</li>
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Advisory roles</li>
+                            <li><i class="fas fa-check text-nba-gold mr-2"></i>Special recognition</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-20 bg-nba-navy">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-nba-gold font-semibold tracking-wider uppercase text-sm">Testimonials</span>
+                <h2 class="font-serif text-4xl font-bold text-white mt-3 mb-4">What Our Members Say</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20">
+                    <div class="flex items-center mb-6">
+                        <img src="img/3.jpeg" alt="Member" class="w-16 h-16 rounded-full object-cover mr-4">
+                        <div>
+                            <p class="text-nba-gold text-sm">Corporate Lawyer, 5 years member</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"Joining NBA Awka was the best career decision I made. The mentorship from senior colleagues and the networking opportunities have transformed my practice beyond measure."</p>
+                    <div class="flex text-nba-gold mt-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20">
+                    <div class="flex items-center mb-6">
+                        <img src="img/2.jpeg" alt="Member" class="w-16 h-16 rounded-full object-cover mr-4">
+                        <div>
+                            <p class="text-nba-gold text-sm">Litigation Counsel, 3 years member</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"The CLE programs are world-class. I've gained expertise in areas I never imagined. The welfare support during my health challenge showed me this is truly a family."</p>
+                    <div class="flex text-nba-gold mt-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20">
+                    <div class="flex items-center mb-6">
+                        <img src="img/4.jpeg" alt="Member" class="w-16 h-16 rounded-full object-cover mr-4">
+                        <div>
+                            <p class="text-nba-gold text-sm">Senior Advocate, 20 years member</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"As a Senior Advocate, I've seen many branches. NBA Awka stands out for its organization, commitment to excellence, and genuine care for members. It's the gold standard."</p>
+                    <div class="flex text-nba-gold mt-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Join -->
+    <section id="join" class="py-20 bg-nba-lightgray">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-nba-gold font-semibold tracking-wider uppercase text-sm">Get Started</span>
+                <h2 class="font-serif text-4xl font-bold text-nba-navy mt-3 mb-4">How to Become a Member</h2>
+                <p class="text-gray-600 text-lg">Joining NBA Awka Branch is a straightforward process. Follow these simple steps to become part of our distinguished community.</p>
+            </div>
+
+            <div class="max-w-4xl mx-auto">
+                <div class="relative">
+                    <!-- Timeline Line -->
+                    <div class="absolute left-8 top-0 bottom-0 w-1 bg-nba-gold/30 hidden md:block"></div>
+
+                    <!-- Step 1 -->
+                    <div class="flex flex-col md:flex-row items-start mb-12 relative">
+                        <div class="w-16 h-16 bg-nba-navy rounded-full flex items-center justify-center text-nba-gold font-bold text-xl border-4 border-white shadow-lg z-10 md:mr-8 flex-shrink-0">
+                            1
+                        </div>
+                        <div class="mt-4 md:mt-0 bg-white rounded-2xl p-8 shadow-lg flex-1">
+                            <h3 class="font-serif text-xl font-bold text-nba-navy mb-3">Complete the Application Form</h3>
+                            <p class="text-gray-600 mb-4">Fill out our comprehensive online application form with your personal details, professional information, and enrollment number. The process takes about 10 minutes.</p>
+                            <a href="join.html" class="inline-flex items-center text-nba-navy font-semibold hover:text-nba-gold transition">
+                                Start Application <i class="fas fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex flex-col md:flex-row items-start mb-12 relative">
+                        <div class="w-16 h-16 bg-nba-gold rounded-full flex items-center justify-center text-nba-navy font-bold text-xl border-4 border-white shadow-lg z-10 md:mr-8 flex-shrink-0">
+                            2
+                        </div>
+                        <div class="mt-4 md:mt-0 bg-white rounded-2xl p-8 shadow-lg flex-1">
+                            <h3 class="font-serif text-xl font-bold text-nba-navy mb-3">Submit Required Documents</h3>
+                            <p class="text-gray-600 mb-4">Upload scanned copies of your Call to Bar certificate, current practicing license, and two passport photographs. Ensure all documents are clear and valid.</p>
+                            <ul class="text-sm text-gray-500 space-y-1">
+                                <li><i class="fas fa-file-pdf text-red-500 mr-2"></i>Call to Bar Certificate (PDF)</li>
+                                <li><i class="fas fa-file-pdf text-red-500 mr-2"></i>Practicing License (PDF)</li>
+                                <li><i class="fas fa-image text-blue-500 mr-2"></i>Passport Photographs (JPG/PNG)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex flex-col md:flex-row items-start mb-12 relative">
+                        <div class="w-16 h-16 bg-nba-navy rounded-full flex items-center justify-center text-nba-gold font-bold text-xl border-4 border-white shadow-lg z-10 md:mr-8 flex-shrink-0">
+                            3
+                        </div>
+                        <div class="mt-4 md:mt-0 bg-white rounded-2xl p-8 shadow-lg flex-1">
+                            <h3 class="font-serif text-xl font-bold text-nba-navy mb-3">Pay Membership Dues</h3>
+                            <p class="text-gray-600 mb-4">Make payment for your annual membership dues based on your selected category. We accept bank transfers, online payments, and POS at our Bar Centre.</p>
+                            <div class="bg-nba-lightgray p-4 rounded-lg">
+                                <p class="text-sm text-gray-600"><strong>Bank:</strong> First Bank of Nigeria</p>
+                                <p class="text-sm text-gray-600"><strong>Account:</strong> NBA Awka Branch</p>
+                                <p class="text-sm text-gray-600"><strong>Number:</strong> 2034567890</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="flex flex-col md:flex-row items-start relative">
+                        <div class="w-16 h-16 bg-nba-gold rounded-full flex items-center justify-center text-nba-navy font-bold text-xl border-4 border-white shadow-lg z-10 md:mr-8 flex-shrink-0">
+                            4
+                        </div>
+                        <div class="mt-4 md:mt-0 bg-white rounded-2xl p-8 shadow-lg flex-1">
+                            <h3 class="font-serif text-xl font-bold text-nba-navy mb-3">Verification & Activation</h3>
+                            <p class="text-gray-600 mb-4">Our membership committee will review your application within 5-7 working days. Once approved, you'll receive your membership ID and portal access credentials via email.</p>
+                            <div class="flex items-center text-green-600">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                <span class="font-semibold">Welcome to NBA Awka Family!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-nba-gold font-semibold tracking-wider uppercase text-sm">Common Questions</span>
+                <h2 class="font-serif text-4xl font-bold text-nba-navy mt-3 mb-4">Frequently Asked Questions</h2>
+            </div>
+
+            <div class="max-w-3xl mx-auto space-y-4">
+                <div class="bg-nba-lightgray rounded-xl overflow-hidden">
+                    <button onclick="toggleFAQ(this)" class="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-100 transition">
+                        <span class="font-semibold text-nba-navy">Who is eligible to join NBA Awka Branch?</span>
+                        <i class="fas fa-chevron-down text-nba-gold transition-transform"></i>
+                    </button>
+                    <div class="hidden px-6 pb-5 text-gray-600">
+                        Any lawyer called to the Nigerian Bar with a valid practicing certificate is eligible to join. This includes lawyers in private practice, corporate counsel, government lawyers, and judicial officers. We also have special categories for young lawyers (less than 7 years post-call) and senior members (25+ years).
+                    </div>
+                </div>
+
+                <div class="bg-nba-lightgray rounded-xl overflow-hidden">
+                    <button onclick="toggleFAQ(this)" class="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-100 transition">
+                        <span class="font-semibold text-nba-navy">What are the annual membership dues?</span>
+                        <i class="fas fa-chevron-down text-nba-gold transition-transform"></i>
+                    </button>
+                    <div class="hidden px-6 pb-5 text-gray-600">
+                        Annual dues vary by membership category: Full Members ₦50,000, Associates ₦30,000, Young Lawyers ₦25,000, and Senior Members ₦40,000. These dues cover access to all branch activities, welfare programs, and voting rights (for full members).
+                    </div>
+                </div>
+
+                <div class="bg-nba-lightgray rounded-xl overflow-hidden">
+                    <button onclick="toggleFAQ(this)" class="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-100 transition">
+                        <span class="font-semibold text-nba-navy">Can I transfer from another NBA branch?</span>
+                        <i class="fas fa-chevron-down text-nba-gold transition-transform"></i>
+                    </button>
+                    <div class="hidden px-6 pb-5 text-gray-600">
+                        Yes! Lawyers transferring from other NBA branches are welcome. You'll need to provide a letter of good standing from your previous branch and complete our transfer form. The process is usually completed within 3-5 working days.
+                    </div>
+                </div>
+
+                <div class="bg-nba-lightgray rounded-xl overflow-hidden">
+                    <button onclick="toggleFAQ(this)" class="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-100 transition">
+                        <span class="font-semibold text-nba-navy">What benefits do I get immediately after joining?</span>
+                        <i class="fas fa-chevron-down text-nba-gold transition-transform"></i>
+                    </button>
+                    <div class="hidden px-6 pb-5 text-gray-600">
+                        Immediate benefits include access to our Bar Centre facilities, law library, monthly newsletters, invitation to all branch events, mentorship pairing (for young lawyers), and eligibility for welfare support. You'll also receive a membership certificate and ID card.
+                    </div>
+                </div>
+
+                <div class="bg-nba-lightgray rounded-xl overflow-hidden">
+                    <button onclick="toggleFAQ(this)" class="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-100 transition">
+                        <span class="font-semibold text-nba-navy">Is there a probation period for new members?</span>
+                        <i class="fas fa-chevron-down text-nba-gold transition-transform"></i>
+                    </button>
+                    <div class="hidden px-6 pb-5 text-gray-600">
+                        No, there is no probation period. Once your application is approved and dues are paid, you enjoy full membership benefits immediately. However, to vote or stand for elections, you must have been a financial member for at least 6 months.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-20 bg-nba-navy relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1920&q=80" alt="Background" class="w-full h-full object-cover">
+        </div>
+        <div class="container mx-auto px-4 relative z-10 text-center">
+            <h2 class="font-serif text-4xl md:text-5xl font-bold text-white mb-6">Ready to Take the Next Step?</h2>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto mb-10">Join over 500 legal professionals who have chosen NBA Awka Branch as their professional home. Your journey to excellence starts here.</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="join.html" class="px-10 py-5 bg-nba-gold text-nba-navy font-bold rounded-lg hover:bg-yellow-500 transition pulse-gold text-lg">
+                    <i class="fas fa-user-plus mr-2"></i>Apply Now
+                </a>
+                <a href="contact.html" class="px-10 py-5 border-2 border-white text-white font-bold rounded-lg hover:bg-white hover:text-nba-navy transition text-lg">
+                    <i class="fas fa-phone mr-2"></i>Contact Us
+                </a>
+            </div>
+            <p class="mt-8 text-gray-400 text-sm">Have questions? Call us at <span class="text-nba-gold">+234 8033912398</span> or email <span class="text-nba-gold">nbaawka@gmail.com</span></p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-nba-darknavy text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-nba-gold rounded-full flex items-center justify-center">
+                            <i class="fas fa-balance-scale text-nba-navy"></i>
+                        </div>
+                        <h4 class="font-serif font-bold text-lg">NBA Awka</h4>
+                    </div>
+                    <p class="text-gray-400 text-sm">Promoting excellence in legal practice and upholding the rule of law in Anambra State since 1984.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="index.html" class="hover:text-nba-gold transition">Home</a></li>
+                        <li><a href="about.html" class="hover:text-nba-gold transition">About Us</a></li>
+                        <li><a href="membership.html" class="hover:text-nba-gold transition">Membership</a></li>
+                        <li><a href="blog.html" class="hover:text-nba-gold transition">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-nba-gold transition">Law Reports</a></li>
+                        <li><a href="#" class="hover:text-nba-gold transition">Practice Directions</a></li>
+                        <li><a href="#" class="hover:text-nba-gold transition">Downloads</a></li>
+                        <li><a href="#" class="hover:text-nba-gold transition">Career Opportunities</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                          <p>Ozo Amanke Okafor Bar Centre, No 26 (former 50B),<br>High Court Road, Amikwo Awka, Awka South L.G.A,<br>Anambra State, Nigeria</p>
+                        <li><i class="fas fa-phone mr-2"></i> +234 8033912398</li>
+                        <li><i class="fas fa-envelope mr-2"></i> nbaawka@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">&copy; 2026 Nigerian Bar Association, Awka Branch. All Rights Reserved.</p>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-nba-gold hover:text-nba-navy transition"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-nba-gold hover:text-nba-navy transition"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-nba-gold hover:text-nba-navy transition"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ Toggle
+        function toggleFAQ(button) {
+            const content = button.nextElementSibling;
+            const icon = button.querySelector('i');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            // Implement mobile menu functionality
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

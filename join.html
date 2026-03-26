@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join NBA | Nigerian Bar Association - Awka Branch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+       tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nba: {
+                            gold: '#D4AF37',
+                            darkgold: '#B8960C',
+                            navy: '#1B365D',
+                            darknavy: '#0F1F33',
+                            cream: '#F5F5DC',
+                            lightgray: '#F8F9FA'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .step-active { background-color: #1e3a8a; color: white; border-color: #1e3a8a; }
+        .step-completed { background-color: #d4af37; color: #1e3a8a; border-color: #d4af37; }
+        .step-pending { background-color: #e5e7eb; color: #6b7280; border-color: #d1d5db; }
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        .loading-spinner { border: 3px solid #f3f3f3; border-top: 3px solid #d4af37; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .otp-input { width: 3rem; height: 3rem; text-align: center; font-size: 1.25rem; font-weight: bold; border: 2px solid #d1d5db; border-radius: 0.5rem; }
+        .otp-input:focus { border-color: #d4af37; outline: none; box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2); }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+
+    <!-- Navigation -->
+    <nav class="bg-nba-navy text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center space-x-3">
+                     <div class="w-20 h-20 rounded-full flex items-center justify-center">
+                        <img src="img/logo1.png" alt="NBA Awka Logo" class="w-60 h-20 object-contain">
+                    </div>
+                    <div>
+                        <h1 class="font-serif font-bold text-lg leading-tight">NBA AWKA</h1>
+                        <p class="text-xs text-gray-300">Nigerian Bar Association</p>
+                    </div>
+                </a>
+                <div class="hidden md:flex items-center space-x-6 text-sm">
+                    <a href="index.html" class="hover:text-nba-gold transition">Home</a>
+                    <a href="#" class="hover:text-nba-gold transition">About</a>
+                    <a href="#" class="hover:text-nba-gold transition">Resources</a>
+                    <a href="membership.html" class="px-4 py-2 bg-nba-gold text-nba-navy rounded font-medium hover:bg-yellow-500 transition">Member Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Progress Steps -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-center max-w-3xl mx-auto">
+                <div class="flex items-center w-full">
+                    <!-- Step 1 -->
+                    <div class="flex-1 flex flex-col items-center">
+                        <div id="step1-indicator" class="w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 step-active transition-all duration-300">1</div>
+                        <span class="text-xs mt-2 font-medium text-gray-600">Registration</span>
+                    </div>
+                    <div class="flex-1 h-1 bg-gray-200 mx-2">
+                        <div id="progress-line-1" class="h-full bg-nba-gold transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flex-1 flex flex-col items-center">
+                        <div id="step2-indicator" class="w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 step-pending transition-all duration-300">2</div>
+                        <span class="text-xs mt-2 font-medium text-gray-600">Verification</span>
+                    </div>
+                    <div class="flex-1 h-1 bg-gray-200 mx-2">
+                        <div id="progress-line-2" class="h-full bg-nba-gold transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flex-1 flex flex-col items-center">
+                        <div id="step3-indicator" class="w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 step-pending transition-all duration-300">3</div>
+                        <span class="text-xs mt-2 font-medium text-gray-600">Confirmation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        
+        <!-- STEP 1: Registration Form -->
+        <div id="step1" class="max-w-2xl mx-auto fade-in">
+            <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+                <div class="text-center mb-8">
+                    <h2 class="font-serif font-bold text-3xl text-nba-navy mb-2">Join NBA Awka</h2>
+                    <p class="text-gray-600">Begin your journey with the Nigerian Bar Association</p>
+                </div>
+
+                <form id="registration-form" class="space-y-6" novalidate>
+                    
+                    <!-- Personal Information -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="firstName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" placeholder="John" required>
+                            <p class="text-red-500 text-sm mt-1 hidden" id="firstName-error"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="lastName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" placeholder="Doe" required>
+                            <p class="text-red-500 text-sm mt-1 hidden" id="lastName-error"></p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
+                        <input type="text" id="middleName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" placeholder="Optional">
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+                            <input type="email" id="email" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" placeholder="john.doe@example.com" required>
+                        </div>
+                        <p class="text-red-500 text-sm mt-1 hidden" id="email-error"></p>
+                        <p class="text-gray-500 text-xs mt-1">This will be your username for the membership portal</p>
+                    </div>
+
+                    <!-- Phone -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="fas fa-phone absolute left-3 top-3.5 text-gray-400"></i>
+                            <input type="tel" id="phone" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" placeholder="+234 803 000 0000" required>
+                        </div>
+                        <p class="text-red-500 text-sm mt-1 hidden" id="phone-error"></p>
+                    </div>
+
+                    <!-- Professional Information -->
+                    <div class="border-t pt-6">
+                        <h3 class="font-serif font-bold text-lg text-nba-navy mb-4">Professional Information</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Enrollment Number <span class="text-red-500">*</span></label>
+                                <input type="text" id="enrollment" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" placeholder="NBA/AWK/12345" required>
+                                <p class="text-red-500 text-sm mt-1 hidden" id="enrollment-error"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Year of Call <span class="text-red-500">*</span></label>
+                                <select id="yearOfCall" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" required>
+                                    <option value="">Select Year</option>
+                                    <!-- Years will be populated by JS -->
+                                </select>
+                                <p class="text-red-500 text-sm mt-1 hidden" id="yearOfCall-error"></p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Law School Attended <span class="text-red-500">*</span></label>
+                            <select id="lawSchool" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" required>
+                                <option value="">Select Law School</option>
+                                <option value="nigerian-law-school-abuja">Nigerian Law School, Abuja</option>
+                                <option value="nigerian-law-school-lagos">Nigerian Law School, Lagos</option>
+                                <option value="nigerian-law-school-kano">Nigerian Law School, Kano</option>
+                                <option value="nigerian-law-school-enugu">Nigerian Law School, Enugu</option>
+                                <option value="nigerian-law-school-yenegoa">Nigerian Law School, Yenagoa</option>
+                            </select>
+                            <p class="text-red-500 text-sm mt-1 hidden" id="lawSchool-error"></p>
+                        </div>
+                    </div>
+
+                    <!-- Practice Information -->
+                    <div class="border-t pt-6">
+                        <h3 class="font-serif font-bold text-lg text-nba-navy mb-4">Practice Details</h3>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Type of Practice <span class="text-red-500">*</span></label>
+                            <select id="practiceType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" required>
+                                <option value="">Select Practice Type</option>
+                                <option value="private-practice">Private Practice</option>
+                                <option value="corporate-counsel">Corporate Counsel</option>
+                                <option value="government">Government/ Public Service</option>
+                                <option value="judicial">Judicial Officer</option>
+                                <option value="academia">Academia</option>
+                                <option value="non-profit">Non-Profit Organization</option>
+                            </select>
+                            <p class="text-red-500 text-sm mt-1 hidden" id="practiceType-error"></p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Firm/Organization Name</label>
+                            <input type="text" id="firmName" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" placeholder="Name of your firm or organization">
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="border-t pt-6">
+                        <h3 class="font-serif font-bold text-lg text-nba-navy mb-4">Create Password</h3>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Password <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+                                <input type="password" id="password" class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" placeholder="Min. 8 characters" required>
+                                <button type="button" onclick="togglePassword('password', 'eye1')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-eye" id="eye1"></i>
+                                </button>
+                            </div>
+                            <div class="mt-2 flex space-x-1" id="password-strength">
+                                <div class="h-1 flex-1 bg-gray-200 rounded"></div>
+                                <div class="h-1 flex-1 bg-gray-200 rounded"></div>
+                                <div class="h-1 flex-1 bg-gray-200 rounded"></div>
+                                <div class="h-1 flex-1 bg-gray-200 rounded"></div>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-1">Must contain uppercase, lowercase, number, and special character</p>
+                            <p class="text-red-500 text-sm mt-1 hidden" id="password-error"></p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+                                <input type="password" id="confirmPassword" class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 transition" placeholder="Confirm your password" required>
+                                <button type="button" onclick="togglePassword('confirmPassword', 'eye2')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-eye" id="eye2"></i>
+                                </button>
+                            </div>
+                            <p class="text-red-500 text-sm mt-1 hidden" id="confirmPassword-error"></p>
+                        </div>
+                    </div>
+
+                    <!-- Terms -->
+                    <div class="flex items-start">
+                        <input type="checkbox" id="terms" class="mt-1 w-4 h-4 text-nba-gold border-gray-300 rounded focus:ring-nba-gold" required>
+                        <label for="terms" class="ml-2 text-sm text-gray-600">
+                            I agree to the <a href="#" class="text-nba-navy hover:underline font-medium">Terms of Service</a> and <a href="#" class="text-nba-navy hover:underline font-medium">Privacy Policy</a> of the Nigerian Bar Association
+                        </label>
+                    </div>
+                    <p class="text-red-500 text-sm hidden" id="terms-error"></p>
+
+                    <!-- Submit -->
+                    <button type="submit" id="submit-btn" class="w-full bg-nba-navy text-white py-4 rounded-lg font-semibold hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-nba-gold focus:ring-offset-2 transition-all duration-200 flex items-center justify-center space-x-2">
+                        <span id="btn-text">Complete Registration</span>
+                        <div id="btn-spinner" class="loading-spinner hidden"></div>
+                    </button>
+
+                    <p class="text-center text-sm text-gray-600">
+                        Already a member? <a href="membership.html" class="text-nba-navy hover:text-nba-gold font-medium transition">Login here</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- STEP 2: Email Verification -->
+        <div id="step2" class="max-w-md mx-auto hidden fade-in">
+            <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 text-center">
+                <div class="w-20 h-20 bg-nba-gold/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-envelope-open-text text-nba-gold text-3xl"></i>
+                </div>
+                
+                <h2 class="font-serif font-bold text-2xl text-nba-navy mb-2">Verify Your Email</h2>
+                <p class="text-gray-600 mb-6">
+                    We've sent a 6-digit verification code to<br>
+                    <strong id="display-email" class="text-nba-navy"></strong>
+                </p>
+
+                <div class="mb-6">
+                    <div class="flex justify-center space-x-3 mb-4">
+                        <input type="text" maxlength="1" class="otp-input" id="otp1" onkeyup="moveToNext(this, 'otp2')" onfocus="this.select()">
+                        <input type="text" maxlength="1" class="otp-input" id="otp2" onkeyup="moveToNext(this, 'otp3')" onfocus="this.select()">
+                        <input type="text" maxlength="1" class="otp-input" id="otp3" onkeyup="moveToNext(this, 'otp4')" onfocus="this.select()">
+                        <input type="text" maxlength="1" class="otp-input" id="otp4" onkeyup="moveToNext(this, 'otp5')" onfocus="this.select()">
+                        <input type="text" maxlength="1" class="otp-input" id="otp5" onkeyup="moveToNext(this, 'otp6')" onfocus="this.select()">
+                        <input type="text" maxlength="1" class="otp-input" id="otp6" onkeyup="verifyOTP()" onfocus="this.select()">
+                    </div>
+                    <p class="text-red-500 text-sm hidden" id="otp-error">Invalid code. Please try again.</p>
+                </div>
+
+                <button onclick="verifyOTP()" id="verify-btn" class="w-full bg-nba-navy text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition mb-4 flex items-center justify-center space-x-2">
+                    <span>Verify Email</span>
+                    <div id="verify-spinner" class="loading-spinner hidden"></div>
+                </button>
+
+                <div class="text-sm text-gray-600">
+                    Didn't receive the code? 
+                    <button onclick="resendOTP()" id="resend-btn" class="text-nba-navy font-medium hover:underline disabled:opacity-50" disabled>
+                        Resend in <span id="countdown">60</span>s
+                    </button>
+                </div>
+
+                <button onclick="changeEmail()" class="mt-4 text-sm text-gray-500 hover:text-nba-navy underline">
+                    Change email address
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 3: Success & Credentials -->
+        <div id="step3" class="max-w-2xl mx-auto hidden fade-in">
+            <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+                <div class="text-center mb-8">
+                    <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-check-circle text-green-600 text-5xl"></i>
+                    </div>
+                    <h2 class="font-serif font-bold text-3xl text-nba-navy mb-2">Congratulations!</h2>
+                    <p class="text-xl text-gray-600">You have successfully onboarded as an NBA member</p>
+                </div>
+
+                <div class="bg-nba-gold/10 border-2 border-nba-gold rounded-xl p-6 mb-8">
+                    <h3 class="font-serif font-bold text-lg text-nba-navy mb-4 flex items-center">
+                        <i class="fas fa-id-card mr-2"></i>
+                        Your Login Credentials
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-lg p-4 border border-nba-gold/30">
+                            <p class="text-sm text-gray-600 mb-1">Username (Email)</p>
+                            <div class="flex items-center justify-between">
+                                <p id="credential-email" class="font-mono font-semibold text-nba-navy text-lg"></p>
+                                <button onclick="copyToClipboard('credential-email')" class="text-nba-gold hover:text-nba-navy transition" title="Copy">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-nba-gold/30">
+                            <p class="text-sm text-gray-600 mb-1">Password</p>
+                            <div class="flex items-center justify-between">
+                                <p id="credential-password" class="font-mono font-semibold text-nba-navy text-lg">••••••••••••</p>
+                                <div class="flex space-x-2">
+                                    <button onclick="toggleCredentialPassword()" class="text-nba-gold hover:text-nba-navy transition" title="Show/Hide">
+                                        <i class="fas fa-eye" id="cred-eye"></i>
+                                    </button>
+                                    <button onclick="copyToClipboard('credential-password-actual')" class="text-nba-gold hover:text-nba-navy transition" title="Copy">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="credential-password-actual">
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start space-x-3">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 mt-0.5"></i>
+                        <p class="text-sm text-yellow-800">
+                            <strong>Important:</strong> Please save these credentials securely. You will need them to access the membership portal.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <a href="membership.html" class="block w-full bg-nba-navy text-white py-4 rounded-lg font-semibold hover:bg-blue-900 transition text-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Proceed to Member Login
+                    </a>
+                    <button onclick="downloadCredentials()" class="block w-full border-2 border-nba-gold text-nba-navy py-3 rounded-lg font-semibold hover:bg-nba-gold hover:text-white transition text-center">
+                        <i class="fas fa-download mr-2"></i>
+                        Download Credentials (PDF)
+                    </button>
+                </div>
+
+                <div class="mt-8 pt-6 border-t text-center">
+                    <p class="text-gray-600 mb-2">Your Enrollment Number</p>
+                    <p id="success-enrollment" class="font-mono text-2xl font-bold text-nba-navy"></p>
+                    <p class="text-sm text-gray-500 mt-4">
+                        A confirmation email has been sent with your membership details.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-nba-navy text-white py-8 mt-auto">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400 text-sm">
+                &copy; 2026 Nigerian Bar Association, Awka Branch. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // State management
+        let currentStep = 1;
+        let registrationData = {};
+        let generatedOTP = '';
+        let countdownInterval;
+        let actualPassword = '';
+
+        // Populate years
+        const yearSelect = document.getElementById('yearOfCall');
+        const currentYear = new Date().getFullYear();
+        for (let year = currentYear; year >= 1980; year--) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
+        }
+
+        // Password toggle
+        function togglePassword(inputId, eyeId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                eye.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Password strength indicator
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBars = document.getElementById('password-strength').children;
+            let strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            const colors = ['bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500'];
+            
+            for (let i = 0; i < 4; i++) {
+                if (i < strength) {
+                    strengthBars[i].className = `h-1 flex-1 rounded ${colors[strength - 1]}`;
+                } else {
+                    strengthBars[i].className = 'h-1 flex-1 bg-gray-200 rounded';
+                }
+            }
+        });
+
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            const fields = ['firstName', 'lastName', 'email', 'phone', 'enrollment', 'yearOfCall', 'lawSchool', 'practiceType', 'password', 'confirmPassword'];
+            
+            fields.forEach(field => {
+                const element = document.getElementById(field);
+                const error = document.getElementById(`${field}-error`);
+                const value = element.value.trim();
+                
+                error.classList.add('hidden');
+                element.classList.remove('border-red-500');
+
+                if (!value) {
+                    error.textContent = 'This field is required';
+                    error.classList.remove('hidden');
+                    element.classList.add('border-red-500');
+                    isValid = false;
+                } else {
+                    // Specific validations
+                    if (field === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                        error.textContent = 'Please enter a valid email address';
+                        error.classList.remove('hidden');
+                        element.classList.add('border-red-500');
+                        isValid = false;
+                    }
+                    if (field === 'enrollment' && !/^NBA\/AWK\/\d{5,}$/i.test(value)) {
+                        error.textContent = 'Format: NBA/AWK/12345';
+                        error.classList.remove('hidden');
+                        element.classList.add('border-red-500');
+                        isValid = false;
+                    }
+                    if (field === 'password') {
+                        if (value.length < 8) {
+                            error.textContent = 'Password must be at least 8 characters';
+                            error.classList.remove('hidden');
+                            element.classList.add('border-red-500');
+                            isValid = false;
+                        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(value)) {
+                            error.textContent = 'Must include uppercase, lowercase, number, and special character';
+                            error.classList.remove('hidden');
+                            element.classList.add('border-red-500');
+                            isValid = false;
+                        }
+                    }
+                    if (field === 'confirmPassword' && value !== document.getElementById('password').value) {
+                        error.textContent = 'Passwords do not match';
+                        error.classList.remove('hidden');
+                        element.classList.add('border-red-500');
+                        isValid = false;
+                    }
+                }
+            });
+
+            // Terms check
+            const terms = document.getElementById('terms');
+            const termsError = document.getElementById('terms-error');
+            if (!terms.checked) {
+                termsError.textContent = 'You must agree to the terms';
+                termsError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                termsError.classList.add('hidden');
+            }
+
+            return isValid;
+        }
+
+        // Form submission
+        document.getElementById('registration-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                this.classList.add('shake');
+                setTimeout(() => this.classList.remove('shake'), 500);
+                return;
+            }
+
+            // Collect data
+            registrationData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                middleName: document.getElementById('middleName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                enrollment: document.getElementById('enrollment').value.toUpperCase(),
+                yearOfCall: document.getElementById('yearOfCall').value,
+                lawSchool: document.getElementById('lawSchool').value,
+                practiceType: document.getElementById('practiceType').value,
+                firmName: document.getElementById('firmName').value,
+                password: document.getElementById('password').value
+            };
+
+            // Show loading
+            document.getElementById('btn-text').textContent = 'Processing...';
+            document.getElementById('btn-spinner').classList.remove('hidden');
+            document.getElementById('submit-btn').disabled = true;
+
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Generate OTP
+            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            console.log('Generated OTP:', generatedOTP); // In production, this is sent via email
+
+            // Move to step 2
+            goToStep(2);
+            document.getElementById('display-email').textContent = registrationData.email;
+            startCountdown();
+            
+            // Auto-fill OTP for demo (remove in production)
+            setTimeout(() => {
+                document.getElementById('otp1').value = generatedOTP[0];
+                document.getElementById('otp2').value = generatedOTP[1];
+                document.getElementById('otp3').value = generatedOTP[2];
+                document.getElementById('otp4').value = generatedOTP[3];
+                document.getElementById('otp5').value = generatedOTP[4];
+                document.getElementById('otp6').value = generatedOTP[5];
+            }, 500);
+        });
+
+        // Navigation between steps
+        function goToStep(step) {
+            // Hide all steps
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            
+            // Show target step
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            
+            // Update indicators
+            updateStepIndicators(step);
+            currentStep = step;
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateStepIndicators(current) {
+            const indicators = [
+                document.getElementById('step1-indicator'),
+                document.getElementById('step2-indicator'),
+                document.getElementById('step3-indicator')
+            ];
+            const lines = [
+                document.getElementById('progress-line-1'),
+                document.getElementById('progress-line-2')
+            ];
+
+            indicators.forEach((ind, idx) => {
+                const stepNum = idx + 1;
+                ind.classList.remove('step-active', 'step-completed', 'step-pending');
+                if (stepNum < current) {
+                    ind.classList.add('step-completed');
+                    ind.innerHTML = '<i class="fas fa-check"></i>';
+                } else if (stepNum === current) {
+                    ind.classList.add('step-active');
+                    ind.innerHTML = stepNum;
+                } else {
+                    ind.classList.add('step-pending');
+                    ind.innerHTML = stepNum;
+                }
+            });
+
+            lines.forEach((line, idx) => {
+                if (idx < current - 1) {
+                    line.style.width = '100%';
+                } else {
+                    line.style.width = '0%';
+                }
+            });
+        }
+
+        // OTP Input handling
+        function moveToNext(current, nextId) {
+            if (current.value.length === 1) {
+                document.getElementById(nextId)?.focus();
+            }
+        }
+
+        // Verify OTP
+        async function verifyOTP() {
+            const otp = Array.from({length: 6}, (_, i) => document.getElementById(`otp${i+1}`).value).join('');
+            
+            if (otp.length !== 6) {
+                document.getElementById('otp-error').textContent = 'Please enter all 6 digits';
+                document.getElementById('otp-error').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('verify-spinner').classList.remove('hidden');
+            
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            if (otp === generatedOTP) {
+                // Success - generate final credentials
+                actualPassword = registrationData.password;
+                
+                document.getElementById('credential-email').textContent = registrationData.email;
+                document.getElementById('credential-password-actual').value = actualPassword;
+                document.getElementById('success-enrollment').textContent = registrationData.enrollment;
+                
+                // Save to localStorage for demo purposes
+                const memberData = {
+                    ...registrationData,
+                    joinedDate: new Date().toISOString(),
+                    status: 'active'
+                };
+                localStorage.setItem(`nba_member_${registrationData.email}`, JSON.stringify(memberData));
+                
+                goToStep(3);
+            } else {
+                document.getElementById('otp-error').textContent = 'Invalid verification code';
+                document.getElementById('otp-error').classList.remove('hidden');
+                document.getElementById('verify-spinner').classList.add('hidden');
+                
+                // Shake animation
+                document.querySelector('.otp-input')?.parentElement.classList.add('shake');
+                setTimeout(() => {
+                    document.querySelector('.otp-input')?.parentElement.classList.remove('shake');
+                }, 500);
+            }
+        }
+
+        // Countdown timer
+        function startCountdown() {
+            let seconds = 60;
+            const countdownEl = document.getElementById('countdown');
+            const resendBtn = document.getElementById('resend-btn');
+            
+            resendBtn.disabled = true;
+            
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                seconds--;
+                countdownEl.textContent = seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(countdownInterval);
+                    resendBtn.disabled = false;
+                    resendBtn.innerHTML = 'Resend Code';
+                }
+            }, 1000);
+        }
+
+        // Resend OTP
+        async function resendOTP() {
+            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            console.log('New OTP:', generatedOTP);
+            
+            document.getElementById('resend-btn').innerHTML = 'Sending...';
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Clear inputs
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`otp${i}`).value = '';
+            }
+            document.getElementById('otp1').focus();
+            document.getElementById('otp-error').classList.add('hidden');
+            
+            startCountdown();
+            
+            // Demo auto-fill
+            setTimeout(() => {
+                document.getElementById('otp1').value = generatedOTP[0];
+                document.getElementById('otp2').value = generatedOTP[1];
+                document.getElementById('otp3').value = generatedOTP[2];
+                document.getElementById('otp4').value = generatedOTP[3];
+                document.getElementById('otp5').value = generatedOTP[4];
+                document.getElementById('otp6').value = generatedOTP[5];
+            }, 500);
+        }
+
+        // Change email
+        function changeEmail() {
+            goToStep(1);
+            document.getElementById('email').focus();
+        }
+
+        // Toggle credential password visibility
+        function toggleCredentialPassword() {
+            const display = document.getElementById('credential-password');
+            const eye = document.getElementById('cred-eye');
+            const actual = document.getElementById('credential-password-actual').value;
+            
+            if (display.textContent === '••••••••••••') {
+                display.textContent = actual;
+                eye.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                display.textContent = '••••••••••••';
+                eye.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(elementId) {
+            const text = elementId === 'credential-password-actual' 
+                ? document.getElementById(elementId).value 
+                : document.getElementById(elementId).textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                // Show temporary success message
+                const btn = event.currentTarget;
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check text-green-600"></i>';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            });
+        }
+
+        // Download credentials as text file (simulating PDF)
+        function downloadCredentials() {
+            const content = `
+NBA AWKA BRANCH - MEMBERSHIP CREDENTIALS
+=========================================
+
+Congratulations on your successful registration!
+
+MEMBER DETAILS:
+---------------
+Name: ${registrationData.firstName} ${registrationData.middleName} ${registrationData.lastName}
+Enrollment Number: ${registrationData.enrollment}
+Email: ${registrationData.email}
+Phone: ${registrationData.phone}
+Year of Call: ${registrationData.yearOfCall}
+
+LOGIN CREDENTIALS:
+------------------
+Username: ${registrationData.email}
+Password: ${actualPassword}
+
+IMPORTANT NOTES:
+- Please keep these credentials secure
+- Do not share your password with anyone
+- Change your password periodically
+- Contact secretariat@nbaawka.org.ng for assistance
+
+Date Generated: ${new Date().toLocaleString()}
+            `.trim();
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `NBA_Awka_Credentials_${registrationData.enrollment.replace(/\//g, '_')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Allow Enter key on OTP inputs
+        document.querySelectorAll('.otp-input').forEach((input, index) => {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    verifyOTP();
+                }
+                if (e.key === 'Backspace' && !input.value && index > 0) {
+                    document.getElementById(`otp${index}`).focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | NBA Awka Branch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nba: {
+                            gold: '#D4AF37',
+                            darkgold: '#B8960C',
+                            navy: '#1B365D',
+                            darknavy: '#0F1F33',
+                            cream: '#F5F5DC',
+                            lightgray: '#F8F9FA'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .fade-in { animation: fadeIn 0.6s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-active { opacity: 1; z-index: 10; }
+        .slide-hidden { opacity: 0; z-index: 0; }
+        .hero-slide { transition: opacity 1s ease-in-out; }
+        .stat-counter { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="bg-white font-sans">
+
+    <!-- Navigation -->
+    <nav class="bg-nba-navy text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <a href="index.html" class="flex items-center space-x-3">
+                    <div class="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden">
+                        <img src="img/logo1.png" alt="NBA Awka Logo" class="w-20 h-20 object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-balance-scale text-nba-navy text-xl\'></i>'">
+                    </div>
+                    <div>
+                        <h1 class="font-serif font-bold text-xl leading-tight">NBA AWKA</h1>
+                        <p class="text-xs text-gray-300">Nigerian Bar Association</p>
+                    </div>
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="hover:text-nba-gold transition">Home</a>
+                    <a href="about.html" class="text-nba-gold font-medium">About</a>
+                    <a href="blog.html" class="hover:text-nba-gold transition">Blog</a>
+                    <a href="membership.html" class="px-4 py-2 bg-nba-gold text-nba-navy rounded hover:bg-yellow-500 transition">Member Login</a>
+                </div>
+                <button class="md:hidden text-2xl" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Slider Section -->
+    <section class="relative h-[600px] overflow-hidden">
+        <!-- Slide 1 -->
+        <div class="hero-slide absolute inset-0 slide-active" data-slide="0">
+            <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1920&q=80" alt="Law Library" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-nba-navy/90 to-nba-navy/40"></div>
+            <div class="absolute inset-0 flex items-center">
+                <div class="container mx-auto px-4">
+                    <div class="max-w-2xl text-white fade-in">
+                        <span class="inline-block px-4 py-2 bg-nba-gold/20 border border-nba-gold/40 rounded-full text-nba-gold text-sm font-semibold mb-6">Established 1984</span>
+                        <h1 class="font-serif text-5xl md:text-6xl font-bold mb-6 leading-tight">Championing Justice in Anambra State</h1>
+                        <p class="text-xl text-gray-200 mb-8">For four decades, NBA Awka Branch has stood as the vanguard of legal excellence, upholding the rule of law and empowering legal practitioners.</p>
+                        <a href="#about" class="inline-flex items-center px-8 py-4 bg-nba-gold text-nba-navy font-bold rounded hover:bg-yellow-500 transition">
+                            Discover Our Story <i class="fas fa-arrow-right ml-3"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="hero-slide absolute inset-0 slide-hidden" data-slide="1">
+            <img src="img/w2.jpeg" alt="Legal Team" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-nba-navy/90 to-nba-navy/40"></div>
+            <div class="absolute inset-0 flex items-center">
+                <div class="container mx-auto px-4">
+                    <div class="max-w-2xl text-white">
+                        <span class="inline-block px-4 py-2 bg-nba-gold/20 border border-nba-gold/40 rounded-full text-nba-gold text-sm font-semibold mb-6">500+ Members</span>
+                        <h1 class="font-serif text-5xl md:text-6xl font-bold mb-6 leading-tight">A Community of Legal Excellence</h1>
+                        <p class="text-xl text-gray-200 mb-8">Join a distinguished network of legal professionals committed to advancing justice and professional development.</p>
+                        <a href="#executive" class="inline-flex items-center px-8 py-4 bg-nba-gold text-nba-navy font-bold rounded hover:bg-yellow-500 transition">
+                            Meet Our Leaders <i class="fas fa-arrow-right ml-3"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="hero-slide absolute inset-0 slide-hidden" data-slide="2">
+            <img src="img/w13.jpeg" alt="Law Books" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-nba-navy/90 to-nba-navy/40"></div>
+            <div class="absolute inset-0 flex items-center">
+                <div class="container mx-auto px-4">
+                    <div class="max-w-2xl text-white">
+                        <span class="inline-block px-4 py-2 bg-nba-gold/20 border border-nba-gold/40 rounded-full text-nba-gold text-sm font-semibold mb-6">40 Years of Service</span>
+                        <h1 class="font-serif text-5xl md:text-6xl font-bold mb-6 leading-tight">Shaping the Future of Law</h1>
+                        <p class="text-xl text-gray-200 mb-8">Through education, advocacy, and community service, we continue to build a stronger legal profession for tomorrow.</p>
+                        <a href="#mission" class="inline-flex items-center px-8 py-4 bg-nba-gold text-nba-navy font-bold rounded hover:bg-yellow-500 transition">
+                            Our Mission <i class="fas fa-arrow-right ml-3"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slider Controls -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
+            <button onclick="goToSlide(0)" class="w-3 h-3 rounded-full bg-white/50 hover:bg-nba-gold transition slider-dot active" data-slide="0"></button>
+            <button onclick="goToSlide(1)" class="w-3 h-3 rounded-full bg-white/50 hover:bg-nba-gold transition slider-dot" data-slide="1"></button>
+            <button onclick="goToSlide(2)" class="w-3 h-3 rounded-full bg-white/50 hover:bg-nba-gold transition slider-dot" data-slide="2"></button>
+        </div>
+
+        <!-- Slider Arrows -->
+        <button onclick="prevSlide()" class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 w-12 h-12 bg-white/10 hover:bg-nba-gold rounded-full flex items-center justify-center text-white hover:text-nba-navy transition backdrop-blur-sm">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button onclick="nextSlide()" class="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 w-12 h-12 bg-white/10 hover:bg-nba-gold rounded-full flex items-center justify-center text-white hover:text-nba-navy transition backdrop-blur-sm">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="fade-in">
+                    <span class="text-nba-gold font-semibold tracking-wider uppercase text-sm">Who We Are</span>
+                    <h2 class="font-serif text-4xl font-bold text-nba-navy mt-3 mb-6">About NBA Awka Branch</h2>
+                    <div class="space-y-4 text-gray-600 leading-relaxed">
+                        <p>The Nigerian Bar Association, Awka Branch is the foremost professional body representing legal practitioners in Anambra State. Established in 1984, our branch has grown to become a beacon of legal excellence, professional integrity, and social responsibility.</p>
+                        <p>We represent over 500 active members spanning diverse practice areas including corporate law, litigation, human rights, property law, and alternative dispute resolution. Our members serve as advocates, counselors, and champions of justice across the state and beyond.</p>
+                        <p>Through our Bar Centre located at the High Court Complex in Awka, we provide a hub for professional development, networking, and access to legal resources. We are committed to upholding the highest standards of the legal profession while contributing meaningfully to the administration of justice in Nigeria.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-6 mt-10">
+                        <div class="text-center p-4 bg-nba-lightgray rounded-lg">
+                            <div class="text-3xl font-bold text-nba-navy stat-counter" data-target="500">0</div>
+                            <div class="text-sm text-gray-600 mt-1">Active Members</div>
+                        </div>
+                        <div class="text-center p-4 bg-nba-lightgray rounded-lg">
+                            <div class="text-3xl font-bold text-nba-navy stat-counter" data-target="40">0</div>
+                            <div class="text-sm text-gray-600 mt-1">Years of Service</div>
+                        </div>
+                        <div class="text-center p-4 bg-nba-lightgray rounded-lg">
+                            <div class="text-3xl font-bold text-nba-navy stat-counter" data-target="25">0</div>
+                            <div class="text-sm text-gray-600 mt-1">Annual Events</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <div class="absolute -top-4 -left-4 w-24 h-24 bg-nba-gold/20 rounded-full"></div>
+                    <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-nba-navy/10 rounded-full"></div>
+                    <img src="img/w17.jpeg" alt="NBA Awka Building" class="relative rounded-2xl shadow-2xl w-full h-[500px] object-cover">
+                    <div class="absolute bottom-8 left-8 bg-white p-6 rounded-lg shadow-xl max-w-xs">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div class="w-10 h-10 bg-nba-gold rounded-full flex items-center justify-center">
+                                <i class="fas fa-award text-nba-navy"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-nba-navy">Excellence Award</p>
+                                <p class="text-xs text-gray-500">2023 National Recognition</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600">Recognized as the most active NBA branch in the South-East region.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission & Vision Section -->
+    <section id="mission" class="py-20 bg-nba-lightgray">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-nba-gold font-semibold tracking-wider uppercase text-sm">Our Purpose</span>
+                <h2 class="font-serif text-4xl font-bold text-nba-navy mt-3">Mission & Vision</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Mission -->
+                <div class="bg-white rounded-2xl p-10 shadow-lg hover:shadow-xl transition group">
+                    <div class="w-16 h-16 bg-nba-navy rounded-2xl flex items-center justify-center mb-6 group-hover:bg-nba-gold transition">
+                        <i class="fas fa-bullseye text-nba-gold text-2xl group-hover:text-nba-navy transition"></i>
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold text-nba-navy mb-4">Our Mission</h3>
+                    <p class="text-gray-600 leading-relaxed mb-6">To uphold the rule of law, promote the highest standards of legal practice and professional ethics, and protect the independence of the Bar; while fostering continuous legal education, unity, and welfare of members, and advancing access to justice and service to society within Awka and beyond..</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-nba-gold mt-1 mr-3"></i>
+                            <span class="text-gray-600">Advance professional excellence through continuous legal education</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-nba-gold mt-1 mr-3"></i>
+                            <span class="text-gray-600">Uphold the highest ethical standards in legal practice</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-nba-gold mt-1 mr-3"></i>
+                            <span class="text-gray-600">Advocate for justice and human rights in our society</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-nba-gold mt-1 mr-3"></i>
+                            <span class="text-gray-600">Support members in their professional development</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Vision -->
+                <div class="bg-nba-navy rounded-2xl p-10 shadow-lg hover:shadow-xl transition group">
+                    <div class="w-16 h-16 bg-nba-gold rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-eye text-nba-navy text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold text-white mb-4">Our Vision</h3>
+                    <p class="text-gray-300 leading-relaxed mb-6">To be a leading Bar Branch distinguished for excellence, integrity, and innovation in legal practice, committed to the advancement of justice, the rule of law, and the professional development and welfare of its members.</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-star text-nba-gold mt-1 mr-3"></i>
+                            <span class="text-gray-300">A branch where every member achieves professional excellence</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-star text-nba-gold mt-1 mr-3"></i>
+                            <span class="text-gray-300">A trusted voice in legal reform and policy advocacy</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-star text-nba-gold mt-1 mr-3"></i>
+                            <span class="text-gray-300">A center of excellence for legal education and research</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-star text-nba-gold mt-1 mr-3"></i>
+                            <span class="text-gray-300">A driving force for positive change in our community</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Core Values -->
+            <div class="mt-16">
+                <h3 class="font-serif text-2xl font-bold text-nba-navy text-center mb-10">Our Core Values</h3>
+                <div class="grid md:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-xl text-center shadow hover:shadow-lg transition">
+                        <div class="w-14 h-14 bg-nba-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-balance-scale text-nba-navy text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-nba-navy mb-2">Integrity</h4>
+                        <p class="text-sm text-gray-600">Upholding the highest ethical standards in all our dealings</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl text-center shadow hover:shadow-lg transition">
+                        <div class="w-14 h-14 bg-nba-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-users text-nba-navy text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-nba-navy mb-2">Service</h4>
+                        <p class="text-sm text-gray-600">Dedicated to our members and the broader community</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl text-center shadow hover:shadow-lg transition">
+                        <div class="w-14 h-14 bg-nba-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-lightbulb text-nba-navy text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-nba-navy mb-2">Innovation</h4>
+                        <p class="text-sm text-gray-600">Embracing modern approaches to legal practice</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl text-center shadow hover:shadow-lg transition">
+                        <div class="w-14 h-14 bg-nba-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-handshake text-nba-navy text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-nba-navy mb-2">Collaboration</h4>
+                        <p class="text-sm text-gray-600">Working together for collective success</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Executive Council Section -->
+    <section id="executive" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-nba-gold font-semibold tracking-wider uppercase text-sm">Leadership</span>
+                <h2 class="font-serif text-4xl font-bold text-nba-navy mt-3 mb-4">Meet Our Executive Council</h2>
+                <p class="text-gray-600">The dedicated professionals steering the affairs of NBA Awka Branch for the 2025/2026 bar year</p>
+            </div>
+
+            <!-- Chairman (Featured) -->
+            <div class="max-w-4xl mx-auto mb-16">
+                <div class="bg-nba-navy rounded-2xl overflow-hidden shadow-2xl">
+                    <div class="grid md:grid-cols-2">
+                        <div class="relative h-80 md:h-auto">
+                            <img src="img/Chair.jpeg" alt="Chairman" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-nba-navy/80 to-transparent md:bg-gradient-to-r"></div>
+                        </div>
+                        <div class="p-8 md:p-12 flex flex-col justify-center">
+                            <span class="text-nba-gold font-semibold text-sm uppercase tracking-wider mb-2">Chairman</span>
+                            <h3 class="font-serif text-3xl font-bold text-white mb-2">Barr. Raphael Nnamdi Anagor, Esq</h3>
+                            <div class="flex space-x-4">
+                                <a href="#" class="w-10 h-10 bg-white/10 hover:bg-nba-gold rounded-full flex items-center justify-center text-white hover:text-nba-navy transition">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-white/10 hover:bg-nba-gold rounded-full flex items-center justify-center text-white hover:text-nba-navy transition">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-white/10 hover:bg-nba-gold rounded-full flex items-center justify-center text-white hover:text-nba-navy transition">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other Executives -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Vice Chairman -->
+                <div class="group">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="img/Vip.jpeg" alt="Vice Chairman" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-nba-navy/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        <div class="p-6 text-center">
+                            <span class="inline-block px-3 py-1 bg-nba-gold/20 text-nba-navy text-xs font-bold rounded-full mb-3">Vice Chairman</span>
+                            <h4 class="font-serif text-xl font-bold text-nba-navy mb-1">Barr. Adaobi Iloakasia, Esq</h4>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fab fa-linkedin-in text-sm"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fas fa-envelope text-sm"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secretary -->
+                <div class="group">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="img/Sec.jpeg" alt="Secretary" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-nba-navy/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        <div class="p-6 text-center">
+                            <span class="inline-block px-3 py-1 bg-nba-gold/20 text-nba-navy text-xs font-bold rounded-full mb-3">Hon. Secretary</span>
+                            <h4 class="font-serif text-xl font-bold text-nba-navy mb-1">Barr. Andrew C. Ogbuodudu, Esq</h4>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fab fa-linkedin-in text-sm"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fas fa-envelope text-sm"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assistant Secretary -->
+                <div class="group">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="img/Asst Sec.jpeg" alt="Assistant Secretary" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-nba-navy/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        <div class="p-6 text-center">
+                            <span class="inline-block px-3 py-1 bg-nba-gold/20 text-nba-navy text-xs font-bold rounded-full mb-3">Assistant Secretary</span>
+                            <h4 class="font-serif text-xl font-bold text-nba-navy mb-1">Barr. Chinenye O. Nweke, Esq</h4>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fab fa-linkedin-in text-sm"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fas fa-envelope text-sm"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Treasurer -->
+                <div class="group">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="img/Trea.jpeg" alt="Treasurer" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-nba-navy/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        <div class="p-6 text-center">
+                            <span class="inline-block px-3 py-1 bg-nba-gold/20 text-nba-navy text-xs font-bold rounded-full mb-3">Treasurer</span>
+                            <h4 class="font-serif text-xl font-bold text-nba-navy mb-1">Barr. Emmanuel C. Okonkwo, Esq</h4>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fab fa-linkedin-in text-sm"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fas fa-envelope text-sm"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Secretary -->
+                <div class="group">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="img/Fin Sec.jpeg" alt="Financial Secretary" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-nba-navy/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        <div class="p-6 text-center">
+                            <span class="inline-block px-3 py-1 bg-nba-gold/20 text-nba-navy text-xs font-bold rounded-full mb-3">Financial Secretary</span>
+                            <h4 class="font-serif text-xl font-bold text-nba-navy mb-1">Barr. Ngozi P. Okafor, Esq</h4>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fab fa-linkedin-in text-sm"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fas fa-envelope text-sm"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Publicity Secretary -->
+                <div class="group">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="img/Pub sec.jpeg" alt="Publicity Secretary" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-nba-navy/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        <div class="p-6 text-center">
+                            <span class="inline-block px-3 py-1 bg-nba-gold/20 text-nba-navy text-xs font-bold rounded-full mb-3">Publicity Secretary</span>
+                            <h4 class="font-serif text-xl font-bold text-nba-navy mb-1">Barr. Chidi O. Maduka, Esq</h4>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fab fa-linkedin-in text-sm"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fas fa-envelope text-sm"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View All Button -->
+            <div class="text-center mt-12">
+                <button onclick="toggleMoreExecutives()" id="view-more-btn" class="px-8 py-3 border-2 border-nba-navy text-nba-navy rounded-lg font-semibold hover:bg-nba-navy hover:text-white transition flex items-center mx-auto">
+                    <span>View All Executive Members</span>
+                    <i class="fas fa-chevron-down ml-2 transition-transform" id="view-more-icon"></i>
+                </button>
+            </div>
+
+            <!-- Hidden Executives -->
+            <div id="more-executives" class="hidden mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Welfare Secretary -->
+                <div class="group">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="img/Welf Sec.jpeg" alt="Welfare Secretary" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <div class="p-6 text-center">
+                            <span class="inline-block px-3 py-1 bg-nba-gold/20 text-nba-navy text-xs font-bold rounded-full mb-3">Welfare Secretary</span>
+                            <h4 class="font-serif text-xl font-bold text-nba-navy mb-1">Barr. Blessing A. Eze, Esq</h4>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fab fa-linkedin-in text-sm"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fas fa-envelope text-sm"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Provost -->
+                <div class="group">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="img/Prov1.jpeg" alt="Provost" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <div class="p-6 text-center">
+                            <span class="inline-block px-3 py-1 bg-nba-gold/20 text-nba-navy text-xs font-bold rounded-full mb-3">Provost</span>
+                            <h4 class="font-serif text-xl font-bold text-nba-navy mb-1">Barr. Justice O. Adeyemi, Esq</h4>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fab fa-linkedin-in text-sm"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fas fa-envelope text-sm"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Secretary -->
+                <div class="group">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="img/Soc sec.jpeg" alt="Social Secretary" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        </div>
+                        <div class="p-6 text-center">
+                            <span class="inline-block px-3 py-1 bg-nba-gold/20 text-nba-navy text-xs font-bold rounded-full mb-3">Social Secretary</span>
+                            <h4 class="font-serif text-xl font-bold text-nba-navy mb-1">Barr. Chioma N. Obi, Esq</h4>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fab fa-linkedin-in text-sm"></i>
+                                </a>
+                                <a href="#" class="w-8 h-8 bg-gray-100 hover:bg-nba-gold rounded-full flex items-center justify-center text-gray-600 hover:text-nba-navy transition">
+                                    <i class="fas fa-envelope text-sm"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-20 bg-nba-navy">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="font-serif text-4xl font-bold text-white mb-6">Join Our Community</h2>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto mb-10">Become a member of NBA Awka Branch and connect with the finest legal minds in Anambra State. Together, we shape the future of law.</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="join.html" class="px-8 py-4 bg-nba-gold text-nba-navy font-bold rounded hover:bg-yellow-500 transition">
+                    Become a Member
+                </a>
+                <a href="contact.html" class="px-8 py-4 border-2 border-white text-white font-bold rounded hover:bg-white hover:text-nba-navy transition">
+                    Contact Us
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-nba-darknavy text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-nba-gold rounded-full flex items-center justify-center">
+                            <i class="fas fa-balance-scale text-nba-navy"></i>
+                        </div>
+                        <h4 class="font-serif font-bold text-lg">NBA Awka</h4>
+                    </div>
+                    <p class="text-gray-400 text-sm">Promoting excellence in legal practice and upholding the rule of law in Anambra State since 1984.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="index.html" class="hover:text-nba-gold transition">Home</a></li>
+                        <li><a href="about.html" class="hover:text-nba-gold transition">About Us</a></li>
+                        <li><a href="blog.html" class="hover:text-nba-gold transition">Blog</a></li>
+                        <li><a href="membership.html" class="hover:text-nba-gold transition">Member Login</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-nba-gold transition">Law Reports</a></li>
+                        <li><a href="#" class="hover:text-nba-gold transition">Practice Directions</a></li>
+                        <li><a href="#" class="hover:text-nba-gold transition">Downloads</a></li>
+                        <li><a href="#" class="hover:text-nba-gold transition">Career Opportunities</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                       <p>Ozo Amanke Okafor Bar Centre, No 26 (former 50B),<br>High Court Road, Amikwo Awka, Awka South L.G.A,<br>Anambra State, Nigeria</p>
+                        <li><i class="fas fa-phone mr-2"></i> +234 8033912398</li>
+                        <li><i class="fas fa-envelope mr-2"></i> nbaawka@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">&copy; 2026 Nigerian Bar Association, Awka Branch. All Rights Reserved.</p>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-nba-gold hover:text-nba-navy transition"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-nba-gold hover:text-nba-navy transition"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-nba-gold hover:text-nba-navy transition"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Hero Slider
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        const totalSlides = slides.length;
+        let slideInterval;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('slide-active');
+                slide.classList.add('slide-hidden');
+                dots[i].classList.remove('active', 'bg-nba-gold', 'w-8');
+                dots[i].classList.add('bg-white/50');
+            });
+
+            slides[index].classList.remove('slide-hidden');
+            slides[index].classList.add('slide-active');
+            dots[index].classList.remove('bg-white/50');
+            dots[index].classList.add('active', 'bg-nba-gold', 'w-8');
+            
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            const next = (currentSlide + 1) % totalSlides;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            const prev = (currentSlide - 1 + totalSlides) % totalSlides;
+            showSlide(prev);
+        }
+
+        function goToSlide(index) {
+            showSlide(index);
+            resetInterval();
+        }
+
+        function resetInterval() {
+            clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, 6000);
+        }
+
+        // Auto-advance slides
+        slideInterval = setInterval(nextSlide, 6000);
+
+        // Toggle More Executives
+        function toggleMoreExecutives() {
+            const moreSection = document.getElementById('more-executives');
+            const btnText = document.querySelector('#view-more-btn span');
+            const btnIcon = document.getElementById('view-more-icon');
+            
+            if (moreSection.classList.contains('hidden')) {
+                moreSection.classList.remove('hidden');
+                moreSection.classList.add('fade-in');
+                btnText.textContent = 'Show Less';
+                btnIcon.style.transform = 'rotate(180deg)';
+            } else {
+                moreSection.classList.add('hidden');
+                moreSection.classList.remove('fade-in');
+                btnText.textContent = 'View All Executive Members';
+                btnIcon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Animate counters on scroll
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-counter');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const increment = target / 50;
+                let current = 0;
+                
+                const updateCounter = () => {
+                    if (current < target) {
+                        current += increment;
+                        counter.textContent = Math.ceil(current);
+                        setTimeout(updateCounter, 30);
+                    } else {
+                        counter.textContent = target;
+                    }
+                };
+                
+                updateCounter();
+            });
+        }
+
+        // Trigger counter animation when section is visible
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const statsSection = document.querySelector('.stat-counter')?.closest('div')?.parentElement;
+            if (statsSection) observer.observe(statsSection);
+        });
+
+        function toggleMobileMenu() {
+            // Implement mobile menu toggle
+        }
+    </script>
+</body>
+</html>

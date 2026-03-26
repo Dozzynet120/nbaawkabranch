@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Awka Blog | Legal Insights & News</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nba: {
+                            gold: '#D4AF37',
+                            darkgold: '#B8960C',
+                            navy: '#1B365D',
+                            darknavy: '#0F1F33',
+                            cream: '#F5F5DC',
+                            lightgray: '#F8F9FA'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .modal-backdrop { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+        .editor-toolbar button { @apply px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded mr-2 mb-2 transition; }
+        .editor-content { min-height: 300px; }
+        .blog-content h2 { @apply text-2xl font-bold text-nba-navy mt-8 mb-4; }
+        .blog-content h3 { @apply text-xl font-bold text-nba-navy mt-6 mb-3; }
+        .blog-content p { @apply mb-4 text-gray-700 leading-relaxed; }
+        .blog-content ul { @apply list-disc pl-6 mb-4 text-gray-700; }
+        .blog-content ol { @apply list-decimal pl-6 mb-4 text-gray-700; }
+        .blog-content blockquote { @apply border-l-4 border-nba-gold pl-4 italic text-gray-600 my-6; }
+        .blog-content img { @apply rounded-lg shadow-lg my-6 max-w-full; }
+        .blog-content a { @apply text-nba-navy underline hover:text-nba-gold; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+
+    <!-- Navigation -->
+    <nav class="bg-nba-navy text-white shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <a href="index.html" class="flex items-center space-x-3">
+                    <div class="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden">
+                        <img src="img/logo1.png" alt="NBA Awka Logo" class="w-20 h-20 object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-balance-scale text-nba-navy text-xl\'></i>'">
+                    </div>
+                    <div>
+                        <h1 class="font-serif font-bold text-xl leading-tight">NBA AWKA</h1>
+                        <p class="text-xs text-gray-300">Nigerian Bar Association</p>
+                    </div>
+                </a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="hover:text-nba-gold transition">Home</a>
+                    <a href="blog.html" class="text-nba-gold font-medium">Blog</a>
+                    <a href="#about" class="hover:text-nba-gold transition">About</a>
+                    <button onclick="openAdminLogin()" class="px-4 py-2 border border-nba-gold text-nba-gold rounded hover:bg-nba-gold hover:text-nba-navy transition">
+                        <i class="fas fa-lock mr-2"></i>Admin
+                    </button>
+                </div>
+                <button class="md:hidden text-2xl" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Public Blog Page -->
+    <div id="public-view">
+        <!-- Hero -->
+        <section class="bg-nba-navy text-white py-16">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Legal Insights & News</h2>
+                <p class="text-xl text-gray-300 max-w-2xl mx-auto">Stay informed with the latest developments in law, justice, and the legal profession in Anambra State</p>
+            </div>
+        </section>
+
+        <!-- Blog Grid -->
+        <section class="py-16">
+            <div class="container mx-auto px-4">
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-4 mb-12 justify-center">
+                    <button onclick="filterBlogs('all')" class="px-6 py-2 bg-nba-navy text-white rounded-full hover:bg-blue-800 transition filter-btn active" data-filter="all">All Posts</button>
+                    <button onclick="filterBlogs('news')" class="px-6 py-2 bg-white text-gray-700 border border-gray-300 rounded-full hover:bg-nba-gold hover:text-white hover:border-nba-gold transition filter-btn" data-filter="news">News</button>
+                    <button onclick="filterBlogs('legal')" class="px-6 py-2 bg-white text-gray-700 border border-gray-300 rounded-full hover:bg-nba-gold hover:text-white hover:border-nba-gold transition filter-btn" data-filter="legal">Legal Insights</button>
+                    <button onclick="filterBlogs('events')" class="px-6 py-2 bg-white text-gray-700 border border-gray-300 rounded-full hover:bg-nba-gold hover:text-white hover:border-nba-gold transition filter-btn" data-filter="events">Events</button>
+                </div>
+
+                <!-- Blog Grid Container -->
+                <div id="blog-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Blogs will be dynamically loaded here -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden text-center py-20">
+                    <i class="fas fa-newspaper text-6xl text-gray-300 mb-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-600 mb-2">No posts yet</h3>
+                    <p class="text-gray-500">Check back soon for new content</p>
+                </div>
+
+                <!-- Load More -->
+                <div class="text-center mt-12">
+                    <button id="load-more-btn" onclick="loadMoreBlogs()" class="px-8 py-3 border-2 border-nba-navy text-nba-navy rounded-lg font-semibold hover:bg-nba-navy hover:text-white transition">
+                        Load More Posts
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Single Blog Post View -->
+    <div id="single-blog-view" class="hidden">
+        <div class="bg-nba-navy text-white py-12">
+            <div class="container mx-auto px-4">
+                <button onclick="showBlogList()" class="text-nba-gold hover:text-white mb-4 flex items-center transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Blog
+                </button>
+            </div>
+        </div>
+        <article class="py-12 bg-white">
+            <div class="container mx-auto px-4 max-w-4xl">
+                <div id="single-blog-content">
+                    <!-- Single blog content loaded here -->
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <!-- Admin Panel (Hidden by default) -->
+    <div id="admin-panel" class="hidden min-h-screen bg-gray-100">
+        <!-- Admin Header -->
+        <div class="bg-nba-navy text-white shadow-lg">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <h2 class="font-serif text-2xl font-bold"><i class="fas fa-cog mr-2"></i>Admin Dashboard</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="admin-email" class="text-gray-300 text-sm hidden md:inline"></span>
+                    
+                    <!-- Settings Button -->
+                    <button onclick="openUserSettings()" class="px-4 py-2 bg-nba-gold/20 text-nba-gold rounded-lg hover:bg-nba-gold hover:text-nba-navy transition flex items-center" title="Account Settings">
+                        <i class="fas fa-cog mr-2"></i>Settings
+                    </button>
+                    
+                    <button onclick="logoutAdmin()" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                    <button onclick="closeAdminPanel()" class="md:hidden text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mx-auto px-4 py-8">
+            <!-- Stats -->
+            <div class="grid md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Total Posts</p>
+                            <p class="text-3xl font-bold text-nba-navy" id="stat-total">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-nba-gold/20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-file-alt text-nba-gold text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Published</p>
+                            <p class="text-3xl font-bold text-green-600" id="stat-published">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Drafts</p>
+                            <p class="text-3xl font-bold text-yellow-600" id="stat-drafts">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-edit text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Total Views</p>
+                            <p class="text-3xl font-bold text-blue-600" id="stat-views">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-eye text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="flex flex-wrap gap-4 mb-6 justify-between items-center">
+                <h3 class="text-2xl font-bold text-gray-800">Blog Posts</h3>
+                <button onclick="openNewPostModal()" class="px-6 py-3 bg-nba-navy text-white rounded-lg hover:bg-blue-800 transition flex items-center shadow-lg">
+                    <i class="fas fa-plus mr-2"></i>New Post
+                </button>
+            </div>
+
+            <!-- Posts Table -->
+            <div class="bg-white rounded-xl shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Post</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Category</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Date</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Views</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-posts-table" class="divide-y divide-gray-100">
+                            <!-- Posts loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="admin-empty-state" class="hidden text-center py-12">
+                    <i class="fas fa-inbox text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">No posts yet. Create your first post!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 fade-in">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-nba-navy rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-lock text-nba-gold text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-nba-navy">Admin Login</h3>
+                <p class="text-gray-600 text-sm mt-2">Secure access for authorized personnel only</p>
+            </div>
+            <form id="admin-login-form" onsubmit="handleAdminLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="admin-login-email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20" placeholder="your@email.com" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <div class="relative">
+                        <input type="password" id="admin-login-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20" placeholder="••••••••" required>
+                        <button type="button" onclick="toggleLoginPassword()" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-eye" id="login-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <p id="login-error" class="text-red-600 text-sm mb-4 hidden"></p>
+                <button type="submit" class="w-full bg-nba-navy text-white py-3 rounded-lg font-semibold hover:bg-blue-800 transition flex items-center justify-center">
+                    <span id="login-btn-text">Sign In</span>
+                    <div id="login-spinner" class="hidden ml-2 w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                </button>
+            </form>
+            <button onclick="closeAdminLogin()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- First Time Setup Modal -->
+    <div id="setup-modal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 fade-in">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-nba-gold rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-plus text-nba-navy text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-nba-navy">Create Admin Account</h3>
+                <p class="text-gray-600 text-sm mt-2">Set up your administrator credentials</p>
+            </div>
+            <form id="setup-form" onsubmit="createInitialAdmin(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address <span class="text-red-500">*</span></label>
+                    <input type="email" id="setup-email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold" placeholder="your@email.com" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input type="password" id="setup-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold" placeholder="Create strong password" minlength="8" required>
+                        <button type="button" onclick="togglePassword('setup-password', 'eye-setup')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-eye" id="eye-setup"></i>
+                        </button>
+                    </div>
+                    <ul class="text-xs text-gray-500 mt-2 space-y-1" id="password-requirements">
+                        <li id="req-length"><i class="fas fa-circle text-gray-300 mr-1 text-[6px]"></i> At least 8 characters</li>
+                        <li id="req-upper"><i class="fas fa-circle text-gray-300 mr-1 text-[6px]"></i> One uppercase letter</li>
+                        <li id="req-lower"><i class="fas fa-circle text-gray-300 mr-1 text-[6px]"></i> One lowercase letter</li>
+                        <li id="req-number"><i class="fas fa-circle text-gray-300 mr-1 text-[6px]"></i> One number</li>
+                        <li id="req-special"><i class="fas fa-circle text-gray-300 mr-1 text-[6px]"></i> One special character</li>
+                    </ul>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password <span class="text-red-500">*</span></label>
+                    <input type="password" id="setup-confirm" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold" placeholder="Confirm password" required>
+                </div>
+                <p id="setup-error" class="text-red-600 text-sm mb-4 hidden"></p>
+                <button type="submit" class="w-full px-6 py-3 bg-nba-navy text-white rounded-lg hover:bg-blue-800 transition font-semibold">
+                    <span id="setup-btn-text">Create Account</span>
+                    <div id="setup-spinner" class="hidden ml-2 w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Account Settings Modal -->
+    <div id="user-settings-modal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 fade-in">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-nba-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-shield text-nba-navy text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-nba-navy">Account Settings</h3>
+                <p class="text-gray-600 text-sm mt-2">Manage your admin credentials</p>
+            </div>
+            <form id="account-settings-form" onsubmit="updateAdminCredentials(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Email</label>
+                    <input type="email" id="current-email" class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-600" readonly>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">New Email</label>
+                    <input type="email" id="new-email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold" placeholder="Enter new email">
+                    <p class="text-xs text-gray-500 mt-1">Leave empty to keep current email</p>
+                </div>
+                <div class="border-t pt-4 mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                    <div class="relative">
+                        <input type="password" id="current-password-verify" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold" placeholder="Enter current password to change" required>
+                        <button type="button" onclick="togglePassword('current-password-verify', 'eye-current')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-eye" id="eye-current"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                    <div class="relative">
+                        <input type="password" id="new-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold" placeholder="Min 8 characters" minlength="8">
+                        <button type="button" onclick="togglePassword('new-password', 'eye-new')" class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-eye" id="eye-new"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2" id="password-strength-meter">
+                        <div class="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                            <div id="strength-bar" class="h-full w-0 transition-all duration-300"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1" id="strength-text">Password strength</p>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                    <input type="password" id="confirm-new-password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold" placeholder="Confirm new password">
+                    <p class="text-red-500 text-sm hidden mt-1" id="password-match-error">Passwords do not match</p>
+                </div>
+                <p id="settings-error" class="text-red-600 text-sm mb-4 hidden"></p>
+                <p id="settings-success" class="text-green-600 text-sm mb-4 hidden"></p>
+                <div class="flex gap-4">
+                    <button type="button" onclick="closeUserSettings()" class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-nba-navy text-white rounded-lg hover:bg-blue-800 transition">
+                        <span id="settings-btn-text">Update</span>
+                        <div id="settings-spinner" class="hidden ml-2 w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New/Edit Post Modal -->
+    <div id="post-modal" class="fixed inset-0 z-50 hidden modal-backdrop overflow-y-auto">
+        <div class="min-h-screen px-4 py-8 flex items-center justify-center">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto fade-in">
+                <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-nba-navy" id="modal-title">New Blog Post</h3>
+                    <button onclick="closePostModal()" class="text-gray-400 hover:text-gray-600 text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="post-form" onsubmit="savePost(event)" class="p-6 space-y-6">
+                    <input type="hidden" id="post-id">
+                    
+                    <!-- Title -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Post Title <span class="text-red-500">*</span></label>
+                        <input type="text" id="post-title" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20 text-lg font-semibold" placeholder="Enter post title" required>
+                    </div>
+
+                    <!-- Category & Status Row -->
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Category <span class="text-red-500">*</span></label>
+                            <select id="post-category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold" required>
+                                <option value="news">News</option>
+                                <option value="legal">Legal Insights</option>
+                                <option value="events">Events</option>
+                                <option value="announcement">Announcement</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                            <select id="post-status" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold">
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Featured Image</label>
+                            <div class="relative">
+                                <input type="url" id="post-image" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold text-sm" placeholder="https://... or leave empty">
+                                <label class="absolute right-2 top-2 px-3 py-1 bg-nba-gold text-nba-navy text-xs rounded cursor-pointer hover:bg-yellow-500 transition">
+                                    <i class="fas fa-upload mr-1"></i>Upload
+                                    <input type="file" id="featured-image-upload" accept="image/*" class="hidden" onchange="handleFeaturedImageUpload(this)">
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Or paste image URL above</p>
+                        </div>
+                    </div>
+
+                    <!-- Featured Image Preview -->
+                    <div id="featured-image-preview" class="hidden mt-4">
+                        <img id="preview-img" src="" alt="Featured image preview" class="h-32 w-auto rounded-lg shadow-md">
+                        <button type="button" onclick="clearFeaturedImage()" class="mt-2 text-red-500 text-sm hover:text-red-700">
+                            <i class="fas fa-trash mr-1"></i>Remove image
+                        </button>
+                    </div>
+
+                    <!-- Excerpt -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Short Excerpt <span class="text-red-500">*</span></label>
+                        <textarea id="post-excerpt" rows="2" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20" placeholder="Brief summary (max 200 characters)" maxlength="200" required></textarea>
+                        <p class="text-xs text-gray-500 mt-1"><span id="excerpt-count">0</span>/200 characters</p>
+                    </div>
+
+                    <!-- Content Editor -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Content <span class="text-red-500">*</span></label>
+                        <div class="border border-gray-300 rounded-lg overflow-hidden">
+                            <!-- Toolbar -->
+                            <div class="bg-gray-50 border-b px-4 py-2 flex flex-wrap gap-2 items-center">
+                                <button type="button" onclick="formatText('bold')" title="Bold" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition"><i class="fas fa-bold"></i></button>
+                                <button type="button" onclick="formatText('italic')" title="Italic" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition"><i class="fas fa-italic"></i></button>
+                                <button type="button" onclick="formatText('underline')" title="Underline" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition"><i class="fas fa-underline"></i></button>
+                                <span class="w-px h-6 bg-gray-300 mx-2"></span>
+                                <button type="button" onclick="formatText('insertUnorderedList')" title="Bullet List" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition"><i class="fas fa-list-ul"></i></button>
+                                <button type="button" onclick="formatText('insertOrderedList')" title="Numbered List" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition"><i class="fas fa-list-ol"></i></button>
+                                <span class="w-px h-6 bg-gray-300 mx-2"></span>
+                                <button type="button" onclick="formatText('justifyLeft')" title="Align Left" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition"><i class="fas fa-align-left"></i></button>
+                                <button type="button" onclick="formatText('justifyCenter')" title="Align Center" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition"><i class="fas fa-align-center"></i></button>
+                                <button type="button" onclick="formatText('justifyRight')" title="Align Right" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition"><i class="fas fa-align-right"></i></button>
+                                <span class="w-px h-6 bg-gray-300 mx-2"></span>
+                                <button type="button" onclick="insertLink()" title="Insert Link" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition"><i class="fas fa-link"></i></button>
+                                
+                                <!-- Local Image Upload -->
+                                <label class="px-3 py-1 text-sm bg-nba-gold/20 hover:bg-nba-gold/30 text-nba-navy rounded transition cursor-pointer flex items-center" title="Upload Image from Computer">
+                                    <i class="fas fa-upload mr-2"></i>
+                                    <span>Upload Image</span>
+                                    <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(this)">
+                                </label>
+                                
+                                <button type="button" onclick="insertImageURL()" title="Insert Image from URL" class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition"><i class="fas fa-image"></i> URL</button>
+                            </div>
+                            
+                            <!-- Image Upload Progress -->
+                            <div id="upload-progress" class="hidden bg-blue-50 px-4 py-2 border-b">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-blue-700"><i class="fas fa-spinner fa-spin mr-2"></i>Uploading image...</span>
+                                    <button type="button" onclick="cancelUpload()" class="text-red-500 hover:text-red-700 text-sm">Cancel</button>
+                                </div>
+                                <div class="w-full bg-blue-200 rounded-full h-2 mt-2">
+                                    <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Editor -->
+                            <div id="post-content" contenteditable="true" class="editor-content w-full px-4 py-3 focus:outline-none blog-content bg-white min-h-[300px]" placeholder="Write your blog post content here..."></div>
+                        </div>
+                        
+                        <!-- Upload Info -->
+                        <p class="text-xs text-gray-500 mt-2">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Supported formats: JPG, PNG, GIF, WebP (Max 5MB per image). Images are embedded directly in the post.
+                        </p>
+                    </div>
+
+                    <!-- Preview Toggle -->
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="enable-preview" class="sr-only" onchange="togglePreview()">
+                            <div class="w-10 h-6 bg-gray-200 rounded-full relative transition-colors duration-200 toggle-bg">
+                                <div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-transform duration-200 toggle-dot"></div>
+                            </div>
+                            <span class="ml-3 text-sm font-medium text-gray-700">Show Preview</span>
+                        </label>
+                        <div class="text-sm text-gray-500">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Auto-saved as draft
+                        </div>
+                    </div>
+
+                    <!-- Preview Panel -->
+                    <div id="preview-panel" class="hidden border-2 border-nba-gold/30 rounded-lg p-6 bg-gray-50">
+                        <h4 class="font-bold text-nba-navy mb-4 border-b pb-2">Preview</h4>
+                        <div id="preview-content" class="blog-content bg-white p-6 rounded shadow-sm"></div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-wrap gap-4 pt-4 border-t">
+                        <button type="submit" class="px-6 py-3 bg-nba-navy text-white rounded-lg hover:bg-blue-800 transition flex items-center shadow-lg">
+                            <i class="fas fa-save mr-2"></i>
+                            <span id="save-btn-text">Publish Post</span>
+                        </button>
+                        <button type="button" onclick="saveAsDraft()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                            Save as Draft
+                        </button>
+                        <button type="button" onclick="closePostModal()" class="px-6 py-3 text-gray-500 hover:text-gray-700 transition ml-auto">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 fade-in text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Delete Post?</h3>
+            <p class="text-gray-600 mb-6">This action cannot be undone. The post will be permanently removed from the blog.</p>
+            <div class="flex gap-4 justify-center">
+                <button onclick="closeDeleteModal()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                    Cancel
+                </button>
+                <button onclick="confirmDelete()" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                    Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 z-50 hidden transform transition-all duration-300 translate-y-20 opacity-0">
+        <div class="bg-nba-navy text-white px-6 py-4 rounded-lg shadow-2xl flex items-center space-x-3">
+            <i id="toast-icon" class="fas fa-check-circle text-nba-gold"></i>
+            <span id="toast-message">Operation successful</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-nba-navy text-white py-12 mt-auto">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h4 class="font-serif font-bold text-lg mb-4">NBA Awka</h4>
+                    <p class="text-gray-400 text-sm">Promoting excellence in legal practice since 1984.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-nba-gold transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-nba-gold transition">Leadership</a></li>
+                        <li><a href="#" class="hover:text-nba-gold transition">Events</a></li>
+                        <li><a href="#" class="hover:text-nba-gold transition">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-nba-gold transition">Law Reports</a></li>
+                        <li><a href="#" class="hover:text-nba-gold transition">Practice Directions</a></li>
+                        <li><a href="#" class="hover:text-nba-gold transition">Downloads</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Newsletter</h4>
+                    <p class="text-gray-400 text-sm mb-4">Subscribe to our updates</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 rounded-l-lg text-gray-800 flex-1 focus:outline-none">
+                        <button class="px-4 py-2 bg-nba-gold text-nba-navy rounded-r-lg hover:bg-yellow-500 transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; 2026 Nigerian Bar Association, Awka Branch. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Data Store
+        let blogs = JSON.parse(localStorage.getItem('nba_blogs')) || [
+            {
+                id: 1,
+                title: "NBA Awka Branch Holds Annual Law Week",
+                excerpt: "The Nigerian Bar Association, Awka Branch successfully concluded its 2024 Annual Law Week with insightful discussions on contemporary legal issues.",
+                content: "<p>The Nigerian Bar Association, Awka Branch successfully concluded its 2024 Annual Law Week with a series of insightful discussions on contemporary legal issues affecting the profession and society at large.</p><h3>Key Highlights</h3><p>The event featured prominent speakers including Senior Advocates of Nigeria, respected jurists, and legal scholars who addressed various topics ranging from constitutional reforms to the future of legal practice in the digital age.</p><blockquote>\"The legal profession must evolve with the times while maintaining the highest standards of ethics and professionalism,\" said the Chairman, Barr. Raphael Nnamdi Anagor.</blockquote><h3>Looking Forward</h3><p>The Branch remains committed to fostering professional development and contributing to the administration of justice in Anambra State.</p>",
+                category: "events",
+                status: "published",
+                image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80",
+                author: "NBA Awka",
+                date: "2024-03-15",
+                views: 245
+            },
+            {
+                id: 2,
+                title: "New Practice Directions for High Court",
+                excerpt: "The Anambra State Judiciary has issued new practice directions aimed at improving case management and reducing delays in the administration of justice.",
+                content: "<p>The Anambra State Judiciary has issued new practice directions aimed at improving case management and reducing delays in the administration of justice.</p><h3>Key Changes</h3><ul><li>Strict timelines for filing processes</li><li>Mandatory pre-trial conferences</li><li>Electronic filing procedures</li><li>Alternative dispute resolution mechanisms</li></ul><p>Legal practitioners are advised to familiarize themselves with these new directions to ensure compliance.</p>",
+                category: "legal",
+                status: "published",
+                image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80",
+                author: "Legal Committee",
+                date: "2024-03-10",
+                views: 189
+            },
+            {
+                id: 3,
+                title: "Continuing Legal Education Workshop",
+                excerpt: "Registration is now open for the upcoming CLE workshop focusing on emerging trends in corporate law and practice.",
+                content: "<p>Registration is now open for the upcoming Continuing Legal Education workshop focusing on emerging trends in corporate law and practice.</p><h3>Workshop Details</h3><p><strong>Date:</strong> April 15, 2024<br><strong>Venue:</strong> NBA Bar Centre, Awka<br><strong>Time:</strong> 10:00 AM - 4:00 PM</p><p>All members are encouraged to attend. Certificates of attendance will be issued.</p>",
+                category: "news",
+                status: "published",
+                image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=80",
+                author: "Secretariat",
+                date: "2024-03-05",
+                views: 156
+            }
+        ];
+
+        let currentFilter = 'all';
+        let deleteTargetId = null;
+        let isAdminLoggedIn = false;
+
+        // ===== SECURE AUTHENTICATION SYSTEM =====
+        
+        // Simple hash function (in production, use bcrypt on backend)
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Generate random salt
+        function generateSalt() {
+            return Array.from(crypto.getRandomValues(new Uint8Array(16)))
+                .map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Store admin user securely
+        async function storeAdminUser(email, password) {
+            const salt = generateSalt();
+            const hashedPassword = await hashPassword(password + salt);
+            
+            const adminUser = {
+                email: email.toLowerCase().trim(),
+                passwordHash: hashedPassword,
+                salt: salt,
+                createdAt: new Date().toISOString(),
+                lastLogin: null,
+                loginAttempts: 0,
+                lockedUntil: null
+            };
+            
+            localStorage.setItem('nba_admin_user', JSON.stringify(adminUser));
+            return adminUser;
+        }
+
+        // Verify password
+        async function verifyPassword(inputPassword, storedHash, salt) {
+            const inputHash = await hashPassword(inputPassword + salt);
+            return inputHash === storedHash;
+        }
+
+        // Check if admin exists
+        function checkAdminExists() {
+            return localStorage.getItem('nba_admin_user') !== null;
+        }
+
+        // Get stored admin
+        function getStoredAdmin() {
+            const data = localStorage.getItem('nba_admin_user');
+            return data ? JSON.parse(data) : null;
+        }
+
+        // Initialize - check if first time setup needed
+        function initAuth() {
+            if (!checkAdminExists()) {
+                document.getElementById('setup-modal').classList.remove('hidden');
+            }
+        }
+
+        // Create initial admin
+        async function createInitialAdmin(e) {
+            e.preventDefault();
+            const email = document.getElementById('setup-email').value;
+            const password = document.getElementById('setup-password').value;
+            const confirm = document.getElementById('setup-confirm').value;
+            const errorEl = document.getElementById('setup-error');
+            const btnText = document.getElementById('setup-btn-text');
+            const spinner = document.getElementById('setup-spinner');
+            
+            // Validation
+            if (password !== confirm) {
+                errorEl.textContent = 'Passwords do not match';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            if (!validatePasswordStrength(password)) {
+                errorEl.textContent = 'Password does not meet all requirements';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            btnText.textContent = 'Creating...';
+            spinner.classList.remove('hidden');
+            
+            try {
+                await storeAdminUser(email, password);
+                document.getElementById('setup-modal').classList.add('hidden');
+                showToast('Admin account created successfully! Please login.', 'success');
+                document.getElementById('admin-login-email').value = email;
+                openAdminLogin();
+            } catch (error) {
+                errorEl.textContent = 'Error creating account. Please try again.';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btnText.textContent = 'Create Account';
+                spinner.classList.add('hidden');
+            }
+        }
+
+        // UPDATED Login Handler
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('admin-login-email').value.toLowerCase().trim();
+            const password = document.getElementById('admin-login-password').value;
+            const errorEl = document.getElementById('login-error');
+            const btnText = document.getElementById('login-btn-text');
+            const spinner = document.getElementById('login-spinner');
+            
+            // Check if setup needed
+            if (!checkAdminExists()) {
+                errorEl.textContent = 'No admin account found. Please set up first.';
+                errorEl.classList.remove('hidden');
+                setTimeout(() => {
+                    closeAdminLogin();
+                    initAuth();
+                }, 1500);
+                return;
+            }
+            
+            const admin = getStoredAdmin();
+            
+            // Check lockout
+            if (admin.lockedUntil && new Date(admin.lockedUntil) > new Date()) {
+                const mins = Math.ceil((new Date(admin.lockedUntil) - new Date()) / 60000);
+                errorEl.textContent = `Account locked. Try again in ${mins} minutes.`;
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            btnText.textContent = 'Verifying...';
+            spinner.classList.remove('hidden');
+            errorEl.classList.add('hidden');
+            
+            try {
+                const isValid = await verifyPassword(password, admin.passwordHash, admin.salt);
+                
+                if (isValid && email === admin.email) {
+                    // Success
+                    admin.lastLogin = new Date().toISOString();
+                    admin.loginAttempts = 0;
+                    admin.lockedUntil = null;
+                    localStorage.setItem('nba_admin_user', JSON.stringify(admin));
+                    
+                    isAdminLoggedIn = true;
+                    sessionStorage.setItem('nba_admin_session', JSON.stringify({
+                        email: admin.email,
+                        time: Date.now()
+                    }));
+                    
+                    document.getElementById('admin-email').textContent = admin.email;
+                    closeAdminLogin();
+                    showAdminPanel();
+                    showToast(`Welcome back, ${admin.email}!`, 'success');
+                } else {
+                    // Failed
+                    admin.loginAttempts = (admin.loginAttempts || 0) + 1;
+                    
+                    if (admin.loginAttempts >= 5) {
+                        const lockTime = new Date(Date.now() + 30 * 60000); // 30 min lock
+                        admin.lockedUntil = lockTime.toISOString();
+                        errorEl.textContent = 'Too many failed attempts. Account locked for 30 minutes.';
+                    } else {
+                        const remaining = 5 - admin.loginAttempts;
+                        errorEl.textContent = `Invalid credentials. ${remaining} attempts remaining.`;
+                    }
+                    
+                    localStorage.setItem('nba_admin_user', JSON.stringify(admin));
+                    errorEl.classList.remove('hidden');
+                    
+                    // Shake animation
+                    document.getElementById('admin-login-form').classList.add('shake');
+                    setTimeout(() => {
+                        document.getElementById('admin-login-form').classList.remove('shake');
+                    }, 500);
+                }
+            } catch (error) {
+                errorEl.textContent = 'Login error. Please try again.';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btnText.textContent = 'Sign In';
+                spinner.classList.add('hidden');
+            }
+        }
+
+        // Update admin credentials
+        async function updateAdminCredentials(e) {
+            e.preventDefault();
+            
+            const admin = getStoredAdmin();
+            const currentEmail = document.getElementById('current-email').value;
+            const newEmail = document.getElementById('new-email').value;
+            const currentPassword = document.getElementById('current-password-verify').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-new-password').value;
+            
+            const errorEl = document.getElementById('settings-error');
+            const successEl = document.getElementById('settings-success');
+            const btnText = document.getElementById('settings-btn-text');
+            const spinner = document.getElementById('settings-spinner');
+            
+            errorEl.classList.add('hidden');
+            successEl.classList.add('hidden');
+            
+            // Verify current password
+            const isValid = await verifyPassword(currentPassword, admin.passwordHash, admin.salt);
+            if (!isValid) {
+                errorEl.textContent = 'Current password is incorrect';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            // Validate new password if provided
+            if (newPassword) {
+                if (newPassword !== confirmPassword) {
+                    errorEl.textContent = 'New passwords do not match';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+                if (newPassword.length < 8) {
+                    errorEl.textContent = 'Password must be at least 8 characters';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+            }
+            
+            btnText.textContent = 'Updating...';
+            spinner.classList.remove('hidden');
+            
+            try {
+                // Update email if changed
+                if (newEmail && newEmail !== currentEmail) {
+                    admin.email = newEmail.toLowerCase().trim();
+                }
+                
+                // Update password if provided
+                if (newPassword) {
+                    const salt = generateSalt();
+                    const hashedPassword = await hashPassword(newPassword + salt);
+                    admin.passwordHash = hashedPassword;
+                    admin.salt = salt;
+                }
+                
+                admin.updatedAt = new Date().toISOString();
+                localStorage.setItem('nba_admin_user', JSON.stringify(admin));
+                
+                successEl.textContent = 'Credentials updated successfully! Please login again.';
+                successEl.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    closeUserSettings();
+                    logoutAdmin();
+                    openAdminLogin();
+                    document.getElementById('admin-login-email').value = admin.email;
+                }, 2000);
+                
+            } catch (error) {
+                errorEl.textContent = 'Error updating credentials';
+                errorEl.classList.remove('hidden');
+            } finally {
+                btnText.textContent = 'Update';
+                spinner.classList.add('hidden');
+            }
+        }
+
+        // Open user settings
+        function openUserSettings() {
+            const admin = getStoredAdmin();
+            if (!admin) {
+                showToast('No admin account found', 'error');
+                return;
+            }
+            document.getElementById('current-email').value = admin.email;
+            document.getElementById('new-email').value = '';
+            document.getElementById('current-password-verify').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-new-password').value = '';
+            document.getElementById('settings-error').classList.add('hidden');
+            document.getElementById('settings-success').classList.add('hidden');
+            document.getElementById('user-settings-modal').classList.remove('hidden');
+        }
+
+        function closeUserSettings() {
+            document.getElementById('user-settings-modal').classList.add('hidden');
+        }
+
+        // Password strength validation
+        function validatePasswordStrength(password) {
+            return password.length >= 8 &&
+                   /[A-Z]/.test(password) &&
+                   /[a-z]/.test(password) &&
+                   /[0-9]/.test(password) &&
+                   /[^A-Za-z0-9]/.test(password);
+        }
+
+        // Toggle password visibility
+        function togglePassword(inputId, eyeId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                eye.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // ===== BLOG FUNCTIONS =====
+
+        // Render Blogs Grid
+        function renderBlogs() {
+            const grid = document.getElementById('blog-grid');
+            const filtered = currentFilter === 'all' ? blogs : blogs.filter(b => b.category === currentFilter && b.status === 'published');
+            const published = filtered.filter(b => b.status === 'published');
+
+            if (published.length === 0) {
+                grid.innerHTML = '';
+                document.getElementById('empty-state').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('empty-state').classList.add('hidden');
+            
+            grid.innerHTML = published.map(blog => {
+                // Determine image to show: use uploaded image, or extract from content, or null
+                let displayImage = blog.image;
+                
+                // If no featured image, try to get from content
+                if (!displayImage) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = blog.content;
+                    const contentImg = tempDiv.querySelector('img');
+                    if (contentImg) {
+                        displayImage = contentImg.src;
+                    }
+                }
+                
+                // Only use default if absolutely no image found
+                const finalImage = displayImage || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80';
+                
+                return `
+                    <article class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 flex flex-col h-full fade-in">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="${finalImage}" 
+                                 alt="${blog.title}" 
+                                 class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                                 onerror="this.src='https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80'">
+                            <div class="absolute top-4 left-4">
+                                <span class="px-3 py-1 bg-nba-gold text-nba-navy text-xs font-bold rounded-full uppercase tracking-wider">
+                                    ${blog.category}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="flex items-center text-sm text-gray-500 mb-3">
+                                <i class="far fa-calendar-alt mr-2"></i>
+                                ${formatDate(blog.date)}
+                                <span class="mx-2">•</span>
+                                <i class="far fa-eye mr-2"></i>
+                                ${blog.views} views
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-nba-navy mb-3 line-clamp-2 hover:text-nba-gold transition cursor-pointer" onclick="viewBlog(${blog.id})">
+                                ${blog.title}
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3 flex-1">${blog.excerpt}</p>
+                            <button onclick="viewBlog(${blog.id})" class="text-nba-navy font-semibold hover:text-nba-gold transition flex items-center mt-auto">
+                                Read More <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        // Filter Blogs
+        function filterBlogs(category) {
+            currentFilter = category;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === category) {
+                    btn.classList.add('bg-nba-navy', 'text-white');
+                    btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                } else {
+                    btn.classList.remove('bg-nba-navy', 'text-white');
+                    btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+                }
+            });
+            
+            renderBlogs();
+        }
+
+        // View Single Blog
+        function viewBlog(id) {
+            const blog = blogs.find(b => b.id === id);
+            if (!blog) return;
+
+            blog.views++;
+            saveBlogs();
+
+            // Determine image
+            let headerImage = blog.image;
+            if (!headerImage) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = blog.content;
+                const contentImg = tempDiv.querySelector('img');
+                if (contentImg) {
+                    headerImage = contentImg.src;
+                }
+            }
+            const finalHeaderImage = headerImage || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80';
+
+            const content = document.getElementById('single-blog-content');
+            content.innerHTML = `
+                <div class="fade-in">
+                    <div class="mb-6">
+                        <span class="px-4 py-1 bg-nba-gold/20 text-nba-navy text-sm font-bold rounded-full uppercase tracking-wider">
+                            ${blog.category}
+                        </span>
+                    </div>
+                    <h1 class="font-serif text-3xl md:text-4xl font-bold text-nba-navy mb-6">${blog.title}</h1>
+                    <div class="flex items-center text-gray-500 mb-8 pb-8 border-b">
+                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(blog.author)}&background=d4af37&color=fff" 
+                             alt="${blog.author}" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <p class="font-semibold text-gray-800">${blog.author}</p>
+                            <p class="text-sm">${formatDate(blog.date)} • ${blog.views} views</p>
+                        </div>
+                    </div>
+                    ${finalHeaderImage ? `<img src="${finalHeaderImage}" alt="${blog.title}" class="w-full h-96 object-cover rounded-xl mb-8 shadow-lg">` : ''}
+                    <div class="blog-content text-lg">
+                        ${blog.content}
+                    </div>
+                    <div class="mt-12 pt-8 border-t flex items-center justify-between">
+                        <div class="flex space-x-4">
+                            <button onclick="shareBlog('facebook', ${blog.id})" class="w-10 h-10 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition flex items-center justify-center">
+                                <i class="fab fa-facebook-f"></i>
+                            </button>
+                            <button onclick="shareBlog('twitter', ${blog.id})" class="w-10 h-10 bg-sky-500 text-white rounded-full hover:bg-sky-600 transition flex items-center justify-center">
+                                <i class="fab fa-twitter"></i>
+                            </button>
+                            <button onclick="shareBlog('linkedin', ${blog.id})" class="w-10 h-10 bg-blue-700 text-white rounded-full hover:bg-blue-800 transition flex items-center justify-center">
+                                <i class="fab fa-linkedin-in"></i>
+                            </button>
+                        </div>
+                        <button onclick="window.print()" class="text-gray-500 hover:text-nba-navy transition">
+                            <i class="fas fa-print mr-2"></i>Print
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('public-view').classList.add('hidden');
+            document.getElementById('single-blog-view').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function showBlogList() {
+            document.getElementById('single-blog-view').classList.add('hidden');
+            document.getElementById('public-view').classList.remove('hidden');
+            renderBlogs();
+        }
+
+        // Admin Functions
+        function openAdminLogin() {
+            document.getElementById('admin-login-modal').classList.remove('hidden');
+        }
+
+        function closeAdminLogin() {
+            document.getElementById('admin-login-modal').classList.add('hidden');
+            document.getElementById('login-error').classList.add('hidden');
+        }
+
+        function toggleLoginPassword() {
+            const input = document.getElementById('admin-login-password');
+            const eye = document.getElementById('login-eye');
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                eye.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        function showAdminPanel() {
+            document.getElementById('public-view').classList.add('hidden');
+            document.getElementById('single-blog-view').classList.add('hidden');
+            document.getElementById('admin-panel').classList.remove('hidden');
+            renderAdminTable();
+            updateStats();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('public-view').classList.remove('hidden');
+            renderBlogs();
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            sessionStorage.removeItem('nba_admin_session');
+            closeAdminPanel();
+            showToast('Logged out successfully', 'info');
+        }
+
+        // Admin Table
+        function renderAdminTable() {
+            const tbody = document.getElementById('admin-posts-table');
+            const emptyState = document.getElementById('admin-empty-state');
+            
+            if (blogs.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = blogs.sort((a, b) => new Date(b.date) - new Date(a.date)).map(blog => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <img src="${blog.image || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded object-cover mr-4">
+                            <div>
+                                <p class="font-semibold text-gray-800 line-clamp-1">${blog.title}</p>
+                                <p class="text-sm text-gray-500">${blog.author}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium uppercase">
+                            ${blog.category}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-medium ${blog.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                            ${blog.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                        ${formatDate(blog.date)}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">
+                        ${blog.views}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-2">
+                            <button onclick="editPost(${blog.id})" class="p-2 text-blue-600 hover:bg-blue-50 rounded transition" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="viewBlog(${blog.id})" class="p-2 text-green-600 hover:bg-green-50 rounded transition" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="openDeleteModal(${blog.id})" class="p-2 text-red-600 hover:bg-red-50 rounded transition" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStats() {
+            const total = blogs.length;
+            const published = blogs.filter(b => b.status === 'published').length;
+            const drafts = blogs.filter(b => b.status === 'draft').length;
+            const views = blogs.reduce((sum, b) => sum + (b.views || 0), 0);
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-published').textContent = published;
+            document.getElementById('stat-drafts').textContent = drafts;
+            document.getElementById('stat-views').textContent = views.toLocaleString();
+        }
+
+        // Post Modal Functions
+        function openNewPostModal() {
+            document.getElementById('post-form').reset();
+            document.getElementById('post-id').value = '';
+            document.getElementById('modal-title').textContent = 'New Blog Post';
+            document.getElementById('post-content').innerHTML = '';
+            document.getElementById('excerpt-count').textContent = '0';
+            document.getElementById('save-btn-text').textContent = 'Publish Post';
+            document.getElementById('featured-image-preview').classList.add('hidden');
+            document.getElementById('post-modal').classList.remove('hidden');
+        }
+
+        function editPost(id) {
+            const blog = blogs.find(b => b.id === id);
+            if (!blog) return;
+
+            document.getElementById('post-id').value = blog.id;
+            document.getElementById('post-title').value = blog.title;
+            document.getElementById('post-category').value = blog.category;
+            document.getElementById('post-status').value = blog.status;
+            
+            // Set image value and preview if exists
+            const imageInput = document.getElementById('post-image');
+            imageInput.value = blog.image || '';
+            
+            if (blog.image) {
+                document.getElementById('preview-img').src = blog.image;
+                document.getElementById('featured-image-preview').classList.remove('hidden');
+            } else {
+                document.getElementById('featured-image-preview').classList.add('hidden');
+            }
+            
+            document.getElementById('post-excerpt').value = blog.excerpt;
+            document.getElementById('post-content').innerHTML = blog.content;
+            document.getElementById('excerpt-count').textContent = blog.excerpt.length;
+            document.getElementById('modal-title').textContent = 'Edit Post';
+            document.getElementById('save-btn-text').textContent = 'Update Post';
+            
+            document.getElementById('post-modal').classList.remove('hidden');
+        }
+
+        function closePostModal() {
+            document.getElementById('post-modal').classList.add('hidden');
+            document.getElementById('preview-panel').classList.add('hidden');
+        }
+
+        // Featured Image Upload
+        function handleFeaturedImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                showToast('Please select a valid image file (JPG, PNG, GIF, or WebP)', 'error');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Image size must be less than 5MB', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
+                document.getElementById('post-image').value = base64Image;
+                document.getElementById('preview-img').src = base64Image;
+                document.getElementById('featured-image-preview').classList.remove('hidden');
+                showToast('Featured image uploaded!', 'success');
+            };
+            reader.readAsDataURL(file);
+            input.value = '';
+        }
+        
+        function clearFeaturedImage() {
+            document.getElementById('post-image').value = '';
+            document.getElementById('preview-img').src = '';
+            document.getElementById('featured-image-upload').value = '';
+            document.getElementById('featured-image-preview').classList.add('hidden');
+        }
+
+        // Editor Functions
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            document.getElementById('post-content').focus();
+        }
+
+        function insertLink() {
+            const url = prompt('Enter URL:');
+            if (url) {
+                document.execCommand('createLink', false, url);
+            }
+        }
+
+        function insertImageURL() {
+            const url = prompt('Enter image URL:');
+            if (url) {
+                insertImageAtCursor(url, 'External image');
+            }
+        }
+
+        // Handle local image upload in editor
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                showToast('Please select a valid image file (JPG, PNG, GIF, or WebP)', 'error');
+                input.value = '';
+                return;
+            }
+            
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                showToast('Image size must be less than 5MB', 'error');
+                input.value = '';
+                return;
+            }
+            
+            const progressContainer = document.getElementById('upload-progress');
+            const progressBar = document.getElementById('progress-bar');
+            progressContainer.classList.remove('hidden');
+            
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                if (progress >= 90) clearInterval(progressInterval);
+            }, 50);
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                clearInterval(progressInterval);
+                progressBar.style.width = '100%';
+                
+                setTimeout(() => {
+                    const imageUrl = e.target.result;
+                    insertImageAtCursor(imageUrl, file.name);
+                    
+                    progressContainer.classList.add('hidden');
+                    progressBar.style.width = '0%';
+                    input.value = '';
+                    
+                    showToast('Image uploaded successfully!', 'success');
+                }, 300);
+            };
+            
+            reader.onerror = function() {
+                clearInterval(progressInterval);
+                progressContainer.classList.add('hidden');
+                showToast('Error uploading image. Please try again.', 'error');
+                input.value = '';
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        function insertImageAtCursor(src, alt) {
+            const editor = document.getElementById('post-content');
+            editor.focus();
+            
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = alt || 'Blog image';
+            img.style.maxWidth = '100%';
+            img.style.borderRadius = '8px';
+            img.style.margin = '16px 0';
+            img.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+            
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(img);
+                
+                range.setStartAfter(img);
+                range.setEndAfter(img);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                
+                const br = document.createElement('br');
+                range.insertNode(br);
+            } else {
+                editor.appendChild(img);
+                editor.appendChild(document.createElement('br'));
+            }
+            
+            editor.dispatchEvent(new Event('input'));
+        }
+        
+        function cancelUpload() {
+            document.getElementById('upload-progress').classList.add('hidden');
+            document.getElementById('image-upload').value = '';
+            showToast('Upload cancelled', 'info');
+        }
+
+        function togglePreview() {
+            const checkbox = document.getElementById('enable-preview');
+            const preview = document.getElementById('preview-panel');
+            const content = document.getElementById('post-content').innerHTML;
+            
+            if (checkbox.checked) {
+                document.getElementById('preview-content').innerHTML = content;
+                preview.classList.remove('hidden');
+                checkbox.nextElementSibling.classList.add('bg-nba-gold');
+                checkbox.nextElementSibling.querySelector('.toggle-dot').classList.add('translate-x-4');
+            } else {
+                preview.classList.add('hidden');
+                checkbox.nextElementSibling.classList.remove('bg-nba-gold');
+                checkbox.nextElementSibling.querySelector('.toggle-dot').classList.remove('translate-x-4');
+            }
+        }
+
+        function saveAsDraft() {
+            document.getElementById('post-status').value = 'draft';
+            document.getElementById('post-form').dispatchEvent(new Event('submit'));
+        }
+
+        function savePost(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('post-id').value;
+            const title = document.getElementById('post-title').value;
+            const category = document.getElementById('post-category').value;
+            const status = document.getElementById('post-status').value;
+            
+            // Get the featured image - use uploaded value or empty string
+            let image = document.getElementById('post-image').value.trim();
+            
+            // If no featured image provided, check if there's an image in content
+            const content = document.getElementById('post-content').innerHTML;
+            if (!image) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+                const firstImg = tempDiv.querySelector('img');
+                if (firstImg) {
+                    image = firstImg.src;
+                }
+            }
+            
+            const excerpt = document.getElementById('post-excerpt').value;
+
+            if (!title || !excerpt || !content) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            const postData = {
+                id: id ? parseInt(id) : Date.now(),
+                title,
+                category,
+                status,
+                image: image || null,
+                excerpt,
+                content,
+                author: 'NBA Awka',
+                date: new Date().toISOString().split('T')[0],
+                views: id ? blogs.find(b => b.id === parseInt(id))?.views || 0 : 0
+            };
+
+            if (id) {
+                const index = blogs.findIndex(b => b.id === parseInt(id));
+                if (index !== -1) {
+                    blogs[index] = postData;
+                    showToast('Post updated successfully!', 'success');
+                }
+            } else {
+                blogs.unshift(postData);
+                showToast('Post published successfully!', 'success');
+            }
+
+            saveBlogs();
+            closePostModal();
+            renderAdminTable();
+            updateStats();
+        }
+
+        // Delete Functions
+        function openDeleteModal(id) {
+            deleteTargetId = id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            deleteTargetId = null;
+            document.getElementById('delete-modal').classList.add('hidden');
+        }
+
+        function confirmDelete() {
+            if (deleteTargetId) {
+                blogs = blogs.filter(b => b.id !== deleteTargetId);
+                saveBlogs();
+                renderAdminTable();
+                updateStats();
+                showToast('Post deleted successfully', 'success');
+            }
+            closeDeleteModal();
+        }
+
+        // Utilities
+        function saveBlogs() {
+            localStorage.setItem('nba_blogs', JSON.stringify(blogs));
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('en-US', options);
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+            
+            msg.textContent = message;
+            icon.className = type === 'success' ? 'fas fa-check-circle text-nba-gold' : 
+                           type === 'error' ? 'fas fa-exclamation-circle text-red-400' : 
+                           'fas fa-info-circle text-blue-400';
+            
+            toast.classList.remove('hidden', 'translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        function shareBlog(platform, id) {
+            const blog = blogs.find(b => b.id === id);
+            const url = window.location.href + '?blog=' + id;
+            const text = encodeURIComponent(blog.title);
+            
+            let shareUrl;
+            switch(platform) {
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+                    break;
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`;
+                    break;
+                case 'linkedin':
+                    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+                    break;
+            }
+            
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+        }
+
+        function loadMoreBlogs() {
+            showToast('No more posts to load', 'info');
+        }
+
+        function toggleMobileMenu() {
+            // Implement mobile menu toggle
+        }
+
+        // ===== EVENT LISTENERS =====
+        document.addEventListener('DOMContentLoaded', function() {
+            initAuth();
+            renderBlogs();
+            
+            // Excerpt character counter
+            document.getElementById('post-excerpt')?.addEventListener('input', function() {
+                document.getElementById('excerpt-count').textContent = this.value.length;
+            });
+            
+            // Password strength checker
+            document.getElementById('new-password')?.addEventListener('input', function() {
+                const password = this.value;
+                const bar = document.getElementById('strength-bar');
+                const text = document.getElementById('strength-text');
+                
+                let strength = 0;
+                if (password.length >= 8) strength++;
+                if (/[A-Z]/.test(password)) strength++;
+                if (/[a-z]/.test(password)) strength++;
+                if (/[0-9]/.test(password)) strength++;
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+                
+                const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500'];
+                const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+                
+                bar.className = `h-full transition-all duration-300 ${colors[strength - 1] || 'bg-gray-200'}`;
+                bar.style.width = `${(strength / 5) * 100}%`;
+                text.textContent = strength > 0 ? labels[strength - 1] : 'Password strength';
+                text.className = `text-xs mt-1 ${strength >= 4 ? 'text-green-600' : 'text-gray-500'}`;
+            });
+
+            // Setup form validation
+            document.getElementById('setup-password')?.addEventListener('input', function() {
+                const val = this.value;
+                document.getElementById('req-length').innerHTML = val.length >= 8 ? 
+                    '<i class="fas fa-check text-green-500 mr-1"></i> At least 8 characters' : 
+                    '<i class="fas fa-circle text-gray-300 mr-1 text-[6px]"></i> At least 8 characters';
+                document.getElementById('req-upper').innerHTML = /[A-Z]/.test(val) ? 
+                    '<i class="fas fa-check text-green-500 mr-1"></i> One uppercase letter' : 
+                    '<i class="fas fa-circle text-gray-300 mr-1 text-[6px]"></i> One uppercase letter';
+                document.getElementById('req-lower').innerHTML = /[a-z]/.test(val) ? 
+                    '<i class="fas fa-check text-green-500 mr-1"></i> One lowercase letter' : 
+                    '<i class="fas fa-circle text-gray-300 mr-1 text-[6px]"></i> One lowercase letter';
+                document.getElementById('req-number').innerHTML = /[0-9]/.test(val) ? 
+                    '<i class="fas fa-check text-green-500 mr-1"></i> One number' : 
+                    '<i class="fas fa-circle text-gray-300 mr-1 text-[6px]"></i> One number';
+                document.getElementById('req-special').innerHTML = /[^A-Za-z0-9]/.test(val) ? 
+                    '<i class="fas fa-check text-green-500 mr-1"></i> One special character' : 
+                    '<i class="fas fa-circle text-gray-300 mr-1 text-[6px]"></i> One special character';
+            });
+
+            // Password match checker
+            document.getElementById('confirm-new-password')?.addEventListener('input', function() {
+                const match = this.value === document.getElementById('new-password').value;
+                document.getElementById('password-match-error').classList.toggle('hidden', match);
+            });
+            
+            // Drag and drop support for editor
+            const editor = document.getElementById('post-content');
+            if (editor) {
+                editor.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.style.backgroundColor = '#f0f9ff';
+                });
+                
+                editor.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.style.backgroundColor = '';
+                });
+                
+                editor.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.style.backgroundColor = '';
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0 && files[0].type.startsWith('image/')) {
+                        const input = document.getElementById('image-upload');
+                        input.files = files;
+                        handleImageUpload(input);
+                    }
+                });
+                
+                // Paste image from clipboard
+                editor.addEventListener('paste', function(e) {
+                    const items = e.clipboardData.items;
+                    for (let i = 0; i < items.length; i++) {
+                        if (items[i].type.indexOf('image') !== -1) {
+                            e.preventDefault();
+                            const blob = items[i].getAsFile();
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                                insertImageAtCursor(event.target.result, 'Pasted image');
+                                showToast('Image pasted from clipboard!', 'success');
+                            };
+                            reader.readAsDataURL(blob);
+                            break;
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
