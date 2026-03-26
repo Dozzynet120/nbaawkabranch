@@ -59,9 +59,9 @@
                     <a href="blog.html" class="hover:text-nba-gold transition">Blog</a>
                     <a href="membership.html" class="px-4 py-2 bg-nba-gold text-nba-navy rounded hover:bg-yellow-500 transition">Member Login</a>
                 </div>
-                <button class="md:hidden text-2xl" onclick="toggleMobileMenu()">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <button id="mobile-menu-btn" class="lg:hidden text-nba-navy text-2xl">
+                     <i class="fas fa-bars"></i>
+                   </button>
             </div>
         </div>
     </nav>
@@ -705,10 +705,79 @@
             const statsSection = document.querySelector('.stat-counter')?.closest('div')?.parentElement;
             if (statsSection) observer.observe(statsSection);
         });
+  // Mobile Menu Toggle - Fully Fixed Version
+document.addEventListener('DOMContentLoaded', function () {
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
 
-        function toggleMobileMenu() {
-            // Implement mobile menu toggle
+    // Stop if elements don't exist
+    if (!mobileMenuBtn || !mobileMenu) return;
+
+    // Toggle menu
+    mobileMenuBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const isHidden = mobileMenu.classList.contains('hidden');
+
+        if (isHidden) {
+            mobileMenu.classList.remove('hidden');
+            mobileMenuBtn.setAttribute('aria-expanded', 'true');
+        } else {
+            mobileMenu.classList.add('hidden');
+            mobileMenuBtn.setAttribute('aria-expanded', 'false');
         }
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', function (e) {
+        if (
+            !mobileMenu.contains(e.target) &&
+            !mobileMenuBtn.contains(e.target)
+        ) {
+            mobileMenu.classList.add('hidden');
+            mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // Prevent menu click from closing itself
+    mobileMenu.addEventListener('click', function (e) {
+        e.stopPropagation();
+    });
+
+    // Close when clicking any link
+    const links = mobileMenu.querySelectorAll('a');
+    links.forEach(link => {
+        link.addEventListener('click', function () {
+            mobileMenu.classList.add('hidden');
+            mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        });
+    });
+
+    // Smooth scroll
+    const anchors = document.querySelectorAll('a[href^="#"]');
+    anchors.forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+
+            if (href && href !== '#') {
+                const target = document.querySelector(href);
+
+                if (target) {
+                    e.preventDefault();
+
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+
+                    // Close mobile menu if open
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+    });
+});
     </script>
 </body>
 </html>

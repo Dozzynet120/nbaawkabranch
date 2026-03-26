@@ -60,9 +60,9 @@
                     <a href="contact.html" class="text-nba-gold font-medium">Contact</a>
                     <a href="membership.html" class="px-4 py-2 bg-nba-gold text-nba-navy rounded hover:bg-yellow-500 transition">Member Login</a>
                 </div>
-                <button class="md:hidden text-2xl" onclick="toggleMobileMenu()">
-                    <i class="fas fa-bars"></i>
-                </button>
+                 <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden text-nba-navy text-2xl">
+                 <i class="fas fa-bars"></i>
+                 </button>
             </div>
         </div>
     </nav>
@@ -410,10 +410,10 @@
 
     <script>
         // Mobile Menu Toggle
-        function toggleMobileMenu() {
-            // Implementation for mobile menu
-            console.log('Mobile menu toggled');
-        }
+          function toggleMobileMenu() {
+         const menu = document.getElementById('mobile-menu');
+          menu.classList.toggle('hidden');
+       }
 
         // FAQ Toggle
         function toggleFaq(button) {
