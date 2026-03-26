@@ -56,33 +56,53 @@
 </head>
 <body class="bg-slate-50 min-h-screen font-sans">
 
-    <!-- Navigation -->
-    <nav class="bg-nba-navy text-white shadow-lg sticky top-0 z-40">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center h-20">
-                <a href="index.html" class="flex items-center space-x-3">
-                    <div class="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden">
-                        <img src="img/logo1.png" alt="NBA Awka Logo" class="w-20 h-20 object-contain" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-balance-scale text-nba-navy text-xl\'></i>'">
-                    </div>
-                    <div>
-                        <h1 class="font-serif font-bold text-xl leading-tight">NBA AWKA</h1>
-                        <p class="text-xs text-gray-300">Nigerian Bar Association</p>
-                    </div>
-                </a>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="index.html" class="hover:text-nba-gold transition">Home</a>
-                    <a href="blog.html" class="text-nba-gold font-medium">Blog</a>
-                    <a href="#about" class="hover:text-nba-gold transition">About</a>
-                    <button onclick="openAdminLogin()" class="px-4 py-2 border border-nba-gold text-nba-gold rounded hover:bg-nba-gold hover:text-nba-navy transition">
-                        <i class="fas fa-lock mr-2"></i>Admin
-                    </button>
+  <!-- NAVBAR -->
+<nav class="bg-nba-navy text-white shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center h-20">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center space-x-3">
+                <div class="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden">
+                    <img src="img/logo1.png" alt="NBA Awka Logo" class="w-20 h-20 object-contain"
+                        onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-balance-scale text-nba-gold text-xl\'></i>'">
                 </div>
-                <button class="md:hidden text-2xl" onclick="toggleMobileMenu()">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <div>
+                    <h1 class="font-serif font-bold text-xl leading-tight">NBA AWKA</h1>
+                    <p class="text-xs text-gray-300">Nigerian Bar Association</p>
+                </div>
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="hover:text-nba-gold transition">Home</a>
+                <a href="about.html" class="hover:text-nba-gold transition">About</a>
+                <a href="events.html" class="text-nba-gold font-medium">Events</a>
+                <a href="blog.html" class="hover:text-nba-gold transition">Blog</a>
+                <a href="membershiplogin.html" class="px-4 py-2 bg-nba-gold text-nba-navy rounded hover:bg-yellow-500 transition">
+                    Member Login
+                </a>
             </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-white text-3xl z-50 p-2 bg-nba-gold rounded focus:outline-none" aria-label="Toggle Menu">
+                ☰
+            </button>
         </div>
-    </nav>
+    </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div id="mobile-menu" class="hidden md:hidden fixed top-20 left-0 w-full bg-white z-[1050] shadow-lg overflow-y-auto">
+    <div class="flex flex-col space-y-4 p-6 text-lg">
+        <a href="index.html" class="hover:text-nba-gold">Home</a>
+        <a href="about.html" class="hover:text-nba-gold">About</a>
+        <a href="events.html" class="text-nba-gold font-medium">Events</a>
+        <a href="blog.html" class="hover:text-nba-gold">Blog</a>
+        <a href="membershiplogin.html" class="px-4 py-2 bg-nba-gold text-nba-navy rounded text-center">
+            Member Login
+        </a>
+    </div>
+</div>
 
     <!-- Public Blog Page -->
     <div id="public-view">
@@ -1596,9 +1616,35 @@
             showToast('No more posts to load', 'info');
         }
 
-        function toggleMobileMenu() {
-            // Implement mobile menu toggle
+      
+     document.addEventListener('DOMContentLoaded', function () {
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (!mobileMenuBtn || !mobileMenu) return;
+
+    mobileMenuBtn.addEventListener('click', function () {
+        mobileMenu.classList.toggle('hidden');
+        const isExpanded = !mobileMenu.classList.contains('hidden');
+        mobileMenuBtn.setAttribute('aria-expanded', isExpanded);
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+            mobileMenu.classList.add('hidden');
+            mobileMenuBtn.setAttribute('aria-expanded', 'false');
         }
+    });
+
+    // Close menu when clicking a link
+    mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function () {
+            mobileMenu.classList.add('hidden');
+            mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        });
+    });
+});
 
         // ===== EVENT LISTENERS =====
         document.addEventListener('DOMContentLoaded', function() {
