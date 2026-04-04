@@ -313,6 +313,38 @@
             font-size: 0.95rem;
         }
         
+.sponsor-logo {
+    width: 150px;
+    height: 100px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s;
+}
+
+.sponsor-logo img {
+    max-height: 40px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.sponsor-logo span {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7);
+}
+
+.sponsor-logo:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.05);
+}
+
         /* Sponsorship Tiers */
         .tiers-section {
             padding: 80px 0;
@@ -949,7 +981,7 @@
     <nav class="navbar">
         <div class="container navbar-inner">
             <div class="logo">
-                <div class="logo-icon">⚖</div>
+                <img src="img/logo.webp" alt="NBA Awka Logo" style="height: 45px;">
                 <span>NBA Awka Branch</span>
             </div>
             <ul class="nav-links">
@@ -1188,14 +1220,39 @@
                 <p>Join these distinguished organizations in supporting the legal profession.</p>
             </div>
             
-            <div class="sponsors-logos">
-                <div class="sponsor-logo">Zenith Bank</div>
-                <div class="sponsor-logo">Shell Nigeria</div>
-                <div class="sponsor-logo">Nestlé Nigeria</div>
-                <div class="sponsor-logo">Dangote Group</div>
-                <div class="sponsor-logo">GTBank</div>
-                <div class="sponsor-logo">UBA</div>
-            </div>
+           <div class="sponsors-logos">
+
+    <div class="sponsor-logo">
+        <img src="img/Zenith.png" alt="Zenith Bank">
+        <span>Zenith Bank</span>
+    </div>
+
+    <div class="sponsor-logo">
+        <img src="img/shell.png" alt="Shell Nigeria">
+        <span>Shell Nigeria</span>
+    </div>
+
+    <div class="sponsor-logo">
+        <img src="img/nestle.png" alt="Nestlé Nigeria">
+        <span>Nestlé Nigeria</span>
+    </div>
+
+    <div class="sponsor-logo">
+        <img src="img/dangote.png" alt="Dangote Group">
+        <span>Dangote Group</span>
+    </div>
+
+    <div class="sponsor-logo">
+        <img src="img/gtb.png" alt="GTBank">
+        <span>GTBank</span>
+    </div>
+
+    <div class="sponsor-logo">
+        <img src="img/uba.png" alt="UBA">
+        <span>UBA</span>
+    </div>
+
+</div>
         </div>
     </section>
 
