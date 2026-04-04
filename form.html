@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sponsor Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+
+<body class="bg-gray-100">
+
+<div class="max-w-4xl mx-auto mt-10 bg-[#0F1F33] text-white p-8 rounded shadow">
+    <h2 class="text-2xl font-bold mb-6 text-center">
+        Become a Sponsor – NBA Awka Branch
+    </h2>
+
+    <form action="https://formsubmit.co/nbaawkabranch@gmail.com" method="POST" class="space-y-6">
+
+        <!-- Hidden Config -->
+        <input type="hidden" name="_subject" value="New NBA Awka Sponsorship Request">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_next" value="thank-you.html">
+
+        <!-- Inputs -->
+        <input type="text" name="name" placeholder="Full Name / Organization" required 
+        class="w-full border rounded px-4 py-2 text-black">
+
+        <input type="email" name="email" placeholder="Email Address" required 
+        class="w-full border rounded px-4 py-2 text-black">
+
+        <input type="tel" name="phone" placeholder="Phone Number" required 
+        class="w-full border rounded px-4 py-2 text-black">
+
+        <!-- Hidden Fields -->
+        <input type="hidden" name="package" id="package">
+        <input type="hidden" name="amount" id="amount">
+
+        <!-- Packages -->
+        <div>
+            <h3 class="font-bold mb-2">Sponsorship Packages</h3>
+
+            <div class="grid md:grid-cols-2 gap-5">
+
+                <!-- Bronze -->
+                <div onclick="selectPackage(this, 'Bronze', 500000)" 
+                     class="package border border-gray-500 rounded p-5 cursor-pointer hover:shadow-lg transition group">
+
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-bold">Bronze</h4>
+                        <i data-feather="award"></i>
+                    </div>
+
+                    <p class="text-sm text-gray-300">₦500K / year</p>
+                </div>
+
+                <!-- Silver -->
+                <div onclick="selectPackage(this, 'Silver', 1000000)" 
+                     class="package border border-gray-500 rounded p-5 cursor-pointer hover:shadow-lg transition group">
+
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-bold">Silver</h4>
+                        <i data-feather="star"></i>
+                    </div>
+
+                    <p class="text-sm text-gray-300">₦1M / year</p>
+                </div>
+
+                <!-- Gold -->
+                <div onclick="selectPackage(this, 'Gold', 2500000)" 
+                     class="package border-2 border-yellow-400 bg-yellow-100 text-black rounded p-5 cursor-pointer hover:shadow-lg transition relative">
+
+                    <span class="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
+                        MOST POPULAR
+                    </span>
+
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-bold">Gold</h4>
+                        <i data-feather="zap"></i>
+                    </div>
+
+                    <p class="text-sm">₦2.5M / year</p>
+                </div>
+
+                <!-- Platinum -->
+                <div onclick="selectPackage(this, 'Platinum', 5000000)" 
+                     class="package border border-gray-500 rounded p-5 cursor-pointer hover:shadow-lg transition group">
+
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-bold">Platinum</h4>
+                        <i data-feather="diamond"></i>
+                    </div>
+
+                    <p class="text-sm text-gray-300">₦5M+ / year</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Message -->
+        <textarea name="message" placeholder="Additional Message" rows="4"
+        class="w-full border rounded px-4 py-2 text-black"></textarea>
+
+        <!-- Submit -->
+        <button type="submit" 
+        class="w-full py-3 bg-yellow-500 text-black font-bold rounded hover:bg-yellow-600">
+            Submit Sponsorship Request
+        </button>
+
+    </form>
+</div>
+
+<script>
+    function selectPackage(element, name, amount) {
+        document.querySelectorAll('.package').forEach(p => {
+            p.classList.remove('border-blue-400', 'bg-blue-100', 'text-black');
+        });
+
+        element.classList.add('border-blue-400', 'bg-blue-100', 'text-black');
+
+        document.getElementById('amount').value = amount;
+        document.getElementById('package').value = name;
+    }
+
+    feather.replace();
+</script>
+
+</body>
+</html>

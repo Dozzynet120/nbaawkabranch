@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become a Sponsor | NBA Awka Branch</title>
+    <meta name="description" content="Partner with NBA Awka Branch. Explore sponsorship opportunities for law week, projects, and events. Build your brand while supporting the legal profession.">
+    
+    <style>
+        :root {
+            --primary: #0F1F33;
+            --primary-dark: #0F1F33;
+            --primary-light: #0F1F33;
+            --gold: #d4af37;
+            --gold-dark: #b8941f;
+            --gold-light: #f4e4bc;
+            --success: #059669;
+            --dark: #0f172a;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --gray-800: #1e293b;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--gray-50);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--gold) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-cta {
+            background: var(--primary);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .nav-cta:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+            opacity: 0.1;
+        }
+        
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        @media (max-width: 900px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+        
+        .hero h1 span {
+            color: var(--gold);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            max-width: 500px;
+        }
+        
+        @media (max-width: 900px) {
+            .hero p { margin: 0 auto 30px; }
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--gold);
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .hero-visual {
+            position: relative;
+        }
+        
+        .sponsor-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            color: var(--gray-800);
+            box-shadow: var(--shadow-xl);
+            transform: rotate(3deg);
+            transition: transform 0.3s;
+        }
+        
+        .sponsor-card:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+        
+        .sponsor-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .sponsor-logo-placeholder {
+            height: 80px;
+            background: var(--gray-100);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-600);
+            margin-bottom: 15px;
+            border: 2px dashed var(--gray-200);
+        }
+        
+        /* Why Sponsor Section */
+        .why-sponsor {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .section-header p {
+            color: var(--gray-600);
+            font-size: 1.1rem;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .benefit-card {
+            padding: 40px 30px;
+            border-radius: var(--radius);
+            background: var(--gray-50);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .benefit-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .benefit-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+            color: white;
+        }
+        
+        .benefit-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--gray-800);
+        }
+        
+        .benefit-card p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+        
+        /* Sponsorship Tiers */
+        .tiers-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, var(--gray-50) 0%, white 100%);
+        }
+        
+        .tiers-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+        
+        @media (max-width: 1000px) {
+            .tiers-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .tiers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .tier-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--gray-200);
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .tier-card.featured {
+            border-color: var(--gold);
+            transform: scale(1.05);
+            box-shadow: var(--shadow-xl);
+            z-index: 10;
+        }
+        
+        @media (max-width: 1000px) {
+            .tier-card.featured {
+                transform: scale(1);
+            }
+        }
+        
+        .tier-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .tier-name {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .tier-amount {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--gray-800);
+            margin-bottom: 5px;
+        }
+        
+        .tier-amount span {
+            font-size: 1rem;
+            color: var(--gray-600);
+            font-weight: 400;
+        }
+        
+        .tier-period {
+            text-align: center;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+        
+        .tier-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+        
+        .tier-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .tier-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .tier-features li.exclude::before {
+            content: '×';
+            color: var(--gray-400);
+        }
+        
+        .tier-btn {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tier-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tier-card.featured .tier-btn {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+            border-color: var(--gold);
+            color: white;
+        }
+        
+        .tier-card.featured .tier-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(212, 175, 55, 0.4);
+        }
+        
+        /* Events & Opportunities */
+        .events-section {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .event-card {
+            display: flex;
+            gap: 25px;
+            padding: 30px;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .event-card:hover {
+            border-color: var(--primary);
+            transform: translateX(10px);
+        }
+        
+        .event-date {
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .event-date .month {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .event-date .day {
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        
+        .event-content h3 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+        }
+        
+        .event-content p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+        
+        .sponsor-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--gold-light);
+            color: var(--gold-dark);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        /* Current Sponsors */
+        .current-sponsors {
+            padding: 80px 0;
+            background: var(--dark);
+            color: white;
+        }
+        
+        .current-sponsors .section-header h2 {
+            color: white;
+        }
+        
+        .current-sponsors .section-header p {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .sponsors-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .sponsor-logo {
+            width: 150px;
+            height: 80px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+        
+        .sponsor-logo:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 80px 0;
+            background: var(--gray-50);
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .testimonial-card {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            color: var(--gray-600);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--gold) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .author-info h4 {
+            color: var(--gray-800);
+            font-size: 1rem;
+        }
+        
+        .author-info p {
+            color: var(--gray-600);
+            font-size: 0.85rem;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+        }
+        
+        .btn-primary {
+            background: var(--gold);
+            color: var(--dark);
+            padding: 16px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px -10px rgba(212, 175, 55, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            padding: 16px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 2px solid white;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: var(--primary);
+        }
+        
+        /* Contact Section */
+        .contact-section {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+        
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .contact-info h3 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gray-100);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        
+        .contact-details h4 {
+            color: var(--gray-800);
+            margin-bottom: 5px;
+        }
+        
+        .contact-details p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+        }
+        
+        .contact-form {
+            background: var(--gray-50);
+            padding: 40px;
+            border-radius: var(--radius);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 0.9rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 500px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .footer-brand h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .footer-brand p {
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+        
+        .footer-links h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--gold);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 30px;
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--dark);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-xl);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast.show {
+            display: flex;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container navbar-inner">
+            <div class="logo">
+                <div class="logo-icon">⚖</div>
+                <span>NBA Awka Branch</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#benefits">Benefits</a></li>
+                <li><a href="#tiers">Sponsorship Tiers</a></li>
+                <li><a href="#events">Events</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="form.html" class="nav-cta">Become a Sponsor</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-grid">
+            <div>
+                <h1>Partner With <span>Excellence</span></h1>
+                <p>Align your brand with the most prestigious legal institution in Anambra State. Reach decision-makers, professionals, and community leaders through NBA Awka Branch.</p>
+                <a href="#tiers" class="btn-primary">View Sponsorship Packages →</a>
+                
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Active Members</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">35</span>
+                        <span class="stat-label">Years of Excellence</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">10K+</span>
+                        <span class="stat-label">Annual Reach</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="sponsor-card">
+                    <div class="sponsor-badge">★ Premium Partner</div>
+                    <div class="sponsor-logo-placeholder">Your Logo Here</div>
+                    <h3 style="margin-bottom: 10px;">Proud Sponsor</h3>
+                    <p style="color: var(--gray-600); font-size: 0.9rem;">Featured at NBA Awka Law Week 2026, all branch events, and digital platforms.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Sponsor Section -->
+    <section class="why-sponsor" id="benefits">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Partner With NBA Awka?</h2>
+                <p>Sponsoring the Nigerian Bar Association Awka Branch offers unique advantages for organizations seeking to connect with legal professionals and the broader community.</p>
+            </div>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">🎯</div>
+                    <h3>Targeted Reach</h3>
+                    <p>Direct access to over 500 legal practitioners, judges, corporate counsel, and business leaders in Anambra State and beyond.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🏆</div>
+                    <h3>Brand Prestige</h3>
+                    <p>Associate your brand with excellence, integrity, and professional standards. Enhance your corporate reputation.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🤝</div>
+                    <h3>Network Access</h3>
+                    <p>Build relationships with decision-makers at exclusive events, dinners, and private gatherings reserved for sponsors.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">📢</div>
+                    <h3>Visibility</h3>
+                    <p>Logo placement on all event materials, website, social media, and press releases reaching thousands.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">💼</div>
+                    <h3>Business Development</h3>
+                    <p>Generate leads and opportunities through speaking slots, exhibition spaces, and direct engagement.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">❤️</div>
+                    <h3>Social Impact</h3>
+                    <p>Support free legal aid, mentorship programs, and community development initiatives that change lives.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sponsorship Tiers -->
+    <section class="tiers-section" id="tiers">
+        <div class="container">
+            <div class="section-header">
+                <h2>Sponsorship Packages</h2>
+                <p>Choose a partnership level that aligns with your goals and budget. All packages are customizable.</p>
+            </div>
+            
+            <div class="tiers-grid">
+                <!-- Bronze Tier -->
+                <div class="tier-card">
+                    <h3 class="tier-name">Bronze</h3>
+                    <div class="tier-amount">₦500K <span>/ year</span></div>
+                    <div class="tier-period">Entry Level Partnership</div>
+                    <ul class="tier-features">
+                        <li>Logo on website sponsors page</li>
+                        <li>Recognition at branch meetings</li>
+                        <li>2 complimentary event tickets</li>
+                        <li>Quarterly newsletter feature</li>
+                        <li class="exclude">Speaking opportunities</li>
+                        <li class="exclude">Exhibition booth</li>
+                        <li class="exclude">Exclusive dinner access</li>
+                    </ul>
+                    <button class="tier-btn" onclick="selectTier('Bronze', 500000)">Select Bronze</button>
+                </div>
+                
+                <!-- Silver Tier -->
+                <div class="tier-card">
+                    <h3 class="tier-name">Silver</h3>
+                    <div class="tier-amount">₦1M <span>/ year</span></div>
+                    <div class="tier-period">Growing Partnership</div>
+                    <ul class="tier-features">
+                        <li>All Bronze benefits included</li>
+                        <li>Logo on all event materials</li>
+                        <li>5 complimentary event tickets</li>
+                        <li>Social media spotlights (monthly)</li>
+                        <li>Quarterly networking meetings</li>
+                        <li class="exclude">Speaking opportunities</li>
+                        <li class="exclude">Exclusive dinner access</li>
+                    </ul>
+                    <button class="tier-btn" onclick="selectTier('Silver', 1000000)">Select Silver</button>
+                </div>
+                
+                <!-- Gold Tier (Featured) -->
+                <div class="tier-card featured">
+                    <div class="tier-badge">Most Popular</div>
+                    <h3 class="tier-name">Gold</h3>
+                    <div class="tier-amount">₦2.5M <span>/ year</span></div>
+                    <div class="tier-period">Premium Partnership</div>
+                    <ul class="tier-features">
+                        <li>All Silver benefits included</li>
+                        <li>Prominent logo placement</li>
+                        <li>10 complimentary VIP tickets</li>
+                        <li>Speaking slot at Law Week</li>
+                        <li>Exhibition booth at major events</li>
+                        <li>Access to members directory</li>
+                        <li>Quarterly CEO dinner</li>
+                    </ul>
+                    <button class="tier-btn" onclick="selectTier('Gold', 2500000)">Select Gold</button>
+                </div>
+                
+                <!-- Platinum Tier -->
+                <div class="tier-card">
+                    <h3 class="tier-name">Platinum</h3>
+                    <div class="tier-amount">₦5M+ <span>/ year</span></div>
+                    <div class="tier-period">Title Partnership</div>
+                    <ul class="tier-features">
+                        <li>All Gold benefits included</li>
+                        <li>Title sponsor naming rights</li>
+                        <li>Unlimited event access</li>
+                        <li>Keynote speaking opportunities</li>
+                        <li>Dedicated account manager</li>
+                        <li>Custom partnership programs</li>
+                        <li>Private judicial dinner hosting</li>
+                    </ul>
+                    <button class="tier-btn" onclick="selectTier('Platinum', 5000000)">Select Platinum</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events & Opportunities -->
+    <section class="events-section" id="events">
+        <div class="container">
+            <div class="section-header">
+                <h2>Sponsorship Opportunities</h2>
+                <p>Target specific events and initiatives that align with your brand objectives.</p>
+            </div>
+            
+            <div class="events-grid">
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="month">NOV</span>
+                        <span class="day">15</span>
+                    </div>
+                    <div class="event-content">
+                        <h3>NBA Awka Law Week 2026</h3>
+                        <p>Our flagship annual event featuring legal conferences, dinners, and awards. Expected attendance: 1,000+ professionals.</p>
+                        <span class="sponsor-tag">Title Sponsorship Available</span>
+                    </div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="month">MAR</span>
+                        <span class="day">08</span>
+                    </div>
+                    <div class="event-content">
+                        <h3>International Women's Day Program</h3>
+                        <p>Celebrating women in law with panel discussions, networking, and recognition awards.</p>
+                        <span class="sponsor-tag">Presenting Sponsor Needed</span>
+                    </div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="month">MAY</span>
+                        <span class="day">01</span>
+                    </div>
+                    <div class="event-content">
+                        <h3>Law Day Celebration</h3>
+                        <p>Community legal awareness program with free consultations and public education.</p>
+                        <span class="sponsor-tag">Community Partner Wanted</span>
+                    </div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="month">ONGOING</span>
+                        <span class="day" style="font-size: 1rem;">24/7</span>
+                    </div>
+                    <div class="event-content">
+                        <h3>Free Legal Aid Clinic</h3>
+                        <p>Year-round pro bono services for indigent community members. Sponsor operations and staff.</p>
+                        <span class="sponsor-tag">Monthly Sponsors Welcome</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Current Sponsors -->
+    <section class="current-sponsors">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Current Partners</h2>
+                <p>Join these distinguished organizations in supporting the legal profession.</p>
+            </div>
+            
+            <div class="sponsors-logos">
+                <div class="sponsor-logo">Zenith Bank</div>
+                <div class="sponsor-logo">Shell Nigeria</div>
+                <div class="sponsor-logo">Nestlé Nigeria</div>
+                <div class="sponsor-logo">Dangote Group</div>
+                <div class="sponsor-logo">GTBank</div>
+                <div class="sponsor-logo">UBA</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2>Partner Testimonials</h2>
+                <p>Hear from organizations that have partnered with NBA Awka Branch.</p>
+            </div>
+            
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Our partnership with NBA Awka has opened doors to relationships we couldn't have built otherwise. The ROI in terms of brand recognition and business opportunities has been exceptional."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">OA</div>
+                        <div class="author-info">
+                            <h4>Okafor Adebayo</h4>
+                            <p>CEO, Prime Legal Solutions</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Supporting the Free Legal Aid Clinic aligned perfectly with our CSR goals. We've seen firsthand how our contribution changes lives in the community."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">CN</div>
+                        <div class="author-info">
+                            <h4>Chioma Nwosu</h4>
+                            <p>Head of CSR, Heritage Bank</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The networking opportunities at Law Week alone justified our sponsorship. We've secured three major clients through connections made at NBA Awka events."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">EI</div>
+                        <div class="author-info">
+                            <h4>Emmanuel Ibe</h4>
+                            <p>Managing Partner, Ibe & Associates</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Partner With Us?</h2>
+            <p>Join the leading organizations supporting legal excellence in Anambra State. Let's discuss how we can create a partnership that delivers value for your brand.</p>
+            <div class="cta-buttons">
+                <a href="#contact" class="btn-primary">Start Your Partnership →</a>
+                <a href="mailto:sponsorship@nbaawka.org" class="btn-secondary">Download Sponsorship Deck</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Let's Discuss Your Partnership</h3>
+                    <p style="color: var(--gray-600); margin-bottom: 30px;">Our partnerships team is ready to create a customized sponsorship package that meets your objectives.</p>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">📧</div>
+                        <div class="contact-details">
+                            <h4>Email Us</h4>
+                            <p>sponsorship@nbaawka.org<br>partnerships@nbaawka.org</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">📞</div>
+                        <div class="contact-details">
+                            <h4>Call Us</h4>
+                            <p>+234 803 123 4567<br>+234 805 987 6543</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div class="contact-details">
+                            <h4>Visit Us</h4>
+                            <p>NBA Awka Branch Secretariat<br>High Court Complex, Awka<br>Anambra State, Nigeria</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">💬</div>
+                        <div class="contact-details">
+                            <h4>WhatsApp</h4>
+                            <p>+234 803 123 4567<br>Available Mon-Fri, 9am - 5pm</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form class="contact-form" onsubmit="handleSponsorInquiry(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="orgName">Organization Name *</label>
+                            <input type="text" id="orgName" required placeholder="Company name">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactPerson">Contact Person *</label>
+                            <input type="text" id="contactPerson" required placeholder="Full name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" required placeholder="email@company.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" required placeholder="+234 ...">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tierInterest">Sponsorship Tier of Interest</label>
+                        <select id="tierInterest">
+                            <option value="">Select a tier...</option>
+                            <option value="Bronze">Bronze (₦500K/year)</option>
+                            <option value="Silver">Silver (₦1M/year)</option>
+                            <option value="Gold">Gold (₦2.5M/year)</option>
+                            <option value="Platinum">Platinum (₦5M+/year)</option>
+                            <option value="Custom">Custom Package</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="eventInterest">Specific Event/Project Interest</label>
+                        <select id="eventInterest">
+                            <option value="">Select an option...</option>
+                            <option value="Law Week">NBA Awka Law Week</option>
+                            <option value="Legal Aid">Free Legal Aid Clinic</option>
+                            <option value="Mentorship">Young Lawyers Mentorship</option>
+                            <option value="Library">Law Library Development</option>
+                            <option value="General">General Partnership</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Tell Us About Your Goals</label>
+                        <textarea id="message" rows="4" placeholder="What do you hope to achieve through this partnership?"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Send Partnership Inquiry</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>NBA Awka Branch</h3>
+                    <p>Advancing the legal profession and promoting the rule of law in Anambra State since 1991. Join us in making a difference.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#benefits">Why Sponsor</a></li>
+                        <li><a href="#tiers">Packages</a></li>
+                        <li><a href="#events">Events</a></li>
+                        <li><a href="donate.html">Donate</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Sponsorship Deck (PDF)</a></li>
+                        <li><a href="#">Media Kit</a></li>
+                        <li><a href="#">Brand Guidelines</a></li>
+                        <li><a href="#">Past Events Gallery</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Terms of Partnership</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Refund Policy</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 Nigerian Bar Association, Awka Branch. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span>✓</span>
+        <span id="toast-message">Message sent successfully!</span>
+    </div>
+
+    <script>
+        // Select Tier
+        function selectTier(tier, amount) {
+            document.getElementById('tierInterest').value = tier;
+            document.getElementById('contactPerson').focus();
+            showToast(`${tier} tier selected! Please complete the inquiry form.`);
+            
+            // Smooth scroll to contact
+            document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Handle Form Submission
+        function handleSponsorInquiry(e) {
+            e.preventDefault();
+            
+            const formData = {
+                organization: document.getElementById('orgName').value,
+                contact: document.getElementById('contactPerson').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                tier: document.getElementById('tierInterest').value,
+                event: document.getElementById('eventInterest').value,
+                message: document.getElementById('message').value
+            };
+            
+            // Here you would typically send to your backend
+            console.log('Sponsorship Inquiry:', formData);
+            
+            showToast('Inquiry sent! Our team will contact you within 24 hours.');
+            e.target.reset();
+        }
+        
+        // Toast Notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+        
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
