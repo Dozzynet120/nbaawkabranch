@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Past Presidents - NBA Awka Branch</title>
+    <title>NBA Awka Branch - The Capital Bar</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -16,167 +17,835 @@
                             navy: '#1B365D',
                             darknavy: '#0F1F33',
                             cream: '#F5F5DC',
-                            lightgray: '#F8F9FA'
+                            lightgray: '#F8F9FA',
+                            accent: '#C9A227'
                         }
                     },
                     fontFamily: {
                         serif: ['Playfair Display', 'serif'],
                         sans: ['Inter', 'sans-serif']
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.8s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
                     }
                 }
             }
         }
     </script>
+    <style>
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .timeline-line {
+            background: linear-gradient(to bottom, #D4AF37, #B8960C);
+        }
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(27, 54, 93, 0.15);
+        }
+        .section-divider {
+            background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+            height: 2px;
+        }
+        .chairman-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            object-position: center top;
+        }
+        .image-placeholder {
+            width: 100%;
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1B365D 0%, #0F1F33 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .image-placeholder::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .initials {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #D4AF37;
+            font-family: 'Playfair Display', serif;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .image-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(27,54,93,0.9), transparent);
+            padding: 1rem;
+            text-align: center;
+            color: #D4AF37;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .error-placeholder {
+            display: none;
+        }
+        img[src].error + .error-placeholder {
+            display: flex;
+        }
+        img[src].error {
+            display: none;
+        }
+    </style>
 </head>
-<body class="bg-nba-lightgray font-sans">
+<body class="bg-nba-lightgray font-sans antialiased">
 
-    <!-- Header Section -->
-    <header class="bg-nba-navy text-nba-cream py-12 text-center">
-        <h1 class="text-4xl md:text-5xl font-serif font-bold">Past Presidents</h1>
-        <p class="text-nba-gold mt-2 text-lg md:text-xl">NBA Awka Branch – From Inception to Date</p>
+    <!-- Navigation -->
+    <nav class="bg-nba-navy text-nba-cream sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+               <div class="w-20 h-20 bg-darknavy rounded-full flex items-center justify-center">
+                        <img src="img/newlogo.png" alt="NBA Awka Logo" class="w-60 h-60 object-contain">
+                    </div>
+                <span class="font-serif text-xl font-bold">NBA Awka Branch</span>
+            </div>
+            <div class="hidden md:flex space-x-8 text-sm font-medium">
+                <a href="about.html" class="hover:text-nba-gold transition-colors">About Us</a>
+                <a href="#history" class="hover:text-nba-gold transition-colors">History</a>
+                <a href="pastP.html" class="hover:text-nba-gold transition-colors">Past Presidents</a>
+                <a href="#leadership" class="hover:text-nba-gold transition-colors">Leadership</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative bg-nba-navy text-nba-cream py-20 overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 left-0 w-96 h-96 bg-nba-gold rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-nba-gold rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2"></div>
+        </div>
+        
+        <div class="relative max-w-5xl mx-auto px-6 text-center animate-fade-in">
+            <div class="inline-block mb-4 px-4 py-1 border border-nba-gold rounded-full text-nba-gold text-sm font-medium tracking-wider uppercase">Est. 1971</div>
+            <h1 class="text-5xl md:text-7xl font-serif font-bold mb-6 text-shadow leading-tight">
+                The Capital Bar
+            </h1>
+            <p class="text-2xl md:text-3xl text-nba-gold font-light mb-8">NBA Awka Branch</p>
+            <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                The second oldest branch of the Nigerian Bar Association in Anambra State, 
+                serving the legal profession with excellence since 1971.
+            </p>
+            
+            <div class="mt-12 flex justify-center space-x-8 text-sm">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-nba-gold">50+</div>
+                    <div class="text-gray-400 mt-1">Years of Service</div>
+                </div>
+                <div class="w-px bg-gray-600"></div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-nba-gold">2</div>
+                    <div class="text-gray-400 mt-1">Branches Produced</div>
+                </div>
+                <div class="w-px bg-gray-600"></div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-nba-gold">5</div>
+                    <div class="text-gray-400 mt-1">SANs Produced</div>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <!-- Presidents Grid Section -->
-    <section class="py-12 px-6 md:px-12">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    <!-- About Us Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16 animate-slide-up">
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-nba-navy mb-4">About Us</h2>
+                <div class="w-24 h-1 bg-nba-gold mx-auto"></div>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Pioneering legal excellence in the heart of Anambra State</p>
+            </div>
 
-            <!-- Example President Card -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/pioneer.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Ozo George Nwogbonnia  Amanke Okafor Esq. </h2>
-                    <p class="text-nba-darkgold mt-1">Pioneer Chairman NBA, Awka Branch 1971-1989</p>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6 animate-slide-up">
+                    <div class="bg-nba-lightgray p-8 rounded-2xl border-l-4 border-nba-gold">
+                        <h3 class="text-2xl font-serif font-bold text-nba-navy mb-4">Who We Are</h3>
+                        <p class="text-gray-700 leading-relaxed">
+                            The Awka Branch of the Nigerian Bar Association, popularly called <span class="font-semibold text-nba-darkgold">"The Capital Bar"</span>, 
+                            is one of the many branches of the Nigerian Bar Association. It is the second oldest branch of the eight (8) branches 
+                            of the NBA in Anambra State of Nigeria.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-nba-navy to-nba-darknavy p-8 rounded-2xl text-white">
+                        <h3 class="text-2xl font-serif font-bold text-nba-gold mb-4">Our Location</h3>
+                        <p class="leading-relaxed text-gray-300">
+                            Located in the capital of Anambra State—the Awka Capital Territory—hence the appellation 
+                            <span class="text-nba-gold font-semibold">"The Capital Bar"</span>. We serve as the premier legal institution 
+                            in the state capital.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="relative animate-slide-up" style="animation-delay: 0.2s;">
+                    <div class="absolute inset-0 bg-nba-gold rounded-2xl transform rotate-3 opacity-20"></div>
+                    <div class="relative bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+                        <div class="flex items-center mb-6">
+                            <div class="w-12 h-12 bg-nba-gold rounded-full flex items-center justify-center text-nba-navy text-2xl">🏛</div>
+                            <div class="ml-4">
+                                <h4 class="font-serif text-xl font-bold text-nba-navy">Ozo Amanke Okafor Bar Centre</h4>
+                                <p class="text-sm text-gray-500">Our Home Since 2017</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed mb-4">
+                            Named after our founding father, <strong>Ozo G.N.A. Okafor (Amanke)</strong>, the Bar Centre 
+                            stands as a testament to our rich heritage and commitment to the legal profession.
+                        </p>
+                        <div class="bg-nba-lightgray p-4 rounded-lg text-sm text-gray-600">
+                            <strong>Address:</strong> 50 Court Road, Awka 420108, Anambra State
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- History Section -->
+    <section id="history" class="py-20 bg-nba-lightgray relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full opacity-5">
+            <div class="absolute top-20 left-10 text-9xl font-serif text-nba-navy">§</div>
+            <div class="absolute bottom-20 right-10 text-9xl font-serif text-nba-navy">§</div>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-nba-navy mb-4">Our History</h2>
+                <div class="w-24 h-1 bg-nba-gold mx-auto"></div>
+                <p class="mt-4 text-gray-600">A journey of resilience, growth, and legal excellence since 1971</p>
+            </div>
+
+            <!-- Formation -->
+            <div class="mb-16">
+                <div class="bg-white rounded-2xl shadow-lg p-8 md:p-12 hover-lift">
+                    <div class="flex items-center mb-6">
+                        <div class="w-16 h-16 bg-nba-gold rounded-full flex items-center justify-center text-nba-navy text-2xl font-bold">01</div>
+                        <div class="ml-6">
+                            <h3 class="text-2xl font-serif font-bold text-nba-navy">Formation & Registration</h3>
+                            <p class="text-nba-darkgold font-medium">1971 - The Beginning</p>
+                        </div>
+                    </div>
+                    <div class="prose max-w-none text-gray-700 leading-relaxed space-y-4">
+                        <p>
+                            The Awka Branch of the Nigerian Bar Association was formed after the Nigerian Civil War, precisely in the year 1971. 
+                            Prior to this, the territory that now constitutes the Awka Judicial Division of the High Court of Anambra State was 
+                            part of the Onitsha Judicial Division of the High Court of the then Eastern Region.
+                        </p>
+                        <p>
+                            There were no law offices open in Awka prior to the Nigerian civil war. However, as a result of the war, Nigerian lawyers 
+                            of Igbo extraction practising in various parts of Nigeria were forced to return to their home base. Consequently, lawyers 
+                            including <strong>George Nwogbonnia Amankemekwu Okafor</strong> (popularly called Amanke), the first General Secretary of the 
+                            Nigerian Bar Association, relocated from Lagos to Awka. He was joined by <strong>James Nnajiofor Iloduba Ezekwe</strong>, 
+                            the first lawyer called to the Bar from Nibo town, who relocated from Jos to Awka.
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/second Pr.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Chief  O.B Onyali SAN</h2>
-                    <p class="text-nba-darkgold mt-1">Sec. NBA, Awka Branch 1981-1989</p>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 1990-1999</p>
-                    <p class="text-nba-darkgold mt-1">Leader of NBA Awka Branch 2007 - till date.</p>
+            <!-- Founding Fathers Grid -->
+            <div class="mb-16">
+                <h3 class="text-3xl font-serif font-bold text-nba-navy mb-8 text-center">The Founding Fathers</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-md hover-lift border-t-4 border-nba-gold">
+                        <h4 class="font-serif text-lg font-bold text-nba-navy mb-2">Ozo G.N.A. Okafor Esq.</h4>
+                        <p class="text-sm text-nba-darkgold font-medium mb-3">"Amanke"</p>
+                        <p class="text-gray-600 text-sm">Founding Chairman (1971-1987). First General Secretary of the NBA. First indigene of Awka town called to the Nigerian Bar.</p>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-md hover-lift border-t-4 border-nba-gold">
+                        <h4 class="font-serif text-lg font-bold text-nba-navy mb-2">J.N.I. Ezekwe Esq.</h4>
+                        <p class="text-sm text-nba-darkgold font-medium mb-3">Founding Vice Chairman</p>
+                        <p class="text-gray-600 text-sm">First lawyer called to the Bar from Nibo town. Later served as Chairman (1987-1990).</p>
+                    </div>
 
+                    <div class="bg-white p-6 rounded-xl shadow-md hover-lift border-t-4 border-nba-gold">
+                        <h4 class="font-serif text-lg font-bold text-nba-navy mb-2">P.N. Nwofor Esq.</h4>
+                        <p class="text-sm text-nba-darkgold font-medium mb-3">"Lord Ogmor"</p>
+                        <p class="text-gray-600 text-sm">Founding Secretary from Nawfia. Instrumental in establishing branch operations.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-md hover-lift border-t-4 border-nba-navy">
+                        <h4 class="font-serif text-lg font-bold text-nba-navy mb-2">Chief (Sir) O.B. Onyali SAN</h4>
+                        <p class="text-sm text-nba-darkgold font-medium mb-3">Founding Assistant Secretary</p>
+                        <p class="text-gray-600 text-sm">Later Secretary and Chairman (1990-1999). Now the Leader of the Branch and only surviving founding member.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-md hover-lift border-t-4 border-nba-navy">
+                        <h4 class="font-serif text-lg font-bold text-nba-navy mb-2">Chief (Sir) Benedict Ozoemena Onyali</h4>
+                        <p class="text-sm text-nba-darkgold font-medium mb-3">SAN</p>
+                        <p class="text-gray-600 text-sm">Prominent among the 1966 law students enrolled into Nigerian Law School, called to Bar in 1971.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-md hover-lift border-t-4 border-nba-navy">
+                        <h4 class="font-serif text-lg font-bold text-nba-navy mb-2">Other Founding Members</h4>
+                        <p class="text-gray-600 text-sm">Including Barr. Ikejiani (Nri), G.C. Nonyelu (Amawbia), F.K.C. Nonyelu (Amawbia), Chief P.N. Obegolu, and Charles Udemezue Ikejiofor.</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/Third Pr.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Prof. Ilochi Okafor SAN</h2>
-                    <p class="text-nba-darkgold mt-1">Deputy leader NBA, Awka Branch</p>
+            <!-- Growth & Expansion -->
+            <div class="bg-gradient-to-r from-nba-navy to-nba-darknavy rounded-2xl p-8 md:p-12 text-white mb-16">
+                <h3 class="text-3xl font-serif font-bold text-nba-gold mb-6">Growth & Expansion</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="text-gray-300 leading-relaxed mb-6">
+                            Since formation in 1971 and registration with the National body of the NBA, Awka Branch has grown from strength to strength 
+                            and has produced other branches of the NBA.
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <span class="w-2 h-2 bg-nba-gold rounded-full mr-3"></span>
+                                <span>Aguata Branch of the NBA (The Frontline Bar)</span>
+                            </li>
+                            <li class="flex items-center">
+                                <span class="w-2 h-2 bg-nba-gold rounded-full mr-3"></span>
+                                <span>Anaocha Branch of the NBA</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-6 backdrop-blur">
+                        <h4 class="text-nba-gold font-serif text-xl font-bold mb-4">Notable Achievements</h4>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex items-start">
+                                <span class="text-nba-gold mr-2">▸</span>
+                                <span>Hosted National Executive Committee Meetings of the NBA</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-nba-gold mr-2">▸</span>
+                                <span>Hosted Eastern Bar Forum (EBF) Meetings</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-nba-gold mr-2">▸</span>
+                                <span>Established permanent Bar Centre at 50 Court Road, Awka</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-nba-gold mr-2">▸</span>
+                                <span>Annual celebration of Chief (Sir) O.B. Onyali SAN, our surviving founder</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-           <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/fouth.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">J.N.I Ezekwe Esq</h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 1989-1993</p>
+
+            <!-- Secretariat -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 md:p-12">
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 bg-nba-gold rounded-full flex items-center justify-center text-nba-navy text-2xl">02</div>
+                    <div class="ml-6">
+                        <h3 class="text-2xl font-serif font-bold text-nba-navy">Secretariat & Meeting Venues</h3>
+                        <p class="text-nba-darkgold font-medium">Evolution of Our Home</p>
+                    </div>
+                </div>
+                <div class="relative border-l-2 border-nba-gold ml-6 space-y-8">
+                    <div class="relative pl-8">
+                        <div class="absolute -left-2 top-0 w-4 h-4 bg-nba-gold rounded-full"></div>
+                        <h4 class="font-bold text-nba-navy">Initial Days (1971-1980s)</h4>
+                        <p class="text-gray-600">Meetings held at Chief Magistrate Court Awka</p>
+                    </div>
+                    <div class="relative pl-8">
+                        <div class="absolute -left-2 top-0 w-4 h-4 bg-nba-gold rounded-full"></div>
+                        <h4 class="font-bold text-nba-navy">Transition Period (1980s-2017)</h4>
+                        <p class="text-gray-600">Moved to State Judiciary Headquarters Conference Hall</p>
+                    </div>
+                    <div class="relative pl-8">
+                        <div class="absolute -left-2 top-0 w-4 h-4 bg-nba-navy rounded-full border-4 border-nba-gold"></div>
+                        <h4 class="font-bold text-nba-navy">Current Home (2017-Present)</h4>
+                        <p class="text-gray-600">During Chief Emmanuel Odum's regime (2015-2017), NBA Awka Branch moved into the present Awka Bar compound. 
+                        We currently operate from a temporary structure while building our permanent structure at the Ozo Amanke Okafor Bar Centre.</p>
+                    </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/fifth.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Ike Onyejiaka Esq</h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 1999-2003</p>
+        </div>
+    </section>
+
+    <!-- Senior Advocates Section -->
+    <section id="leadership" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-nba-navy mb-4">Distinguished Members</h2>
+                <div class="w-24 h-1 bg-nba-gold mx-auto"></div>
+                <p class="mt-4 text-gray-600">Senior Advocates of Nigeria from our Branch</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div class="bg-gradient-to-b from-nba-navy to-nba-darknavy p-6 rounded-xl text-center text-white hover-lift">
+                    <div class="w-10 h-10 mx-auto mb-4 bg-nba-gold rounded-full flex items-center justify-center text-nba-navy text-3xl font-serif font-bold">1</div>
+                     <img src="img/Third Pr.jpeg" alt="Prof. Ilochi Okafor" class="chairman-image" onerror="this.classList.add('error')">
+                    <h4 class="font-serif text-lg font-bold text-nba-gold">Prof. Ilochi Okafor</h4>
+                    <p class="text-sm text-gray-300 mt-2">SAN</p>
+                    <p class="text-xs text-gray-400 mt-2">Most Senior</p>
                 </div>
+
+                <div class="bg-gradient-to-b from-nba-navy to-nba-darknavy p-6 rounded-xl text-center text-white hover-lift">
+                    <div class="w-10 h-10 mx-auto mb-4 bg-nba-gold rounded-full flex items-center justify-center text-nba-navy text-3xl font-serif font-bold">2</div>
+                    <img src="img/second Pr.jpeg" alt="Chief O.B. Onyali" class="chairman-image" onerror="this.classList.add('error')">
+                    <h4 class="font-serif text-lg font-bold text-nba-gold">Chief O.B. Onyali</h4>
+                    <p class="text-sm text-gray-300 mt-2">SAN</p>
+                    <p class="text-xs text-gray-400 mt-2">Founding Member</p>
+                </div>
+                <div class="bg-gradient-to-b from-nba-navy to-nba-darknavy p-6 rounded-xl text-center text-white hover-lift">
+                    <div class="w-10 h-10 mx-auto mb-4 bg-nba-gold rounded-full flex items-center justify-center text-nba-navy text-3xl font-serif font-bold">3</div>
+                     <img src="img/eight.jpeg" alt="Chief Ifeanyichukwu Obiakor " class="chairman-image" onerror="this.classList.add('error')">
+                    <h4 class="font-serif text-lg font-bold text-nba-gold">Chief Ifeanyichukwu Obiakor</h4>
+                    <p class="text-sm text-gray-300 mt-2">SAN</p>
+                    <p class="text-xs text-gray-400 mt-2">Past Chairman</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Past Presidents Section with Images -->
+    <section id="presidents" class="py-20 bg-nba-lightgray">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-nba-navy mb-4">Past Presidents & Chairmen</h2>
+                <div class="w-24 h-1 bg-nba-gold mx-auto"></div>
+                <p class="mt-4 text-gray-600">Leadership lineage from inception to date</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                
+                <!-- 1. Pioneer - Ozo G.N.A. Okafor -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift group">
+                    <div class="relative">
+                        <img src="img/pioneer.jpeg" alt="Ozo G.N.A. Okafor" class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">GNO</span>
+                            <span class="text-nba-gold text-sm mt-2 relative z-10">Pioneer Chairman</span>
+                            <div class="image-label">Photo: img/pioneer.jpeg</div>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 bg-nba-gold text-nba-navy text-center py-1 text-xs font-bold">PIONEER</div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Ozo George Nwogbonnia Amanke Okafor Esq.</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Pioneer Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">1971 - 1989</p>
+                        <p class="text-xs text-gray-400 mt-2 italic">Founding Father</p>
+                    </div>
+                </div>
+
+                <!-- 2. Chief O.B. Onyali SAN -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/second Pr.jpeg" alt="Chief O.B. Onyali SAN" class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">OB</span>
+                            <span class="text-nba-gold text-sm mt-2 relative z-10">SAN</span>
+                            <div class="image-label">Photo: img/second Pr.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Chief O.B. Onyali SAN</h3>
+                        <div class="mt-2 space-y-1">
+                            <p class="text-nba-darkgold text-sm">Sec. 1981-1989</p>
+                            <p class="text-nba-darkgold text-sm font-semibold">Chairman 1990-1999</p>
+                            <p class="text-gray-600 text-sm">Leader 2007-date</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Prof. Ilochi Okafor SAN -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/Third Pr.jpeg" alt="Prof. Ilochi Okafor SAN" class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">IO</span>
+                            <span class="text-nba-gold text-sm mt-2 relative z-10">SAN</span>
+                            <div class="image-label">Photo: img/Third Pr.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Prof. Ilochi Okafor SAN</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Deputy Leader</p>
+                        <p class="text-gray-500 text-sm mt-1">Distinguished Silk</p>
+                    </div>
+                </div>
+
+                <!-- 4. J.N.I. Ezekwe Esq. -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/fouth.jpeg" alt="J.N.I. Ezekwe Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">JNI</span>
+                            <div class="image-label">Photo: img/fouth.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">J.N.I. Ezekwe Esq.</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">1989 - 1993</p>
+                        <p class="text-xs text-gray-400 mt-2">Founding Vice Chairman</p>
+                    </div>
+                </div>
+
+                <!-- 5. Ike Onyejiaka Esq. -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/fifth.jpeg" alt="Ike Onyejiaka Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">IO</span>
+                            <div class="image-label">Photo: img/fifth.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Ike Onyejiaka Esq.</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">1999 - 2003</p>
+                    </div>
+                </div>
+
+                <!-- 6. E.C.G. Okechukwu Esq. -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/sixth.jpeg" alt="E.C.G. Okechukwu Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">ECG</span>
+                            <div class="image-label">Photo: img/sixth.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">E.C.G. Okechukwu Esq.</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">2003 - 2005</p>
+                    </div>
+                </div>
+
+                <!-- 7. Hon. Justice C.G. Nwankwor -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/seveth.jpeg" alt="Hon. Justice C.G. Nwankwor" class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">CGN</span>
+                            <div class="image-label">Photo: img/seveth.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Hon. Justice C.G. Nwankwor</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">2005 - 2007</p>
+                        <p class="text-xs text-gray-400 mt-2">"Akukalia"</p>
+                    </div>
+                </div>
+
+                <!-- 8. Chief Ifeanyichukwu Obiakor SAN -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/eight.jpeg" alt="Chief Ifeanyichukwu Obiakor SAN" class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">IFO</span>
+                            <span class="text-nba-gold text-sm mt-2 relative z-10">SAN</span>
+                            <div class="image-label">Photo: img/eight.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Chief Ifeanyichukwu Obiakor SAN</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">2007 - 2009</p>
+                        <p class="text-xs text-gray-400 mt-2">"Ezeomeisato"</p>
+                    </div>
+                </div>
+
+                <!-- 9. John Ikemefuna Igu Esq. -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/ninth.jpeg" alt="John Ikemefuna Igu Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">JII</span>
+                            <div class="image-label">Photo: img/ninth.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">John Ikemefuna Igu Esq.</h3>
+                        <div class="mt-2 space-y-1">
+                            <p class="text-nba-darkgold text-sm">Sec. 1999-2003</p>
+                            <p class="text-nba-darkgold text-sm font-semibold">Chairman 2009-2011</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10. S.U.S. Mbanaso Esq. -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/tenth.jpeg" alt="S.U.S. Mbanaso Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">SUM</span>
+                            <div class="image-label">Photo: img/tenth.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">S.U.S. Mbanaso Esq.</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">2011 - 2012</p>
+                    </div>
+                </div>
+
+                <!-- 11. Amaka Ezeno Esq. -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/eleventh.jpeg" alt="Amaka Ezeno Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">AE</span>
+                            <div class="image-label">Photo: img/eleventh.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Amaka Ezeno Esq.</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">2012 - 2013</p>
+                        <p class="text-xs text-gray-400 mt-2">"Bencher"</p>
+                    </div>
+                </div>
+
+                <!-- 12. Uba Anene Esq. -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/12th.jpeg" alt="Uba Anene Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">UA</span>
+                            <div class="image-label">Photo: img/12th.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Uba Anene Esq.</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">2013 - 2015</p>
+                        <p class="text-xs text-gray-400 mt-2">"Eko Awka"</p>
+                    </div>
+                </div>
+
+                <!-- 13. Emma Odum Esq. -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/13th.jpeg" alt="Emma Odum Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">EO</span>
+                            <div class="image-label">Photo: img/13th.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Emma Odum Esq.</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">2015 - 2017</p>
+                        <p class="text-xs text-gray-400 mt-2">Moved to Bar Centre</p>
+                    </div>
+                </div>
+
+                <!-- 14. Gabriel U. Moneke Esq. -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/14th.jpeg" alt="Gabriel U. Moneke Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">GUM</span>
+                            <div class="image-label">Photo: img/14th.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Gabriel U. Moneke Esq.</h3>
+                        <div class="mt-2 space-y-1">
+                            <p class="text-nba-darkgold text-sm">Sec. 2005-2007</p>
+                            <p class="text-nba-darkgold text-sm font-semibold">Chairman 2017-2019</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 15. Ekene Okonkwo Esq. -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/15th.jpeg" alt="Ekene Okonkwo Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">EO</span>
+                            <div class="image-label">Photo: img/15th.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Ekene Okonkwo Esq.</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">2019 - 2021</p>
+                    </div>
+                </div>
+
+                <!-- 16. Ken Nwanna Esq. -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift">
+                    <div class="relative">
+                        <img src="img/16th.jpeg" alt="Ken Nwanna Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder">
+                            <span class="initials">KN</span>
+                            <div class="image-label">Photo: img/16th.jpeg</div>
+                        </div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Ken Nwanna Esq.</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">2021 - 2023</p>
+                    </div>
+                </div>
+
+                <!-- 17. Hon. Bona Oraekwe - CURRENT -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift ring-2 ring-nba-gold ring-offset-2">
+                    <div class="relative">
+                        <img src="img/17th.jpeg" alt="Hon. Bona Oraekwe" class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder" style="background: linear-gradient(135deg, #D4AF37 0%, #B8960C 100%);">
+                            <span class="initials text-white">BO</span>
+                            <div class="image-label bg-nba-navy text-nba-gold">Photo: img/17th.jpeg</div>
+                        </div>
+                        <div class="absolute top-4 right-4 bg-white text-nba-darkgold px-3 py-1 rounded-full text-xs font-bold shadow-lg">EMERITUS</div>
+                    </div>
+                    <div class="p-6 text-center bg-gradient-to-b from-white to-nba-lightgray">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Hon. Bona Oraekwe</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">2023 - 2025</p>
+                    </div>
+                </div>
+
+                <!-- 18. Raphael N. Anagor Esq. - INCOMING -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift opacity-75">
+                    <div class="relative">
+                        <img src="img/Chair.jpeg" alt="Raphael N. Anagor Esq." class="chairman-image" onerror="this.classList.add('error')">
+                        <div class="error-placeholder image-placeholder" style="background: linear-gradient(135deg, #9CA3AF 0%, #6B7280 100%);">
+                            <span class="initials text-white">RNA</span>
+                            <div class="image-label bg-gray-800 text-gray-300">Photo: img/18th.jpeg</div>
+                        </div>
+                        <div class="absolute top-4 right-4 bg-white text-gray-600 px-3 py-1 rounded-full text-xs font-bold shadow-lg">CURRENT</div>
+                    </div>
+                    <div class="p-6 text-center">
+                        <h3 class="font-serif text-lg text-nba-navy font-bold leading-tight">Raphael N. Anagor Esq.</h3>
+                        <p class="text-nba-darkgold mt-2 text-sm font-medium">Chairman</p>
+                        <p class="text-gray-500 text-sm mt-1">2025 - </p>
+                    </div>
+                </div>
+
             </div>
             
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/sixth.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">E.C.G Okechukwu Esq</h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 2003-2005</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/seveth.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Hon Justice  C.G Nwankwor</h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 2005-2007</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/eight.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Chief Ifeanyichukwu Obiakor SAN</h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA,  Awka Branch 2007-2009</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/ninth.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">John Ikemefuna Igu Esq</h2>
-                    <p class="text-nba-darkgold mt-1">Sec NBA, Awka Branch 1999-2003</p>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 2009-2011</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/tenth.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">S.U S Mbanaso Esq </h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 2011-2012</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/eleventh.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Amaka Ezeno Esq </h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 2012-2013</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/12th.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Uba Anene Esq </h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 2013-2015</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/13th.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Emma Odum Esq  </h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 2015-2017</p>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/14th.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Gabriel U. Moneke Esq  </h2>
-                    <p class="text-nba-darkgold mt-1">Sec NBA, Awka Branch 2005-2007</p>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 2017-2019</p>
-                </div>
-            </div>
-              <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/15th.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Ekene Okonkwo Esq  </h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 2019-2021</p>
-                </div>
-            </div>
-              <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/16th.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Ken Nwanna </h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 2021-2023</p>
-                </div>
-            </div>
-              <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                <img src="img/17th.jpeg" alt="President Name" class="w-full h-70 object-cover">
-                <div class="p-4 text-center">
-                    <h2 class="font-serif text-xl text-nba-navy font-semibold">Hon. Bona Oraekwe </h2>
-                    <p class="text-nba-darkgold mt-1">Chairman NBA, Awka Branch 2023-2025</p>
-                </div>
-            </div>
-
-            <!-- Add more cards similarly -->
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-nba-navy text-nba-cream text-center py-6 mt-12">
-        <p class="text-sm">&copy; NBA Awka Branch – All Rights Reserved</p>
+    <footer class="bg-nba-navy text-nba-cream py-12 border-t-4 border-nba-gold">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-nba-gold rounded-full flex items-center justify-center text-nba-navy font-bold text-xl">⚖</div>
+                        <span class="font-serif text-xl font-bold">NBA Awka Branch</span>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        The Capital Bar - Pioneering legal excellence in Anambra State since 1971.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-serif text-lg font-bold text-nba-gold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#about" class="hover:text-nba-gold transition-colors">About Us</a></li>
+                        <li><a href="#history" class="hover:text-nba-gold transition-colors">Our History</a></li>
+                        <li><a href="#presidents" class="hover:text-nba-gold transition-colors">Past Presidents</a></li>
+                        <li><a href="#leadership" class="hover:text-nba-gold transition-colors">Distinguished Members</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-serif text-lg font-bold text-nba-gold mb-4">Contact</h4>
+                    <p class="text-gray-400 text-sm mb-2">Ozo Amanke Okafor Bar Centre</p>
+                    <p class="text-gray-400 text-sm mb-2">50 Court Road, Awka 420108</p>
+                    <p class="text-gray-400 text-sm">Anambra State, Nigeria</p>
+                </div>
+            </div>
+            <div class="section-divider mb-8"></div>
+            <div class="text-center text-sm text-gray-500">
+                <p>&copy; 2025 NBA Awka Branch – The Capital Bar. All Rights Reserved.</p>
+                <p class="mt-2 text-xs">Dedicated to the memory of our founding fathers</p>
+            </div>
+        </div>
     </footer>
 
+    <script>
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards
+        document.querySelectorAll('.hover-lift').forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+            observer.observe(el);
+        });
+
+        // Image error handling - show placeholder if image fails to load
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('error', function() {
+                this.classList.add('error');
+            });
+        });
+    </script>
 </body>
 </html>

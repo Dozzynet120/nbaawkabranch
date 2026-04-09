@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annual Reports - NBA Awka Branch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nba: {
+                            gold: '#D4AF37',
+                            darkgold: '#B8960C',
+                            navy: '#1B365D',
+                            darknavy: '#0F1F33',
+                            cream: '#F5F5DC',
+                            lightgray: '#F8F9FA',
+                            accent: '#C9A227',
+                            red: '#DC2626',
+                            green: '#059669'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .report-card {
+            transition: all 0.3s ease;
+        }
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(27, 54, 93, 0.15);
+        }
+        .year-badge {
+            background: linear-gradient(135deg, #D4AF37 0%, #B8960C 100%);
+        }
+        .pdf-icon {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .archive-item {
+            transition: all 0.2s ease;
+        }
+        .archive-item:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+            border-left-color: #D4AF37;
+        }
+        .admin-panel {
+            display: none;
+        }
+        .admin-panel.active {
+            display: block;
+        }
+        .modal {
+            display: none;
+            background: rgba(0,0,0,0.5);
+        }
+        .modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-nba-lightgray font-sans antialiased">
+
+    <!-- Admin Login Bar (Top) -->
+    <div id="adminLoginBar" class="bg-nba-darknavy text-white py-2 px-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <span class="text-sm text-gray-400">Admin Access</span>
+            <button onclick="toggleAdminLogin()" id="loginBtn" class="text-sm bg-nba-gold text-nba-navy px-4 py-1 rounded font-semibold hover:bg-white transition">
+                <i class="fas fa-lock mr-2"></i>Admin Login
+            </button>
+            <button onclick="logoutAdmin()" id="logoutBtn" class="hidden text-sm bg-nba-red text-white px-4 py-1 rounded font-semibold hover:bg-red-700 transition">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="loginModal" class="modal fixed inset-0 z-50 items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <h3 class="text-2xl font-serif font-bold text-nba-navy mb-4">Admin Login</h3>
+            <p class="text-gray-600 mb-6 text-sm">Enter credentials to manage annual reports.</p>
+            <input type="password" id="adminPassword" placeholder="Enter admin password" class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 focus:border-nba-gold focus:outline-none">
+            <div class="flex gap-4">
+                <button onclick="loginAdmin()" class="flex-1 bg-nba-navy text-white py-3 rounded-lg font-semibold hover:bg-nba-darknavy transition">Login</button>
+                <button onclick="toggleAdminLogin()" class="flex-1 border-2 border-gray-300 text-gray-600 py-3 rounded-lg font-semibold hover:border-nba-navy hover:text-nba-navy transition">Cancel</button>
+            </div>
+            <p class="text-xs text-gray-500 mt-4">Default password: admin123 (change in production)</p>
+        </div>
+    </div>
+
+    <!-- Report Modal (Add/Edit) -->
+    <div id="reportModal" class="modal fixed inset-0 z-50 items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-lg w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 id="modalTitle" class="text-2xl font-serif font-bold text-nba-navy mb-6">Add New Report</h3>
+            <form id="reportForm" onsubmit="saveReport(event)">
+                <input type="hidden" id="editReportId">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Year *</label>
+                    <input type="number" id="reportYear" required min="2000" max="2030" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" 
+                           placeholder="e.g., 2024">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                    <input type="text" id="reportTitle" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" 
+                           placeholder="e.g., NBA Awka Branch Annual Report 2024">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">PDF File Name *</label>
+                    <input type="text" id="reportFile" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" 
+                           placeholder="e.g., NBA-Awka-Annual-Report-2024.pdf">
+                    <p class="text-xs text-gray-500 mt-1">File must exist in /reports/ folder</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">File Size</label>
+                        <input type="text" id="reportSize" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" 
+                               placeholder="e.g., 3.2 MB">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Pages</label>
+                        <input type="number" id="reportPages" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" 
+                               placeholder="e.g., 48">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">New Members</label>
+                        <input type="number" id="statMembers" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" 
+                               placeholder="e.g., 156">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">CLE Programs</label>
+                        <input type="number" id="statCLE" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" 
+                               placeholder="e.g., 24">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Welfare Amount</label>
+                        <input type="text" id="statWelfare" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" 
+                               placeholder="e.g., ₦12.5M">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Community Projects</label>
+                        <input type="number" id="statProjects" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" 
+                               placeholder="e.g., 8">
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea id="reportDescription" rows="3" 
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none resize-none" 
+                              placeholder="Brief description of the report..."></textarea>
+                </div>
+
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 bg-nba-green text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition">
+                        <i class="fas fa-save mr-2"></i>Save Report
+                    </button>
+                    <button type="button" onclick="closeReportModal()" class="flex-1 border-2 border-gray-300 text-gray-600 py-3 rounded-lg font-semibold hover:border-nba-navy hover:text-nba-navy transition">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-nba-navy text-nba-cream sticky top-0 z-40 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-4">
+                <div class="logo-hover cursor-pointer">
+                    <svg width="56" height="56" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-lg">
+                        <defs>
+                            <linearGradient id="goldGradNav" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#F9F1D8;stop-opacity:1" />
+                                <stop offset="30%" style="stop-color:#E5C76B;stop-opacity:1" />
+                                <stop offset="60%" style="stop-color:#D4AF37;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#B8960C;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="navyGradNav" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#3D5A8C;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#1B365D;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#0F1F33;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="120" cy="120" r="110" fill="url(#navyGradNav)" stroke="url(#goldGradNav)" stroke-width="5"/>
+                        <circle cx="120" cy="120" r="100" fill="none" stroke="url(#goldGradNav)" stroke-width="1.5" opacity="0.4"/>
+                        <g transform="translate(120, 105) scale(0.85)">
+                            <defs>
+                                <linearGradient id="pillarGradNav" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#B8960C"/>
+                                    <stop offset="50%" style="stop-color:#F4E4BC"/>
+                                    <stop offset="100%" style="stop-color:#B8960C"/>
+                                </linearGradient>
+                            </defs>
+                            <rect x="-8" y="-50" width="16" height="100" rx="3" fill="url(#pillarGradNav)"/>
+                            <rect x="-15" y="-55" width="30" height="12" rx="2" fill="url(#goldGradNav)"/>
+                            <rect x="-20" y="45" width="40" height="12" rx="3" fill="url(#goldGradNav)"/>
+                            <rect x="-30" y="55" width="60" height="10" rx="4" fill="url(#goldGradNav)"/>
+                            <rect x="-70" y="-58" width="140" height="10" rx="3" fill="url(#goldGradNav)"/>
+                            <circle cx="0" cy="-58" r="10" fill="url(#goldGradNav)"/>
+                            <circle cx="0" cy="-58" r="6" fill="url(#navyGradNav)"/>
+                            <circle cx="0" cy="-58" r="3" fill="url(#goldGradNav)"/>
+                            <line x1="-55" y1="-53" x2="-55" y2="-15" stroke="url(#goldGradNav)" stroke-width="4" stroke-linecap="round"/>
+                            <line x1="-55" y1="-35" x2="-65" y2="-20" stroke="url(#goldGradNav)" stroke-width="2"/>
+                            <line x1="-55" y1="-35" x2="-45" y2="-20" stroke="url(#goldGradNav)" stroke-width="2"/>
+                            <ellipse cx="-55" cy="-10" rx="28" ry="10" fill="none" stroke="url(#goldGradNav)" stroke-width="4"/>
+                            <line x1="55" y1="-53" x2="55" y2="-15" stroke="url(#goldGradNav)" stroke-width="4" stroke-linecap="round"/>
+                            <line x1="55" y1="-35" x2="45" y2="-20" stroke="url(#goldGradNav)" stroke-width="2"/>
+                            <line x1="55" y1="-35" x2="65" y2="-20" stroke="url(#goldGradNav)" stroke-width="2"/>
+                            <ellipse cx="55" cy="-10" rx="28" ry="10" fill="none" stroke="url(#goldGradNav)" stroke-width="4"/>
+                        </g>
+                        <path id="topArcNav" d="M 50,165 A 90,90 0 0,1 190,165" fill="none"/>
+                        <text font-family="'Playfair Display', Georgia, serif" font-size="22" font-weight="700" fill="url(#goldGradNav)" letter-spacing="6">
+                            <textPath href="#topArcNav" startOffset="50%" text-anchor="middle">NBA</textPath>
+                        </text>
+                        <path id="bottomArcNav" d="M 45,155 A 95,95 0 0,0 195,155" fill="none"/>
+                        <text font-family="'Playfair Display', Georgia, serif" font-size="20" font-weight="700" fill="url(#goldGradNav)" letter-spacing="4">
+                            <textPath href="#bottomArcNav" startOffset="50%" text-anchor="middle">AWKA</textPath>
+                        </text>
+                        <g fill="url(#goldGradNav)">
+                            <polygon points="120,18 122,24 128,24 123,28 125,34 120,30 115,34 117,28 112,24 118,24"/>
+                            <polygon points="25,120 26.5,123.5 30,123.5 27.2,126 28,129.5 25,127.5 22,129.5 22.8,126 20,123.5 23.5,123.5" opacity="0.8"/>
+                            <polygon points="215,120 216.5,123.5 220,123.5 217.2,126 218,129.5 215,127.5 212,129.5 212.8,126 210,123.5 213.5,123.5" opacity="0.8"/>
+                        </g>
+                        <text x="120" y="215" font-family="'Inter', sans-serif" font-size="11" font-weight="500" fill="url(#goldGradNav)" text-anchor="middle" letter-spacing="2" opacity="0.9">THE CAPITAL BAR</text>
+                    </svg>
+                </div>
+                <div class="hidden sm:block">
+                    <h1 class="font-serif text-xl font-bold leading-tight">NBA Awka Branch</h1>
+                    <p class="text-nba-gold text-xs tracking-wider uppercase font-medium">The Capital Bar</p>
+                </div>
+            </a>
+
+            <div class="flex items-center space-x-6">
+                <a href="index.html" class="hidden md:block text-sm hover:text-nba-gold transition-colors">← Back to Home</a>
+                <div class="bg-nba-gold/20 text-nba-gold px-4 py-2 rounded-full text-sm font-semibold border border-nba-gold/30">
+                    <i class="fas fa-file-alt mr-2"></i>Annual Reports
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Panel (Hidden by default) -->
+    <div id="adminPanel" class="admin-panel bg-nba-darknavy text-white py-4 px-6 border-b-4 border-nba-gold">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-cog text-nba-gold text-xl"></i>
+                <span class="font-bold">Admin Panel</span>
+                <span class="text-sm text-gray-400">Manage Annual Reports</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="openReportModal()" class="bg-nba-green text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition flex items-center">
+                    <i class="fas fa-plus mr-2"></i>Add New Report
+                </button>
+                <button onclick="resetToDefault()" class="bg-nba-red text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition flex items-center">
+                    <i class="fas fa-undo mr-2"></i>Reset to Default
+                </button>
+                <button onclick="clearAllReports()" class="bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition flex items-center">
+                    <i class="fas fa-trash mr-2"></i>Clear All
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="relative bg-gradient-to-br from-nba-navy via-nba-darknavy to-nba-navy text-nba-cream py-16 overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 left-0 w-96 h-96 bg-nba-gold rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2"></div>
+        </div>
+        
+        <div class="relative max-w-4xl mx-auto px-6 text-center">
+            <div class="inline-flex items-center mb-4 px-4 py-2 bg-nba-gold/20 border border-nba-gold/30 rounded-full text-nba-gold text-sm font-medium">
+                <i class="fas fa-chart-line mr-2"></i>
+                Transparency & Accountability
+            </div>
+            <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4 text-shadow">
+                Annual Reports
+            </h1>
+            <p class="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                Access our comprehensive annual reports detailing the activities, achievements, financial performance, 
+                and strategic direction of the NBA Awka Branch.
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        
+        <!-- Featured Report Section -->
+        <section class="mb-16">
+            <div class="flex items-center mb-8">
+                <div class="w-1 h-8 bg-nba-gold mr-4"></div>
+                <h2 class="text-2xl font-serif font-bold text-nba-navy">Latest Report</h2>
+            </div>
+
+            <div id="featuredReport" class="bg-white rounded-2xl shadow-xl overflow-hidden report-card">
+                <!-- Featured report will be loaded here dynamically -->
+            </div>
+        </section>
+
+        <!-- Report Highlights -->
+        <section class="mb-16">
+            <div class="flex items-center mb-8">
+                <div class="w-1 h-8 bg-nba-gold mr-4"></div>
+                <h2 class="text-2xl font-serif font-bold text-nba-navy">Report Highlights</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-nba-gold">
+                    <div class="w-12 h-12 bg-nba-gold/10 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-users text-nba-gold text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-nba-navy mb-2">Membership Growth</h3>
+                    <p class="text-gray-600 text-sm">Detailed analysis of membership statistics, new admissions, and retention rates across all practice categories.</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-nba-navy">
+                    <div class="w-12 h-12 bg-nba-navy/10 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-graduation-cap text-nba-navy text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-nba-navy mb-2">Continuing Education</h3>
+                    <p class="text-gray-600 text-sm">Comprehensive review of CLE programs, workshops, and professional development initiatives.</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-nba-gold">
+                    <div class="w-12 h-12 bg-nba-gold/10 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-hand-holding-heart text-nba-gold text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-nba-navy mb-2">Welfare & Support</h3>
+                    <p class="text-gray-600 text-sm">Financial assistance programs, member welfare initiatives, and support services provided.</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-nba-navy">
+                    <div class="w-12 h-12 bg-nba-navy/10 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-gavel text-nba-navy text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-nba-navy mb-2">Court Liaison</h3>
+                    <p class="text-gray-600 text-sm">Updates on court infrastructure improvements and judicial relations activities.</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-nba-gold">
+                    <div class="w-12 h-12 bg-nba-gold/10 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-landmark text-nba-gold text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-nba-navy mb-2">Bar Centre</h3>
+                    <p class="text-gray-600 text-sm">Ozo Amanke Okafor Bar Centre operations, facilities management, and development.</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-lg border-t-4 border-nba-navy">
+                    <div class="w-12 h-12 bg-nba-navy/10 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-pie text-nba-navy text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-nba-navy mb-2">Financial Report</h3>
+                    <p class="text-gray-600 text-sm">Audited financial statements, income and expenditure, and budget performance.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Archive Section -->
+        <section class="mb-16">
+            <div class="flex items-center mb-8">
+                <div class="w-1 h-8 bg-nba-gold mr-4"></div>
+                <h2 class="text-2xl font-serif font-bold text-nba-navy">Report Archive</h2>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="p-6 border-b border-gray-200 bg-nba-lightgray">
+                    <div class="flex flex-wrap gap-4 items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-sm font-medium text-gray-600">Filter by Year:</span>
+                            <select id="yearFilter" onchange="filterReports()" class="px-4 py-2 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none">
+                                <option value="all">All Years</option>
+                            </select>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <span id="reportCount">0</span> reports available
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reportsList" class="divide-y divide-gray-200">
+                    <!-- Reports will be loaded here dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Request Printed Copy -->
+        <section class="mb-16">
+            <div class="bg-nba-navy rounded-2xl p-8 md:p-12 text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-nba-gold/10 rounded-full transform translate-x-32 -translate-y-32"></div>
+                <div class="relative z-10 grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-2xl font-serif font-bold mb-4">Request a Printed Copy</h3>
+                        <p class="text-gray-300 mb-6">
+                            Members can request a hard copy of the current or previous annual reports. 
+                            Please allow 5-7 business days for processing and delivery.
+                        </p>
+                        <div class="flex items-center space-x-4 text-sm text-nba-gold">
+                            <span><i class="fas fa-phone mr-2"></i>+234 803 XXX XXXX</span>
+                            <span><i class="fas fa-envelope mr-2"></i>secretary@nbaawka.org.ng</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-center md:justify-end">
+                        <a href="mailto:secretary@nbaawka.org.ng?subject=Request for Annual Report Hard Copy" 
+                           class="inline-flex items-center px-8 py-4 bg-nba-gold text-nba-navy rounded-lg font-bold hover:bg-white transition-all shadow-lg">
+                            <i class="fas fa-paper-plane mr-2"></i>Request Hard Copy
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-nba-navy text-nba-cream py-12 border-t-4 border-nba-gold">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-12 h-12 bg-nba-gold rounded-full flex items-center justify-center">
+                            <svg width="28" height="28" viewBox="0 0 240 240" class="drop-shadow">
+                                <circle cx="120" cy="120" r="110" fill="#1B365D" stroke="#D4AF37" stroke-width="10"/>
+                                <g transform="translate(120, 115) scale(0.55)" stroke="#D4AF37" stroke-width="6" fill="none">
+                                    <rect x="-6" y="-40" width="12" height="80" rx="2"/>
+                                    <rect x="-25" y="35" width="50" height="10" rx="3"/>
+                                    <rect x="-60" y="-45" width="120" height="8" rx="2"/>
+                                    <circle cx="0" cy="-45" r="8" fill="#D4AF37"/>
+                                    <line x1="-50" y1="-41" x2="-50" y2="-10"/>
+                                    <ellipse cx="-50" cy="-5" rx="20" ry="8"/>
+                                    <line x1="50" y1="-41" x2="50" y2="-10"/>
+                                    <ellipse cx="50" cy="-5" rx="20" ry="8"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="font-serif text-lg font-bold block">NBA Awka Branch</span>
+                            <span class="text-nba-gold text-xs tracking-wider">The Capital Bar</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Committed to upholding the highest standards of legal ethics and professional conduct.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-serif text-lg font-bold text-nba-gold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="index.html" class="hover:text-nba-gold transition-colors">Home</a></li>
+                        <li><a href="index.html#about" class="hover:text-nba-gold transition-colors">About Us</a></li>
+                        <li><a href="index.html#leadership" class="hover:text-nba-gold transition-colors">Leadership</a></li>
+                        <li><a href="violationpage.html" class="hover:text-nba-gold transition-colors">Report Violation</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-serif text-lg font-bold text-nba-gold mb-4">Contact Secretariat</h4>
+                    <p class="text-gray-400 text-sm mb-2">Ozo Amanke Okafor Bar Centre</p>
+                    <p class="text-gray-400 text-sm mb-2">50 Court Road, Awka 420108</p>
+                    <p class="text-gray-400 text-sm font-semibold text-nba-gold">nbaawkabranch@gmail.com</p>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-sm text-gray-500">
+                <p>&copy; 2025 NBA Awka Branch – The Capital Bar. All Rights Reserved.</p>
+                <p class="mt-2 text-xs">Annual Reports published in accordance with NBA Constitution requirements</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Default reports data
+        const defaultReports = [
+            {
+                id: '2024',
+                year: 2024,
+                title: 'NBA Awka Branch Annual Report 2024',
+                file: 'NBA-Awka-Annual-Report-2024.pdf',
+                size: '3.2 MB',
+                pages: 48,
+                members: 156,
+                cle: 24,
+                welfare: '₦12.5M',
+                projects: 8,
+                description: 'A comprehensive overview of our branch\'s activities, membership growth, continuing legal education programs, community service initiatives, and financial stewardship throughout the 2024 fiscal year.',
+                downloads: 234
+            },
+            {
+                id: '2023',
+                year: 2023,
+                title: 'NBA Awka Branch Annual Report 2023',
+                file: 'NBA-Awka-Annual-Report-2023.pdf',
+                size: '2.8 MB',
+                pages: 45,
+                members: 142,
+                cle: 22,
+                welfare: '₦10.8M',
+                projects: 6,
+                description: 'Annual report covering membership development, welfare programs, and branch activities for 2023.',
+                downloads: 456
+            },
+            {
+                id: '2022',
+                year: 2022,
+                title: 'NBA Awka Branch Annual Report 2022',
+                file: 'NBA-Awka-Annual-Report-2022.pdf',
+                size: '2.5 MB',
+                pages: 42,
+                members: 128,
+                cle: 20,
+                welfare: '₦9.2M',
+                projects: 5,
+                description: 'Complete annual report for 2022 with financial statements and activity summary.',
+                downloads: 389
+            },
+            {
+                id: '2021',
+                year: 2021,
+                title: 'NBA Awka Branch Annual Report 2021',
+                file: 'NBA-Awka-Annual-Report-2021.pdf',
+                size: '2.3 MB',
+                pages: 40,
+                members: 115,
+                cle: 18,
+                welfare: '₦8.5M',
+                projects: 4,
+                description: 'Annual report documenting branch achievements and financial performance for 2021.',
+                downloads: 312
+            },
+            {
+                id: '2020',
+                year: 2020,
+                title: 'NBA Awka Branch Annual Report 2020',
+                file: 'NBA-Awka-Annual-Report-2020.pdf',
+                size: '2.1 MB',
+                pages: 38,
+                members: 98,
+                cle: 15,
+                welfare: '₦7.2M',
+                projects: 3,
+                description: 'Annual report for 2020 including COVID-19 impact and adaptation strategies.',
+                downloads: 278
+            },
+            {
+                id: '2019',
+                year: 2019,
+                title: 'NBA Awka Branch Annual Report 2019',
+                file: 'NBA-Awka-Annual-Report-2019.pdf',
+                size: '1.9 MB',
+                pages: 36,
+                members: 87,
+                cle: 14,
+                welfare: '₦6.8M',
+                projects: 4,
+                description: 'Annual report covering 2019 activities and financial statements.',
+                downloads: 198
+            }
+        ];
+
+        let reports = [];
+        let isAdmin = false;
+        const ADMIN_PASSWORD = 'admin123'; // Change this in production!
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadReports();
+            renderPage();
+        });
+
+        // Load reports from localStorage or use defaults
+        function loadReports() {
+            const stored = localStorage.getItem('nba_awka_reports');
+            if (stored) {
+                reports = JSON.parse(stored);
+            } else {
+                reports = [...defaultReports];
+                saveReports();
+            }
+        }
+
+        // Save reports to localStorage
+        function saveReports() {
+            localStorage.setItem('nba_awka_reports', JSON.stringify(reports));
+        }
+
+        // Render the entire page
+        function renderPage() {
+            renderFeaturedReport();
+            renderArchive();
+            updateYearFilter();
+        }
+
+        // Render featured report (latest)
+        function renderFeaturedReport() {
+            const container = document.getElementById('featuredReport');
+            if (reports.length === 0) {
+                container.innerHTML = '<div class="p-12 text-center text-gray-500">No reports available. Add a report using the admin panel.</div>';
+                return;
+            }
+
+            const latest = reports[0]; // Assumes sorted by year desc
+            const adminControls = isAdmin ? `
+                <div class="mt-4 pt-4 border-t border-gray-200 flex gap-2">
+                    <button onclick="editReport('${latest.id}')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm">
+                        <i class="fas fa-edit mr-2"></i>Edit
+                    </button>
+                    <button onclick="deleteReport('${latest.id}')" class="px-4 py-2 bg-nba-red text-white rounded hover:bg-red-700 transition text-sm">
+                        <i class="fas fa-trash mr-2"></i>Delete
+                    </button>
+                </div>
+            ` : '';
+
+            container.innerHTML = `
+                <div class="grid md:grid-cols-2">
+                    <div class="p-8 md:p-12 flex flex-col justify-center">
+                        <div class="year-badge inline-block px-4 py-2 rounded-full text-nba-navy font-bold text-sm mb-4 w-fit">
+                            ${latest.year} Annual Report
+                        </div>
+                        <h3 class="text-3xl font-serif font-bold text-nba-navy mb-4">
+                            ${latest.title}
+                        </h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            ${latest.description}
+                        </p>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-8">
+                            <div class="bg-nba-lightgray rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-nba-navy">${latest.members}</div>
+                                <div class="text-xs text-gray-600 uppercase tracking-wide">New Members</div>
+                            </div>
+                            <div class="bg-nba-lightgray rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-nba-navy">${latest.cle}</div>
+                                <div class="text-xs text-gray-600 uppercase tracking-wide">CLE Programs</div>
+                            </div>
+                            <div class="bg-nba-lightgray rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-nba-navy">${latest.welfare}</div>
+                                <div class="text-xs text-gray-600 uppercase tracking-wide">Welfare Disbursed</div>
+                            </div>
+                            <div class="bg-nba-lightgray rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-nba-navy">${latest.projects}</div>
+                                <div class="text-xs text-gray-600 uppercase tracking-wide">Community Projects</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-4">
+                            <a href="reports/${latest.file}" target="_blank" 
+                               class="inline-flex items-center px-6 py-3 bg-nba-navy text-white rounded-lg font-semibold hover:bg-nba-darknavy transition-all shadow-lg">
+                                <i class="fas fa-eye mr-2"></i>View Report
+                            </a>
+                            <a href="reports/${latest.file}" download 
+                               class="inline-flex items-center px-6 py-3 border-2 border-nba-navy text-nba-navy rounded-lg font-semibold hover:bg-nba-navy hover:text-white transition-all">
+                                <i class="fas fa-download mr-2"></i>Download PDF
+                            </a>
+                        </div>
+                        ${adminControls}
+                    </div>
+                    <div class="relative bg-gradient-to-br from-nba-gold/20 to-nba-navy/10 p-8 md:p-12 flex items-center justify-center">
+                        <div class="relative w-full max-w-sm">
+                            <div class="absolute inset-0 bg-nba-gold/20 rounded-lg transform rotate-3"></div>
+                            <div class="relative bg-white rounded-lg shadow-2xl p-6 border-2 border-nba-gold/30">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="w-12 h-12 bg-nba-navy rounded-full flex items-center justify-center">
+                                        <i class="fas fa-balance-scale text-nba-gold text-xl"></i>
+                                    </div>
+                                    <span class="text-nba-gold font-bold">${latest.year}</span>
+                                </div>
+                                <h4 class="font-serif font-bold text-nba-navy text-lg mb-2">Annual Report</h4>
+                                <p class="text-gray-500 text-sm mb-4">NBA Awka Branch - The Capital Bar</p>
+                                <div class="flex items-center text-nba-navy text-sm">
+                                    <i class="fas fa-file-pdf text-nba-red mr-2 pdf-icon"></i>
+                                    <span>PDF • ${latest.size}</span>
+                                </div>
+                                <div class="mt-3 text-xs text-gray-500">
+                                    <i class="fas fa-download mr-1"></i> ${latest.downloads} downloads
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render archive list
+        function renderArchive() {
+            const container = document.getElementById('reportsList');
+            const yearFilter = document.getElementById('yearFilter').value;
+            
+            let filtered = reports;
+            if (yearFilter !== 'all') {
+                if (yearFilter === 'older') {
+                    filtered = reports.filter(r => r.year <= 2019);
+                } else {
+                    filtered = reports.filter(r => r.year === parseInt(yearFilter));
+                }
+            }
+
+            document.getElementById('reportCount').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="p-12 text-center text-gray-500">No reports found for the selected filter.</div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(report => {
+                const isLatest = report.id === reports[0]?.id;
+                const adminControls = isAdmin ? `
+                    <div class="flex gap-2 ml-4">
+                        <button onclick="editReport('${report.id}')" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-sm" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteReport('${report.id}')" class="px-3 py-1 bg-nba-red text-white rounded hover:bg-red-700 transition text-sm" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="archive-item p-6 flex items-center justify-between border-l-4 border-transparent" data-year="${report.year}">
+                        <div class="flex items-center space-x-4 flex-1">
+                            <div class="w-16 h-20 ${isLatest ? 'bg-nba-navy' : 'bg-gray-600'} rounded flex items-center justify-center text-white shadow-md">
+                                <div class="text-center">
+                                    <div class="text-xs">${report.year}</div>
+                                    <i class="fas fa-file-pdf ${isLatest ? 'text-nba-gold' : 'text-gray-300'} mt-1"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-nba-navy">${report.title}</h4>
+                                <p class="text-sm text-gray-600">Published: December ${report.year} • ${report.pages} pages</p>
+                                <div class="flex items-center mt-2 space-x-4 text-xs text-gray-500">
+                                    <span><i class="fas fa-hdd mr-1"></i>${report.size}</span>
+                                    <span><i class="fas fa-download mr-1"></i>${report.downloads} downloads</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <a href="reports/${report.file}" target="_blank" 
+                               class="px-4 py-2 text-nba-navy hover:bg-nba-lightgray rounded-lg transition">
+                                <i class="fas fa-eye mr-2"></i>View
+                            </a>
+                            <a href="reports/${report.file}" download 
+                               class="px-4 py-2 bg-nba-navy text-white rounded-lg hover:bg-nba-darknavy transition flex items-center">
+                                <i class="fas fa-download mr-2"></i>Download
+                            </a>
+                            ${adminControls}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update year filter dropdown
+        function updateYearFilter() {
+            const select = document.getElementById('yearFilter');
+            const years = [...new Set(reports.map(r => r.year))].sort((a, b) => b - a);
+            
+            let options = '<option value="all">All Years</option>';
+            years.forEach(year => {
+                options += `<option value="${year}">${year}</option>`;
+            });
+            options += '<option value="older">2019 & Earlier</option>';
+            
+            select.innerHTML = options;
+        }
+
+        // Filter reports
+        function filterReports() {
+            renderArchive();
+        }
+
+        // Admin Login Functions
+        function toggleAdminLogin() {
+            const modal = document.getElementById('loginModal');
+            modal.classList.toggle('active');
+        }
+
+        function loginAdmin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                document.getElementById('loginModal').classList.remove('active');
+                document.getElementById('adminPanel').classList.add('active');
+                document.getElementById('loginBtn').classList.add('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+                document.getElementById('adminPassword').value = '';
+                renderPage(); // Re-render to show admin controls
+                alert('Admin login successful! You can now manage reports.');
+            } else {
+                alert('Incorrect password. Please try again.');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdmin = false;
+            document.getElementById('adminPanel').classList.remove('active');
+            document.getElementById('loginBtn').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
+            renderPage(); // Re-render to hide admin controls
+        }
+
+        // Report Modal Functions
+        function openReportModal(reportId = null) {
+            const modal = document.getElementById('reportModal');
+            const form = document.getElementById('reportForm');
+            const title = document.getElementById('modalTitle');
+            
+            form.reset();
+            document.getElementById('editReportId').value = '';
+            
+            if (reportId) {
+                const report = reports.find(r => r.id === reportId);
+                if (report) {
+                    title.textContent = 'Edit Report';
+                    document.getElementById('editReportId').value = report.id;
+                    document.getElementById('reportYear').value = report.year;
+                    document.getElementById('reportTitle').value = report.title;
+                    document.getElementById('reportFile').value = report.file;
+                    document.getElementById('reportSize').value = report.size;
+                    document.getElementById('reportPages').value = report.pages;
+                    document.getElementById('statMembers').value = report.members;
+                    document.getElementById('statCLE').value = report.cle;
+                    document.getElementById('statWelfare').value = report.welfare;
+                    document.getElementById('statProjects').value = report.projects;
+                    document.getElementById('reportDescription').value = report.description;
+                }
+            } else {
+                title.textContent = 'Add New Report';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('active');
+        }
+
+        // Save report (Add or Edit)
+        function saveReport(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('editReportId').value;
+            const year = parseInt(document.getElementById('reportYear').value);
+            
+            const reportData = {
+                id: id || year.toString(),
+                year: year,
+                title: document.getElementById('reportTitle').value,
+                file: document.getElementById('reportFile').value,
+                size: document.getElementById('reportSize').value || 'Unknown',
+                pages: parseInt(document.getElementById('reportPages').value) || 0,
+                members: parseInt(document.getElementById('statMembers').value) || 0,
+                cle: parseInt(document.getElementById('statCLE').value) || 0,
+                welfare: document.getElementById('statWelfare').value || '₦0',
+                projects: parseInt(document.getElementById('statProjects').value) || 0,
+                description: document.getElementById('reportDescription').value,
+                downloads: id ? (reports.find(r => r.id === id)?.downloads || 0) : 0
+            };
+
+            if (id) {
+                // Edit existing
+                const index = reports.findIndex(r => r.id === id);
+                if (index !== -1) {
+                    reports[index] = reportData;
+                }
+            } else {
+                // Add new
+                reports.push(reportData);
+            }
+
+            // Sort by year descending
+            reports.sort((a, b) => b.year - a.year);
+            
+            saveReports();
+            renderPage();
+            closeReportModal();
+            
+            alert(id ? 'Report updated successfully!' : 'New report added successfully!');
+        }
+
+        // Edit report
+        function editReport(id) {
+            openReportModal(id);
+        }
+
+        // Delete report
+        function deleteReport(id) {
+            if (!confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
+                return;
+            }
+            
+            reports = reports.filter(r => r.id !== id);
+            saveReports();
+            renderPage();
+            alert('Report deleted successfully!');
+        }
+
+        // Reset to default reports
+        function resetToDefault() {
+            if (!confirm('This will replace all current reports with the default set. Continue?')) {
+                return;
+            }
+            
+            reports = [...defaultReports];
+            saveReports();
+            renderPage();
+            alert('Reports reset to defaults successfully!');
+        }
+
+        // Clear all reports
+        function clearAllReports() {
+            if (!confirm('WARNING: This will delete ALL reports. Are you sure?')) {
+                return;
+            }
+            
+            reports = [];
+            saveReports();
+            renderPage();
+            alert('All reports cleared. Add new reports using the "Add New Report" button.');
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
