@@ -41,6 +41,12 @@
         .tab-active { border-bottom: 3px solid #D4AF37; color: #1B365D; }
         .tab-inactive { border-bottom: 3px solid transparent; color: #6B7280; }
         .tab-inactive:hover { color: #1B365D; }
+        .admin-panel { display: none; }
+        .admin-panel.active { display: block; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+        .admin-badge { display: none; }
+        .admin-badge.active { display: inline-flex; }
     </style>
 </head>
 <body class="bg-white font-sans">
@@ -67,7 +73,18 @@
                 <a href="about.html" class="hover:text-nba-gold transition">About</a>
                 <a href="events.html" class="text-nba-gold font-medium">Events</a>
                 <a href="blog.html" class="hover:text-nba-gold transition">Blog</a>
-                <a href="membershiplogin.html" class="px-4 py-2 bg-nba-gold text-nba-navy rounded hover:bg-yellow-500 transition">
+                
+                <!-- Admin Badge -->
+                <span id="adminBadge" class="admin-badge items-center px-3 py-1 bg-green-500 text-white rounded-full text-xs font-bold mr-2">
+                    <i class="fas fa-shield-alt mr-1"></i> ADMIN
+                </span>
+                
+                <!-- Admin Login/Logout Button -->
+                <button id="adminBtn" onclick="toggleAdmin()" class="px-4 py-2 bg-nba-gold text-nba-navy rounded hover:bg-yellow-500 transition font-semibold">
+                    <i class="fas fa-lock mr-2"></i> Admin
+                </button>
+                
+                <a href="membershiplogin.html" class="px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-nba-navy transition">
                     Member Login
                 </a>
             </div>
@@ -90,8 +107,192 @@
         <a href="election.html" class="hover:text-nba-gold transition">Election</a>
         <a href="Membership.html" class="hover:text-nba-gold transition">Members</a>
         <a href="contact.html" class="hover:text-nba-gold transition">Contact</a>
+        
+        <!-- Mobile Admin Button -->
+        <button onclick="toggleAdmin()" class="text-left hover:text-nba-gold transition flex items-center">
+            <i class="fas fa-lock mr-2"></i> Admin Access
+        </button>
     </div>
 </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="modal fixed inset-0 bg-black/50 z-[60] items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 fade-in">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-nba-navy rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-lock text-nba-gold text-2xl"></i>
+                </div>
+                <h3 class="font-serif text-2xl font-bold text-nba-navy">Admin Access</h3>
+                <p class="text-gray-500 text-sm mt-2">Enter password to manage events</p>
+            </div>
+            
+            <form id="adminLoginForm" class="space-y-4" onsubmit="return handleAdminLogin(event)">
+                <div>
+                    <input type="password" id="adminPassword" placeholder="Enter admin password" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nba-gold"
+                        required>
+                    <p class="text-xs text-gray-400 mt-1">Default: admin123</p>
+                </div>
+                <div id="loginError" class="text-red-500 text-sm text-center hidden"></div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeAdminLogin()" 
+                        class="flex-1 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                        class="flex-1 py-3 bg-nba-gold text-nba-navy font-bold rounded-lg hover:bg-yellow-500 transition">
+                        Login
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel (Visible only when logged in) -->
+    <div id="adminPanel" class="admin-panel bg-nba-darknavy text-white py-4 border-b-4 border-nba-gold">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-cog text-nba-gold text-xl"></i>
+                    <span class="font-bold text-lg">Event Management Panel</span>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="openEventModal()" 
+                        class="px-4 py-2 bg-nba-gold text-nba-navy rounded-lg font-semibold hover:bg-yellow-500 transition flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add New Event
+                    </button>
+                    <button onclick="showDeleteMode()" id="deleteModeBtn"
+                        class="px-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition flex items-center">
+                        <i class="fas fa-trash mr-2"></i> Delete Events
+                    </button>
+                    <button onclick="logoutAdmin()" 
+                        class="px-4 py-2 border border-white text-white rounded-lg font-semibold hover:bg-white hover:text-nba-navy transition flex items-center">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
+                </div>
+            </div>
+            <div id="deleteModeIndicator" class="hidden mt-3 p-3 bg-red-500/20 border border-red-500 rounded-lg text-sm">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <strong>Delete Mode Active:</strong> Click the <i class="fas fa-trash text-red-400 mx-1"></i> icon on any event card to delete it. 
+                <button onclick="cancelDeleteMode()" class="underline ml-2 hover:text-white">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Form Modal (Add/Edit) -->
+    <div id="eventFormModal" class="modal fixed inset-0 bg-black/50 z-[70] items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-2xl w-full my-8 fade-in">
+            <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center rounded-t-2xl">
+                <h3 id="formModalTitle" class="font-serif text-2xl font-bold text-nba-navy">Add New Event</h3>
+                <button onclick="closeEventModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition">
+                    <i class="fas fa-times text-gray-600"></i>
+                </button>
+            </div>
+            
+            <form id="eventForm" class="p-6 space-y-4" onsubmit="return saveEvent(event)">
+                <input type="hidden" id="editEventId">
+                
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Event Title *</label>
+                        <input type="text" id="eventTitle" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nba-gold"
+                            placeholder="e.g., Annual Bar Conference">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Category *</label>
+                        <select id="eventCategory" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nba-gold">
+                            <option value="workshop">Workshop</option>
+                            <option value="networking">Networking</option>
+                            <option value="cle">CLE Program</option>
+                            <option value="conference">Conference</option>
+                            <option value="social">Social</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Date *</label>
+                        <input type="date" id="eventDate" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nba-gold">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Time</label>
+                        <input type="text" id="eventTime" placeholder="e.g., 9:00 AM"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nba-gold">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Duration</label>
+                        <input type="text" id="eventDuration" placeholder="e.g., 2 days"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nba-gold">
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Location *</label>
+                        <input type="text" id="eventLocation" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nba-gold"
+                            placeholder="e.g., NBA Bar Centre, Awka">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Seats/Capacity</label>
+                        <input type="text" id="eventSeats" placeholder="e.g., 50 Seats or 5 CLE Points"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nba-gold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Image URL</label>
+                    <input type="url" id="eventImage" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nba-gold"
+                        placeholder="https://images.unsplash.com/...">
+                    <p class="text-xs text-gray-400 mt-1">Leave empty for default image</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Description *</label>
+                    <textarea id="eventDescription" required rows="3"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nba-gold"
+                        placeholder="Describe the event..."></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-4 border-t">
+                    <button type="button" onclick="closeEventModal()" 
+                        class="flex-1 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                        class="flex-1 py-3 bg-nba-gold text-nba-navy font-bold rounded-lg hover:bg-yellow-500 transition">
+                        <i class="fas fa-save mr-2"></i> Save Event
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="modal fixed inset-0 bg-black/50 z-[80] items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center fade-in">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
+            </div>
+            <h3 class="font-serif text-xl font-bold text-nba-navy mb-2">Delete Event?</h3>
+            <p class="text-gray-600 mb-6">Are you sure you want to delete "<span id="deleteEventName" class="font-semibold"></span>"? This action cannot be undone.</p>
+            <div class="flex gap-4">
+                <button onclick="closeDeleteConfirm()" 
+                    class="flex-1 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition">
+                    Cancel
+                </button>
+                <button onclick="confirmDelete()" 
+                    class="flex-1 py-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="relative h-[500px] overflow-hidden">
@@ -191,163 +392,7 @@
 
             <!-- Events Grid -->
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="events-grid">
-                
-                <!-- Event 1 -->
-                <div class="event-card bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100" data-category="workshop">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80" alt="Legal Drafting Workshop" class="w-full h-full object-cover">
-                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-nba-navy">
-                            <i class="fas fa-users mr-1"></i> 50 Seats
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-nba-gold text-sm font-semibold">Workshop</span>
-                            <span class="text-gray-400 text-sm"><i class="far fa-clock mr-1"></i> 2 days</span>
-                        </div>
-                        <h3 class="font-serif text-xl font-bold text-nba-navy mb-2">Advanced Legal Drafting Masterclass</h3>
-                        <p class="text-gray-600 text-sm mb-4">Master the art of contract drafting, pleadings, and legal correspondence with industry experts.</p>
-                        <div class="space-y-2 mb-4 text-sm text-gray-500">
-                            <div class="flex items-center"><i class="far fa-calendar-alt w-5 text-nba-gold"></i> April 15-16, 2026</div>
-                            <div class="flex items-center"><i class="far fa-clock w-5 text-nba-gold"></i> 9:00 AM - 4:00 PM</div>
-                            <div class="flex items-center"><i class="fas fa-map-marker-alt w-5 text-nba-gold"></i> NBA Bar Centre, Awka</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="openModal('drafting')" class="flex-1 py-2 border border-nba-navy text-nba-navy rounded font-semibold hover:bg-nba-navy hover:text-white transition">Details</button>
-                            <button onclick="openModal('register')" class="flex-1 py-2 bg-nba-gold text-nba-navy rounded font-semibold hover:bg-yellow-500 transition">Register</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event 2 -->
-                <div class="event-card bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100" data-category="networking">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&q=80" alt="Networking Dinner" class="w-full h-full object-cover">
-                        <div class="absolute top-4 right-4 bg-nba-gold px-3 py-1 rounded-full text-xs font-bold text-nba-navy">
-                            <i class="fas fa-star mr-1"></i> Popular
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-nba-gold text-sm font-semibold">Networking</span>
-                            <span class="text-gray-400 text-sm"><i class="far fa-clock mr-1"></i> Evening</span>
-                        </div>
-                        <h3 class="font-serif text-xl font-bold text-nba-navy mb-2">Quarterly Bar Night & Networking</h3>
-                        <p class="text-gray-600 text-sm mb-4">An evening of networking, entertainment, and camaraderie among legal professionals.</p>
-                        <div class="space-y-2 mb-4 text-sm text-gray-500">
-                            <div class="flex items-center"><i class="far fa-calendar-alt w-5 text-nba-gold"></i> April 25, 2026</div>
-                            <div class="flex items-center"><i class="far fa-clock w-5 text-nba-gold"></i> 6:00 PM - 10:00 PM</div>
-                            <div class="flex items-center"><i class="fas fa-map-marker-alt w-5 text-nba-gold"></i> Bon Hotel, Awka</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="openModal('barnight')" class="flex-1 py-2 border border-nba-navy text-nba-navy rounded font-semibold hover:bg-nba-navy hover:text-white transition">Details</button>
-                            <button onclick="openModal('register')" class="flex-1 py-2 bg-nba-gold text-nba-navy rounded font-semibold hover:bg-yellow-500 transition">Register</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event 3 -->
-                <div class="event-card bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100" data-category="cle">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&q=80" alt="CLE Program" class="w-full h-full object-cover">
-                        <div class="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                            <i class="fas fa-certificate mr-1"></i> 5 CLE Points
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-nba-gold text-sm font-semibold">CLE Program</span>
-                            <span class="text-gray-400 text-sm"><i class="far fa-clock mr-1"></i> 1 day</span>
-                        </div>
-                        <h3 class="font-serif text-xl font-bold text-nba-navy mb-2">Ethics & Professional Responsibility</h3>
-                        <p class="text-gray-600 text-sm mb-4">Mandatory CLE program on professional ethics, client relations, and practice management.</p>
-                        <div class="space-y-2 mb-4 text-sm text-gray-500">
-                            <div class="flex items-center"><i class="far fa-calendar-alt w-5 text-nba-gold"></i> May 10, 2026</div>
-                            <div class="flex items-center"><i class="far fa-clock w-5 text-nba-gold"></i> 10:00 AM - 3:00 PM</div>
-                            <div class="flex items-center"><i class="fas fa-map-marker-alt w-5 text-nba-gold"></i> High Court Complex, Awka</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="openModal('ethics')" class="flex-1 py-2 border border-nba-navy text-nba-navy rounded font-semibold hover:bg-nba-navy hover:text-white transition">Details</button>
-                            <button onclick="openModal('register')" class="flex-1 py-2 bg-nba-gold text-nba-navy rounded font-semibold hover:bg-yellow-500 transition">Register</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event 4 -->
-                <div class="event-card bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100" data-category="conference">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&q=80" alt="Law Week" class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-nba-gold text-sm font-semibold">Conference</span>
-                            <span class="text-gray-400 text-sm"><i class="far fa-clock mr-1"></i> 1 week</span>
-                        </div>
-                        <h3 class="font-serif text-xl font-bold text-nba-navy mb-2">2026 Law Week Celebration</h3>
-                        <p class="text-gray-600 text-sm mb-4">Annual celebration featuring legal debates, essay competitions, court visits, and community service.</p>
-                        <div class="space-y-2 mb-4 text-sm text-gray-500">
-                            <div class="flex items-center"><i class="far fa-calendar-alt w-5 text-nba-gold"></i> May 19-24, 2026</div>
-                            <div class="flex items-center"><i class="far fa-clock w-5 text-nba-gold"></i> Various Times</div>
-                            <div class="flex items-center"><i class="fas fa-map-marker-alt w-5 text-nba-gold"></i> Multiple Venues</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="openModal('lawweek')" class="flex-1 py-2 border border-nba-navy text-nba-navy rounded font-semibold hover:bg-nba-navy hover:text-white transition">Details</button>
-                            <button onclick="openModal('register')" class="flex-1 py-2 bg-nba-gold text-nba-navy rounded font-semibold hover:bg-yellow-500 transition">Register</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event 5 -->
-                <div class="event-card bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100" data-category="workshop">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80" alt="Arbitration Workshop" class="w-full h-full object-cover">
-                        <div class="absolute top-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                            <i class="fas fa-award mr-1"></i> Certificate
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-nba-gold text-sm font-semibold">Workshop</span>
-                            <span class="text-gray-400 text-sm"><i class="far fa-clock mr-1"></i> 3 days</span>
-                        </div>
-                        <h3 class="font-serif text-xl font-bold text-nba-navy mb-2">Alternative Dispute Resolution (ADR) Workshop</h3>
-                        <p class="text-gray-600 text-sm mb-4">Intensive training on arbitration, mediation, and negotiation techniques for modern legal practice.</p>
-                        <div class="space-y-2 mb-4 text-sm text-gray-500">
-                            <div class="flex items-center"><i class="far fa-calendar-alt w-5 text-nba-gold"></i> June 5-7, 2026</div>
-                            <div class="flex items-center"><i class="far fa-clock w-5 text-nba-gold"></i> 9:00 AM - 5:00 PM</div>
-                            <div class="flex items-center"><i class="fas fa-map-marker-alt w-5 text-nba-gold"></i> NBA Bar Centre, Awka</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="openModal('adr')" class="flex-1 py-2 border border-nba-navy text-nba-navy rounded font-semibold hover:bg-nba-navy hover:text-white transition">Details</button>
-                            <button onclick="openModal('register')" class="flex-1 py-2 bg-nba-gold text-nba-navy rounded font-semibold hover:bg-yellow-500 transition">Register</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event 6 -->
-                <div class="event-card bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100" data-category="networking">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80" alt="Mentorship" class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-nba-gold text-sm font-semibold">Networking</span>
-                            <span class="text-gray-400 text-sm"><i class="far fa-clock mr-1"></i> 2 hours</span>
-                        </div>
-                        <h3 class="font-serif text-xl font-bold text-nba-navy mb-2">Young Lawyers Mentorship Forum</h3>
-                        <p class="text-gray-600 text-sm mb-4">Connect with senior practitioners for guidance on career development and practice building.</p>
-                        <div class="space-y-2 mb-4 text-sm text-gray-500">
-                            <div class="flex items-center"><i class="far fa-calendar-alt w-5 text-nba-gold"></i> June 20, 2026</div>
-                            <div class="flex items-center"><i class="far fa-clock w-5 text-nba-gold"></i> 2:00 PM - 4:00 PM</div>
-                            <div class="flex items-center"><i class="fas fa-map-marker-alt w-5 text-nba-gold"></i> NBA Bar Centre, Awka</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="openModal('mentorship')" class="flex-1 py-2 border border-nba-navy text-nba-navy rounded font-semibold hover:bg-nba-navy hover:text-white transition">Details</button>
-                            <button onclick="openModal('register')" class="flex-1 py-2 bg-nba-gold text-nba-navy rounded font-semibold hover:bg-yellow-500 transition">Register</button>
-                        </div>
-                    </div>
-                </div>
-
+                <!-- Events will be loaded dynamically here -->
             </div>
 
             <div class="text-center mt-12">
@@ -542,6 +587,458 @@
     </div>
 
     <script>
+        // ==================== ADMIN FUNCTIONALITY ====================
+        
+        const ADMIN_PASSWORD = 'admin123'; // Change this in production!
+        let isAdminLoggedIn = false;
+        let deleteMode = false;
+        let eventToDelete = null;
+        let eventToEdit = null;
+
+        // Initialize events data
+        let eventsData = [];
+
+        // Sample events data (default events)
+        const defaultEvents = [
+            {
+                id: '1',
+                title: 'Advanced Legal Drafting Masterclass',
+                category: 'workshop',
+                date: '2026-04-15',
+                time: '9:00 AM - 4:00 PM',
+                duration: '2 days',
+                location: 'NBA Bar Centre, Awka',
+                seats: '50 Seats',
+                image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80',
+                description: 'Master the art of contract drafting, pleadings, and legal correspondence with industry experts.',
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '2',
+                title: 'Quarterly Bar Night & Networking',
+                category: 'networking',
+                date: '2026-04-25',
+                time: '6:00 PM - 10:00 PM',
+                duration: 'Evening',
+                location: 'Bon Hotel, Awka',
+                seats: '',
+                image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&q=80',
+                description: 'An evening of networking, entertainment, and camaraderie among legal professionals.',
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '3',
+                title: 'Ethics & Professional Responsibility',
+                category: 'cle',
+                date: '2026-05-10',
+                time: '10:00 AM - 3:00 PM',
+                duration: '1 day',
+                location: 'High Court Complex, Awka',
+                seats: '5 CLE Points',
+                image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&q=80',
+                description: 'Mandatory CLE program on professional ethics, client relations, and practice management.',
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '4',
+                title: '2026 Law Week Celebration',
+                category: 'conference',
+                date: '2026-05-19',
+                time: 'Various Times',
+                duration: '1 week',
+                location: 'Multiple Venues',
+                seats: '',
+                image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=600&q=80',
+                description: 'Annual celebration featuring legal debates, essay competitions, court visits, and community service.',
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '5',
+                title: 'Alternative Dispute Resolution (ADR) Workshop',
+                category: 'workshop',
+                date: '2026-06-05',
+                time: '9:00 AM - 5:00 PM',
+                duration: '3 days',
+                location: 'NBA Bar Centre, Awka',
+                seats: 'Certificate',
+                image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80',
+                description: 'Intensive training on arbitration, mediation, and negotiation techniques for modern legal practice.',
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '6',
+                title: 'Young Lawyers Mentorship Forum',
+                category: 'networking',
+                date: '2026-06-20',
+                time: '2:00 PM - 4:00 PM',
+                duration: '2 hours',
+                location: 'NBA Bar Centre, Awka',
+                seats: '',
+                image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80',
+                description: 'Connect with senior practitioners for guidance on career development and practice building.',
+                createdAt: new Date().toISOString()
+            }
+        ];
+
+        // Load events from localStorage or use defaults
+        function loadEvents() {
+            const stored = localStorage.getItem('nbaEvents');
+            if (stored) {
+                eventsData = JSON.parse(stored);
+            } else {
+                eventsData = [...defaultEvents];
+                saveEvents();
+            }
+            renderEvents();
+        }
+
+        // Save events to localStorage
+        function saveEvents() {
+            localStorage.setItem('nbaEvents', JSON.stringify(eventsData));
+        }
+
+        // Generate unique ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Toggle admin login/logout
+        function toggleAdmin() {
+            if (isAdminLoggedIn) {
+                logoutAdmin();
+            } else {
+                document.getElementById('adminLoginModal').classList.add('active');
+            }
+        }
+
+        // Handle admin login
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const password = document.getElementById('adminPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (password === ADMIN_PASSWORD) {
+                isAdminLoggedIn = true;
+                localStorage.setItem('nbaAdminLoggedIn', 'true');
+                localStorage.setItem('nbaAdminLoginTime', new Date().toISOString());
+                
+                document.getElementById('adminLoginModal').classList.remove('active');
+                document.getElementById('adminPanel').classList.add('active');
+                document.getElementById('adminBadge').classList.add('active');
+                document.getElementById('adminBtn').innerHTML = '<i class="fas fa-sign-out-alt mr-2"></i> Logout';
+                document.getElementById('adminBtn').classList.remove('bg-nba-gold', 'text-nba-navy');
+                document.getElementById('adminBtn').classList.add('bg-red-500', 'text-white');
+                
+                document.getElementById('adminPassword').value = '';
+                errorDiv.classList.add('hidden');
+                
+                renderEvents(); // Re-render to show edit/delete buttons
+                showNotification('Admin access granted!', 'success');
+            } else {
+                errorDiv.textContent = 'Invalid password. Please try again.';
+                errorDiv.classList.remove('hidden');
+            }
+            return false;
+        }
+
+        // Close admin login modal
+        function closeAdminLogin() {
+            document.getElementById('adminLoginModal').classList.remove('active');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        // Logout admin
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            deleteMode = false;
+            localStorage.removeItem('nbaAdminLoggedIn');
+            localStorage.removeItem('nbaAdminLoginTime');
+            
+            document.getElementById('adminPanel').classList.remove('active');
+            document.getElementById('adminBadge').classList.remove('active');
+            document.getElementById('adminBtn').innerHTML = '<i class="fas fa-lock mr-2"></i> Admin';
+            document.getElementById('adminBtn').classList.remove('bg-red-500', 'text-white');
+            document.getElementById('adminBtn').classList.add('bg-nba-gold', 'text-nba-navy');
+            document.getElementById('deleteModeIndicator').classList.add('hidden');
+            
+            renderEvents(); // Re-render to hide edit/delete buttons
+            showNotification('Logged out successfully', 'success');
+        }
+
+        // Check if admin is already logged in (session check)
+        function checkAdminSession() {
+            const loggedIn = localStorage.getItem('nbaAdminLoggedIn');
+            const loginTime = localStorage.getItem('nbaAdminLoginTime');
+            
+            if (loggedIn === 'true' && loginTime) {
+                const thirtyMinutes = 30 * 60 * 1000;
+                if (new Date() - new Date(loginTime) < thirtyMinutes) {
+                    // Auto-login
+                    isAdminLoggedIn = true;
+                    document.getElementById('adminPanel').classList.add('active');
+                    document.getElementById('adminBadge').classList.add('active');
+                    document.getElementById('adminBtn').innerHTML = '<i class="fas fa-sign-out-alt mr-2"></i> Logout';
+                    document.getElementById('adminBtn').classList.remove('bg-nba-gold', 'text-nba-navy');
+                    document.getElementById('adminBtn').classList.add('bg-red-500', 'text-white');
+                } else {
+                    // Session expired
+                    localStorage.removeItem('nbaAdminLoggedIn');
+                    localStorage.removeItem('nbaAdminLoginTime');
+                }
+            }
+        }
+
+        // Open event form modal (Add or Edit)
+        function openEventModal(eventId = null) {
+            const modal = document.getElementById('eventFormModal');
+            const title = document.getElementById('formModalTitle');
+            const form = document.getElementById('eventForm');
+            
+            if (eventId) {
+                // Edit mode
+                const event = eventsData.find(e => e.id === eventId);
+                if (event) {
+                    title.textContent = 'Edit Event';
+                    document.getElementById('editEventId').value = event.id;
+                    document.getElementById('eventTitle').value = event.title;
+                    document.getElementById('eventCategory').value = event.category;
+                    document.getElementById('eventDate').value = event.date;
+                    document.getElementById('eventTime').value = event.time;
+                    document.getElementById('eventDuration').value = event.duration;
+                    document.getElementById('eventLocation').value = event.location;
+                    document.getElementById('eventSeats').value = event.seats;
+                    document.getElementById('eventImage').value = event.image;
+                    document.getElementById('eventDescription').value = event.description;
+                    eventToEdit = eventId;
+                }
+            } else {
+                // Add mode
+                title.textContent = 'Add New Event';
+                form.reset();
+                document.getElementById('editEventId').value = '';
+                eventToEdit = null;
+            }
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close event form modal
+        function closeEventModal() {
+            document.getElementById('eventFormModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            eventToEdit = null;
+        }
+
+        // Save event (Create or Update)
+        function saveEvent(e) {
+            e.preventDefault();
+            
+            const eventId = document.getElementById('editEventId').value;
+            const eventData = {
+                id: eventId || generateId(),
+                title: document.getElementById('eventTitle').value,
+                category: document.getElementById('eventCategory').value,
+                date: document.getElementById('eventDate').value,
+                time: document.getElementById('eventTime').value,
+                duration: document.getElementById('eventDuration').value,
+                location: document.getElementById('eventLocation').value,
+                seats: document.getElementById('eventSeats').value,
+                image: document.getElementById('eventImage').value || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80',
+                description: document.getElementById('eventDescription').value,
+                updatedAt: new Date().toISOString()
+            };
+            
+            if (eventId) {
+                // Update existing
+                const index = eventsData.findIndex(e => e.id === eventId);
+                if (index !== -1) {
+                    eventData.createdAt = eventsData[index].createdAt;
+                    eventsData[index] = eventData;
+                    showNotification('Event updated successfully!', 'success');
+                }
+            } else {
+                // Create new
+                eventData.createdAt = new Date().toISOString();
+                eventsData.push(eventData);
+                showNotification('Event created successfully!', 'success');
+            }
+            
+            saveEvents();
+            renderEvents();
+            closeEventModal();
+            return false;
+        }
+
+        // Show delete mode
+        function showDeleteMode() {
+            deleteMode = true;
+            document.getElementById('deleteModeIndicator').classList.remove('hidden');
+            document.getElementById('deleteModeBtn').classList.add('bg-red-600');
+            renderEvents();
+            showNotification('Delete mode activated. Click the trash icon on any event.', 'info');
+        }
+
+        // Cancel delete mode
+        function cancelDeleteMode() {
+            deleteMode = false;
+            document.getElementById('deleteModeIndicator').classList.add('hidden');
+            document.getElementById('deleteModeBtn').classList.remove('bg-red-600');
+            renderEvents();
+        }
+
+        // Delete event (triggered from card)
+        function deleteEvent(eventId) {
+            if (!deleteMode) {
+                // Direct delete with confirmation
+                const event = eventsData.find(e => e.id === eventId);
+                if (event) {
+                    eventToDelete = eventId;
+                    document.getElementById('deleteEventName').textContent = event.title;
+                    document.getElementById('deleteConfirmModal').classList.add('active');
+                }
+            } else {
+                // Delete mode active - direct delete
+                performDelete(eventId);
+            }
+        }
+
+        // Close delete confirmation
+        function closeDeleteConfirm() {
+            document.getElementById('deleteConfirmModal').classList.remove('active');
+            eventToDelete = null;
+        }
+
+        // Confirm delete
+        function confirmDelete() {
+            if (eventToDelete) {
+                performDelete(eventToDelete);
+                closeDeleteConfirm();
+            }
+        }
+
+        // Perform actual delete
+        function performDelete(eventId) {
+            eventsData = eventsData.filter(e => e.id !== eventId);
+            saveEvents();
+            renderEvents();
+            showNotification('Event deleted successfully!', 'success');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            const colors = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-[90] fade-in ${colors} text-white font-semibold flex items-center`;
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle mr-2"></i>${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // ==================== EXISTING EVENTS FUNCTIONALITY ====================
+
+        // Render events dynamically
+        function renderEvents() {
+            const grid = document.getElementById('events-grid');
+            const categoryLabels = {
+                workshop: 'Workshop',
+                networking: 'Networking',
+                cle: 'CLE Program',
+                conference: 'Conference',
+                social: 'Social'
+            };
+
+            // Sort by date
+            eventsData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            grid.innerHTML = eventsData.map(event => {
+                const dateObj = new Date(event.date);
+                const month = dateObj.toLocaleDateString('en-US', { month: 'short' });
+                const day = dateObj.getDate();
+                
+                // Admin controls
+                const adminControls = isAdminLoggedIn ? `
+                    <div class="absolute top-4 left-4 flex gap-2 z-10">
+                        <button onclick="openEventModal('${event.id}')" 
+                            class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition shadow-lg"
+                            title="Edit Event">
+                            <i class="fas fa-edit text-xs"></i>
+                        </button>
+                        <button onclick="deleteEvent('${event.id}')" 
+                            class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition shadow-lg"
+                            title="Delete Event">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                ` : '';
+
+                // Delete mode overlay
+                const deleteOverlay = deleteMode ? `
+                    <div class="absolute inset-0 bg-red-500/20 border-2 border-red-500 rounded-xl flex items-center justify-center cursor-pointer" onclick="deleteEvent('${event.id}')">
+                        <div class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold">
+                            <i class="fas fa-trash mr-2"></i> Click to Delete
+                        </div>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="event-card bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 relative" data-category="${event.category}">
+                        ${adminControls}
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="${event.image}" alt="${event.title}" class="w-full h-full object-cover">
+                            ${event.seats ? `
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-nba-navy">
+                                <i class="fas fa-users mr-1"></i> ${event.seats}
+                            </div>
+                            ` : ''}
+                            <div class="absolute bottom-4 left-4 bg-nba-gold text-nba-navy px-3 py-1 rounded-lg text-center min-w-[60px]">
+                                <div class="text-xs uppercase font-bold">${month}</div>
+                                <div class="text-xl font-bold">${day}</div>
+                            </div>
+                            ${deleteOverlay}
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-nba-gold text-sm font-semibold">${categoryLabels[event.category]}</span>
+                                <span class="text-gray-400 text-sm"><i class="far fa-clock mr-1"></i> ${event.duration}</span>
+                            </div>
+                            <h3 class="font-serif text-xl font-bold text-nba-navy mb-2">${event.title}</h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">${event.description}</p>
+                            <div class="space-y-2 mb-4 text-sm text-gray-500">
+                                <div class="flex items-center"><i class="far fa-calendar-alt w-5 text-nba-gold"></i> ${formatDate(event.date)}</div>
+                                <div class="flex items-center"><i class="far fa-clock w-5 text-nba-gold"></i> ${event.time}</div>
+                                <div class="flex items-center"><i class="fas fa-map-marker-alt w-5 text-nba-gold"></i> ${event.location}</div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="openModal('${event.id}')" class="flex-1 py-2 border border-nba-navy text-nba-navy rounded font-semibold hover:bg-nba-navy hover:text-white transition">Details</button>
+                                <button onclick="openModal('register')" class="flex-1 py-2 bg-nba-gold text-nba-navy rounded font-semibold hover:bg-yellow-500 transition">Register</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (eventsData.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-calendar-times text-gray-400 text-2xl"></i>
+                        </div>
+                        <p class="text-gray-500">No events found. ${isAdminLoggedIn ? 'Click "Add New Event" to create one.' : 'Check back soon!'}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function formatDate(dateString) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('en-US', options);
+        }
+
         // Countdown Timer
         function updateCountdown() {
             const eventDate = new Date('March 28, 2026 09:00:00').getTime();
@@ -564,7 +1061,6 @@
 
         // Event Filtering
         function filterEvents(category) {
-            // Update tabs
             document.querySelectorAll('[id^="tab-"]').forEach(tab => {
                 tab.classList.remove('tab-active');
                 tab.classList.add('tab-inactive');
@@ -572,7 +1068,6 @@
             document.getElementById(`tab-${category}`).classList.remove('tab-inactive');
             document.getElementById(`tab-${category}`).classList.add('tab-active');
 
-            // Filter cards
             const cards = document.querySelectorAll('.event-card');
             cards.forEach(card => {
                 if (category === 'all' || card.dataset.category === category) {
@@ -683,13 +1178,7 @@
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Select Event</label>
                             <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-nba-gold" required>
                                 <option value="">Choose an event...</option>
-                                <option>2026 Annual Bar Conference & AGM</option>
-                                <option>Advanced Legal Drafting Masterclass</option>
-                                <option>Quarterly Bar Night & Networking</option>
-                                <option>Ethics & Professional Responsibility</option>
-                                <option>2026 Law Week Celebration</option>
-                                <option>Alternative Dispute Resolution Workshop</option>
-                                <option>Young Lawyers Mentorship Forum</option>
+                                ${eventsData.map(e => `<option>${e.title}</option>`).join('')}
                             </select>
                         </div>
                         <button type="submit" class="w-full py-3 bg-nba-gold text-nba-navy font-bold rounded-lg hover:bg-yellow-500 transition">
@@ -705,13 +1194,43 @@
             const title = document.getElementById('modalTitle');
             const content = document.getElementById('modalContent');
             
-            const details = eventDetails[type] || {
-                title: 'Event Details',
-                content: '<p class="text-gray-600">Full event details coming soon. Please check back later or contact the secretariat for more information.</p>'
-            };
+            // Check if it's a dynamic event ID
+            const event = eventsData.find(e => e.id === type);
+            if (event) {
+                title.textContent = event.title;
+                content.innerHTML = `
+                    <div class="space-y-4">
+                        <img src="${event.image}" class="w-full h-64 object-cover rounded-xl mb-4">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-nba-lightgray p-4 rounded-lg">
+                                <i class="far fa-calendar-alt text-nba-gold mb-2"></i>
+                                <p class="font-semibold text-nba-navy">${formatDate(event.date)}</p>
+                            </div>
+                            <div class="bg-nba-lightgray p-4 rounded-lg">
+                                <i class="fas fa-map-marker-alt text-nba-gold mb-2"></i>
+                                <p class="font-semibold text-nba-navy">${event.location}</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600">${event.description}</p>
+                        <div class="bg-nba-navy text-white p-4 rounded-lg mt-4">
+                            <p class="font-semibold">Time: ${event.time}</p>
+                            <p class="font-semibold">Duration: ${event.duration}</p>
+                            ${event.seats ? `<p class="font-semibold">Capacity: ${event.seats}</p>` : ''}
+                        </div>
+                        <button onclick="openModal('register')" class="w-full mt-6 py-3 bg-nba-gold text-nba-navy font-bold rounded-lg hover:bg-yellow-500 transition">
+                            Register Now
+                        </button>
+                    </div>
+                `;
+            } else {
+                const details = eventDetails[type] || {
+                    title: 'Event Details',
+                    content: '<p class="text-gray-600">Full event details coming soon. Please check back later or contact the secretariat for more information.</p>'
+                };
+                title.textContent = details.title;
+                content.innerHTML = details.content;
+            }
             
-            title.textContent = details.title;
-            content.innerHTML = details.content;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             document.body.style.overflow = 'hidden';
@@ -733,34 +1252,56 @@
             alert('More events coming soon! Subscribe to our newsletter to stay updated.');
         }
 
-     document.addEventListener('DOMContentLoaded', function () {
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
+                // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                    const isOpen = !mobileMenu.classList.contains('hidden');
+                    mobileMenuBtn.innerHTML = isOpen ? '✕' : '☰';
+                    mobileMenuBtn.setAttribute('aria-expanded', isOpen);
+                });
 
-    if (!mobileMenuBtn || !mobileMenu) return;
+                // Close menu when clicking on links
+                mobileMenu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuBtn.innerHTML = '☰';
+                        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                    });
+                });
+            }
 
-    mobileMenuBtn.addEventListener('click', function () {
-        mobileMenu.classList.toggle('hidden');
-        const isExpanded = !mobileMenu.classList.contains('hidden');
-        mobileMenuBtn.setAttribute('aria-expanded', isExpanded);
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', function (e) {
-        if (!mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-            mobileMenu.classList.add('hidden');
-            mobileMenuBtn.setAttribute('aria-expanded', 'false');
-        }
-    });
-
-    // Close menu when clicking a link
-    mobileMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', function () {
-            mobileMenu.classList.add('hidden');
-            mobileMenuBtn.setAttribute('aria-expanded', 'false');
+            // Initialize
+            loadEvents();
+            checkAdminSession();
         });
-    });
-});
+
+        // Close modals on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeEventModal();
+                closeAdminLogin();
+                closeDeleteConfirm();
+            }
+        });
+
+        // Close modals on outside click
+        document.getElementById('adminLoginModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAdminLogin();
+        });
+
+        document.getElementById('eventFormModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEventModal();
+        });
+
+        document.getElementById('deleteConfirmModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDeleteConfirm();
+        });
     </script>
 </body>
 </html>

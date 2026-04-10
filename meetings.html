@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Meetings - NBA Awka Branch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://meet.jit.si/external_api.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nba: {
+                            gold: '#D4AF37',
+                            darkgold: '#B8960C',
+                            navy: '#1B365D',
+                            darknavy: '#0F1F33',
+                            cream: '#F5F5DC',
+                            lightgray: '#F8F9FA',
+                            green: '#059669',
+                            red: '#DC2626'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .meeting-card { transition: all 0.3s ease; }
+        .meeting-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .live-indicator { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .modal {
+            display: none;
+            background: rgba(0,0,0,0.5);
+        }
+        .modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-nba-lightgray font-sans antialiased">
+
+    <!-- Navigation -->
+    <nav class="bg-nba-navy text-nba-cream sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-nba-gold rounded-full flex items-center justify-center">
+                    <i class="fas fa-balance-scale text-nba-navy text-xl"></i>
+                </div>
+                <div class="hidden sm:block">
+                    <h1 class="font-serif text-xl font-bold leading-tight">NBA Awka Branch</h1>
+                    <p class="text-nba-gold text-xs tracking-wider uppercase">The Capital Bar</p>
+                </div>
+            </a>
+            <div class="flex items-center space-x-6">
+                <a href="index.html" class="text-sm hover:text-nba-gold transition">← Back to Home</a>
+                <div class="bg-nba-green/20 text-nba-green px-4 py-2 rounded-full text-sm font-semibold border border-nba-green/30">
+                    <i class="fas fa-video mr-2"></i>Virtual Meetings
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative bg-gradient-to-br from-nba-navy via-nba-darknavy to-nba-navy text-nba-cream py-16">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 left-0 w-96 h-96 bg-nba-gold rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+        </div>
+        <div class="relative max-w-4xl mx-auto px-6 text-center">
+            <div class="inline-flex items-center mb-4 px-4 py-2 bg-nba-green/20 border border-nba-green/30 rounded-full text-nba-green text-sm font-medium">
+                <span class="live-indicator w-2 h-2 bg-nba-green rounded-full mr-2"></span>
+                Virtual Meeting Center
+            </div>
+            <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">NBA Awka Virtual Chambers</h1>
+            <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+                Join live meetings, CLE sessions, and branch discussions from anywhere. 
+                Secure, professional video conferencing for all members.
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        
+        <!-- Quick Join Section -->
+        <section class="mb-12">
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h2 class="text-2xl font-serif font-bold text-nba-navy mb-6">Quick Join</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Enter Meeting ID or Room Name</label>
+                        <div class="flex gap-3">
+                            <input type="text" id="roomInput" placeholder="e.g., nba-awka-agm-2024" 
+                                   class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none">
+                            <button onclick="joinCustomRoom()" class="px-6 py-3 bg-nba-navy text-white rounded-lg font-semibold hover:bg-nba-darknavy transition">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Join
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Leave blank to create a new instant meeting</p>
+                    </div>
+                    <div class="bg-nba-lightgray rounded-xl p-6 flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-nba-navy">Start Instant Meeting</h3>
+                            <p class="text-sm text-gray-600">Create a new meeting room immediately</p>
+                        </div>
+                        <button onclick="startInstantMeeting()" class="px-6 py-3 bg-nba-green text-white rounded-lg font-semibold hover:bg-green-700 transition">
+                            <i class="fas fa-plus-circle mr-2"></i>Start Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scheduled Meetings -->
+        <section class="mb-12">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center">
+                    <div class="w-1 h-8 bg-nba-gold mr-4"></div>
+                    <h2 class="text-2xl font-serif font-bold text-nba-navy">Scheduled Meetings</h2>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="showAddMeetingModal()" class="px-4 py-2 bg-nba-navy text-white rounded-lg hover:bg-nba-darknavy transition text-sm">
+                        <i class="fas fa-calendar-plus mr-2"></i>Schedule Meeting
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="meetingsList">
+                <!-- Meeting cards loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- Active Meeting Container -->
+        <section id="activeMeetingSection" class="hidden mb-12">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <div class="bg-nba-navy text-white p-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <span class="live-indicator w-3 h-3 bg-nba-red rounded-full"></span>
+                        <h3 class="font-bold" id="activeMeetingTitle">Active Meeting</h3>
+                        <span class="text-sm text-gray-300" id="activeMeetingId">Room: ---</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="copyMeetingLink()" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition text-sm">
+                            <i class="fas fa-copy mr-2"></i>Copy Link
+                        </button>
+                        <button onclick="endMeeting()" class="px-4 py-2 bg-nba-red rounded-lg hover:bg-red-700 transition font-semibold">
+                            <i class="fas fa-phone-slash mr-2"></i>End Call
+                        </button>
+                    </div>
+                </div>
+                <div id="jitsiContainer" class="w-full" style="height: 600px;"></div>
+            </div>
+        </section>
+
+        <!-- Meeting Guidelines -->
+        <section class="mb-12">
+            <div class="bg-nba-gold/10 border border-nba-gold/30 rounded-xl p-6">
+                <h3 class="font-bold text-nba-navy mb-4 flex items-center">
+                    <i class="fas fa-info-circle text-nba-gold mr-2"></i>
+                    Meeting Guidelines
+                </h3>
+                <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
+                    <ul class="space-y-2">
+                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Join with your full name for identification</li>
+                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Mute microphone when not speaking</li>
+                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Use professional background or blur</li>
+                    </ul>
+                    <ul class="space-y-2">
+                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Test audio/video before important meetings</li>
+                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Raise hand feature for questions</li>
+                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Chat for sharing links and documents</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Support -->
+        <section>
+            <div class="bg-nba-navy rounded-2xl p-8 text-white">
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-2xl font-serif font-bold mb-4">Need Technical Support?</h3>
+                        <p class="text-gray-300 mb-4">
+                            Having trouble joining a meeting? Contact our technical team for assistance.
+                        </p>
+                        <div class="space-y-2 text-sm">
+                            <p><i class="fas fa-envelope text-nba-gold mr-2"></i>techsupport@nbaawka.org.ng</p>
+                            <p><i class="fas fa-phone text-nba-gold mr-2"></i>+234 803 XXX XXXX</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-center md:justify-end">
+                        <a href="https://meet.jit.si" target="_blank" class="px-6 py-3 bg-nba-gold text-nba-navy rounded-lg font-bold hover:bg-white transition">
+                            <i class="fas fa-external-link-alt mr-2"></i>Open Jitsi Meet
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Add Meeting Modal -->
+    <div id="addMeetingModal" class="modal fixed inset-0 z-50 items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-lg w-full mx-4">
+            <h3 class="text-2xl font-serif font-bold text-nba-navy mb-6">Schedule New Meeting</h3>
+            <form onsubmit="saveMeeting(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Meeting Title *</label>
+                    <input type="text" id="meetingTitle" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" placeholder="e.g., Monthly Branch Meeting">
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Date *</label>
+                        <input type="date" id="meetingDate" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Time *</label>
+                        <input type="time" id="meetingTime" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Meeting ID (optional)</label>
+                    <input type="text" id="meetingRoom" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" placeholder="Auto-generated if blank">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea id="meetingDesc" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none resize-none" placeholder="Meeting agenda and details..."></textarea>
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 bg-nba-navy text-white py-3 rounded-lg font-semibold hover:bg-nba-darknavy transition">Save Meeting</button>
+                    <button type="button" onclick="closeAddMeetingModal()" class="flex-1 border-2 border-gray-300 text-gray-600 py-3 rounded-lg font-semibold hover:border-nba-navy hover:text-nba-navy transition">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-nba-navy text-nba-cream py-12 border-t-4 border-nba-gold">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <p>&copy; 2025 NBA Awka Branch – The Capital Bar. All Rights Reserved.</p>
+            <p class="mt-2 text-xs text-gray-500">Powered by Jitsi Meet • Secure & Open Source Video Conferencing</p>
+        </div>
+    </footer>
+
+    <script>
+        // Sample meetings data
+        let meetings = JSON.parse(localStorage.getItem('nba_meetings')) || [
+            {
+                id: 'nba-awka-agm-2024',
+                title: 'Annual General Meeting 2024',
+                date: '2024-12-15',
+                time: '10:00',
+                description: 'Annual general meeting of the NBA Awka Branch. All members are encouraged to attend.',
+                status: 'upcoming'
+            },
+            {
+                id: 'nba-awka-cle-dec',
+                title: 'CLE Session: Legal Tech Trends',
+                date: '2024-12-20',
+                time: '14:00',
+                description: 'Continuing Legal Education on emerging legal technologies and AI in legal practice.',
+                status: 'upcoming'
+            }
+        ];
+
+        let activeApi = null;
+        let currentRoom = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMeetings();
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('meetingDate').min = today;
+        });
+
+        // Render meetings list
+        function renderMeetings() {
+            const container = document.getElementById('meetingsList');
+            const now = new Date();
+            
+            if (meetings.length === 0) {
+                container.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-8">No scheduled meetings. Click "Schedule Meeting" to add one.</div>';
+                return;
+            }
+            
+            container.innerHTML = meetings.map(meeting => {
+                const meetingDate = new Date(meeting.date + 'T' + meeting.time);
+                const isLive = Math.abs(now - meetingDate) < 3600000; // Within 1 hour
+                const isPast = meetingDate < now && !isLive;
+                
+                return `
+                    <div class="meeting-card bg-white rounded-xl shadow-lg overflow-hidden ${isLive ? 'ring-2 ring-nba-green' : ''}">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold ${isLive ? 'bg-nba-green text-white' : isPast ? 'bg-gray-200 text-gray-600' : 'bg-nba-gold/20 text-nba-navy'}">
+                                    ${isLive ? '● LIVE NOW' : isPast ? 'COMPLETED' : 'UPCOMING'}
+                                </span>
+                                <span class="text-sm text-gray-500">
+                                    <i class="far fa-calendar mr-1"></i>${formatDate(meeting.date)}
+                                </span>
+                            </div>
+                            <h3 class="font-bold text-nba-navy text-lg mb-2">${meeting.title}</h3>
+                            <p class="text-sm text-gray-600 mb-4 line-clamp-2">${meeting.description}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-500">
+                                    <i class="far fa-clock mr-1"></i>${meeting.time}
+                                </span>
+                                <button onclick="joinMeeting('${meeting.id}', '${meeting.title.replace(/'/g, "\\'")}')" 
+                                        class="px-4 py-2 ${isLive || !isPast ? 'bg-nba-navy text-white hover:bg-nba-darknavy' : 'bg-gray-200 text-gray-600 cursor-not-allowed'} rounded-lg transition"
+                                        ${isPast ? 'disabled' : ''}>
+                                    ${isLive ? 'Join Now' : isPast ? 'Ended' : 'Join'}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-nba-lightgray px-6 py-3 text-xs text-gray-600 flex items-center justify-between">
+                            <span>Room: ${meeting.id}</span>
+                            <button onclick="copyRoomLink('${meeting.id}')" class="text-nba-navy hover:text-nba-gold transition">
+                                <i class="fas fa-copy mr-1"></i>Copy Link
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatDate(dateStr) {
+            return new Date(dateStr).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        // Join meeting
+        function joinMeeting(roomId, title) {
+            if (activeApi) {
+                activeApi.dispose();
+            }
+            
+            currentRoom = roomId;
+            document.getElementById('activeMeetingTitle').textContent = title;
+            document.getElementById('activeMeetingId').textContent = 'Room: ' + roomId;
+            document.getElementById('activeMeetingSection').classList.remove('hidden');
+            
+            const domain = 'meet.jit.si';
+            const options = {
+                roomName: roomId,
+                width: '100%',
+                height: '100%',
+                parentNode: document.getElementById('jitsiContainer'),
+                configOverwrite: {
+                    startWithAudioMuted: true,
+                    prejoinPageEnabled: true,
+                    disableDeepLinking: false
+                },
+                interfaceConfigOverwrite: {
+                    TOOLBAR_BUTTONS: [
+                        'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+                        'fodeviceselection', 'hangup', 'chat', 'recording', 'etherpad',
+                        'settings', 'raisehand', 'videoquality', 'filmstrip', 'tileview',
+                        'mute-everyone', 'security'
+                    ],
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_WATERMARK_FOR_GUESTS: false
+                }
+            };
+            
+            activeApi = new JitsiMeetExternalAPI(domain, options);
+            
+            document.getElementById('activeMeetingSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Join custom room
+        function joinCustomRoom() {
+            const room = document.getElementById('roomInput').value.trim();
+            if (!room) {
+                startInstantMeeting();
+                return;
+            }
+            joinMeeting(room, 'Custom Meeting');
+        }
+
+        // Start instant meeting
+        function startInstantMeeting() {
+            const roomId = 'nba-awka-instant-' + Math.random().toString(36).substring(2, 8);
+            joinMeeting(roomId, 'Instant Meeting');
+        }
+
+        // End meeting
+        function endMeeting() {
+            if (activeApi) {
+                activeApi.executeCommand('hangup');
+                setTimeout(() => {
+                    activeApi.dispose();
+                    activeApi = null;
+                }, 1000);
+            }
+            document.getElementById('activeMeetingSection').classList.add('hidden');
+            currentRoom = null;
+        }
+
+        // Copy meeting link
+        function copyMeetingLink() {
+            if (!currentRoom) return;
+            const link = `https://meet.jit.si/${currentRoom}`;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Meeting link copied to clipboard!\n\nShare this link with participants.');
+            });
+        }
+
+        function copyRoomLink(roomId) {
+            const link = `https://meet.jit.si/${roomId}`;
+            navigator.clipboard.writeText(link).then(() => {
+                alert('Room link copied to clipboard!');
+            });
+        }
+
+        // Modal functions
+        function showAddMeetingModal() {
+            document.getElementById('addMeetingModal').classList.add('active');
+        }
+
+        function closeAddMeetingModal() {
+            document.getElementById('addMeetingModal').classList.remove('active');
+        }
+
+        function saveMeeting(event) {
+            event.preventDefault();
+            
+            const newMeeting = {
+                id: document.getElementById('meetingRoom').value.trim() || 'nba-awka-' + Date.now(),
+                title: document.getElementById('meetingTitle').value,
+                date: document.getElementById('meetingDate').value,
+                time: document.getElementById('meetingTime').value,
+                description: document.getElementById('meetingDesc').value,
+                status: 'upcoming'
+            };
+            
+            meetings.push(newMeeting);
+            meetings.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+            localStorage.setItem('nba_meetings', JSON.stringify(meetings));
+            
+            renderMeetings();
+            closeAddMeetingModal();
+            event.target.reset();
+            alert('Meeting scheduled successfully!');
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (activeApi) {
+                activeApi.dispose();
+            }
+        });
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target.id === 'addMeetingModal') {
+                closeAddMeetingModal();
+            }
+        }
+    </script>
+</body>
+</html>
