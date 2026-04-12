@@ -108,7 +108,8 @@
     <!-- Main Navigation -->
     <nav class="bg-nba-navy text-nba-cream sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-            <a href="#" class="flex items-center space-x-4">
+            <!-- FIXED: Link to main website index.html -->
+            <a href="index.html" class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-nba-gold rounded-full flex items-center justify-center">
                     <i class="fas fa-balance-scale text-nba-navy text-xl"></i>
                 </div>
@@ -534,7 +535,8 @@
         function logout() {
             localStorage.removeItem('nba_session');
             currentUser = null;
-            location.reload();
+            // FIXED: Reload meetings.html instead of index.html
+            window.location.href = 'meetings.html';
         }
 
         function initializeApp() {
@@ -614,10 +616,14 @@
                 return;
             }
 
+            const roomId = document.getElementById('schedRoomId').value || 'nba-awka-' + Date.now();
+            const meetingTitle = document.getElementById('schedTitle').value;
+
             const meeting = {
                 id: Date.now().toString(),
-                roomId: document.getElementById('schedRoomId').value || 'nba-awka-' + Date.now(),
-                title: document.getElementById('schedTitle').value,
+                meetingId: roomId,
+                roomId: roomId,
+                title: meetingTitle,
                 date: document.getElementById('schedDate').value,
                 time: document.getElementById('schedTime').value,
                 duration: document.getElementById('schedDuration').value,
@@ -629,7 +635,8 @@
                 createdBy: currentUser.id,
                 status: 'scheduled',
                 invitedMembers: selectedMembers,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                joinUrl: `${window.location.origin}/meeting-room.html?room=${roomId}&title=${encodeURIComponent(meetingTitle)}`
             };
 
             meetings.push(meeting);
@@ -711,7 +718,7 @@
                                         <i class="fas fa-chart-bar mr-1"></i>Report
                                     </button>
                                 `}
-                                <button onclick="copyMeetingLink('${m.roomId}')" class="px-3 py-2 border border-gray-300 rounded-lg hover:border-nba-gold hover:text-nba-gold transition" title="Copy link">
+                                <button onclick="copyMeetingLink('${m.roomId}', '${m.title}')" class="px-3 py-2 border border-gray-300 rounded-lg hover:border-nba-gold hover:text-nba-gold transition" title="Copy link">
                                     <i class="fas fa-link"></i>
                                 </button>
                                 <button onclick="deleteMeeting('${m.id}')" class="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition" title="Delete">
@@ -731,7 +738,9 @@
             currentMeetingId = meetingId;
             document.getElementById('controlMeetingTitle').textContent = meeting.title;
             document.getElementById('controlMeetingId').textContent = 'Room: ' + meeting.roomId;
-            document.getElementById('controlMeetingLink').value = `https://meet.jit.si/${meeting.roomId}`;
+            
+            const meetingRoomUrl = `${window.location.origin}/meeting-room.html?room=${meeting.roomId}&title=${encodeURIComponent(meeting.title)}`;
+            document.getElementById('controlMeetingLink').value = meetingRoomUrl;
             
             renderWaitingList();
             document.getElementById('meetingControlModal').classList.add('active');
@@ -851,7 +860,6 @@
                 updateAdminStats();
                 showToast('Meeting started! Opening meeting room...', 'success');
                 
-                // Redirect to meeting room after short delay
                 setTimeout(() => {
                     const encodedTitle = encodeURIComponent(meeting.title);
                     const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${encodeURIComponent(currentUser.name || 'Host')}&host=1&title=${encodedTitle}&uid=${currentUser.id}`;
@@ -866,7 +874,6 @@
 
             closeMeetingControlModal();
             
-            // Redirect to meeting room
             const encodedTitle = encodeURIComponent(meeting.title);
             const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${encodeURIComponent(currentUser.name || 'Host')}&host=1&title=${encodedTitle}&uid=${currentUser.id}`;
             window.location.href = redirectUrl;
@@ -912,8 +919,10 @@
             document.getElementById('adminStatsLive').textContent = meetings.filter(m => m.status === 'live').length;
         }
 
-        function copyMeetingLink(roomId) {
-            const link = `https://meet.jit.si/${roomId}`;
+        function copyMeetingLink(roomId, title) {
+            const meeting = meetings.find(m => m.roomId === roomId);
+            const meetingTitle = title || (meeting ? meeting.title : 'NBA Awka Meeting');
+            const link = `${window.location.origin}/meeting-room.html?room=${roomId}&title=${encodeURIComponent(meetingTitle)}`;
             navigator.clipboard.writeText(link);
             showToast('Meeting link copied!', 'success');
         }
@@ -1105,7 +1114,6 @@
 
             document.getElementById('waitingBanner').classList.add('hidden');
             
-            // Redirect to meeting room
             const encodedTitle = encodeURIComponent(meeting.title);
             const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${encodeURIComponent(currentUser.name || 'Member')}&title=${encodedTitle}&uid=${currentUser.id}`;
             window.location.href = redirectUrl;

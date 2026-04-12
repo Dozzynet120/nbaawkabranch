@@ -138,7 +138,8 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const roomId = urlParams.get('room') || 'nba-awka-default';
+        // FIXED: Support both 'room' and 'id' parameters for compatibility
+        const roomId = urlParams.get('room') || urlParams.get('id') || 'nba-awka-default';
         const displayName = urlParams.get('name') || 'Guest';
         const isHost = urlParams.get('host') === '1';
         const meetingTitle = decodeURIComponent(urlParams.get('title') || 'NBA Awka Meeting');
@@ -161,7 +162,11 @@
         });
 
         function checkAuthentication() {
-            const session = localStorage.getItem('nba_session');
+            // FIXED: Check both admin and member sessions
+            const session = localStorage.getItem('nba_session') || 
+                          sessionStorage.getItem('nba_member_session') || 
+                          sessionStorage.getItem('nba_admin_session');
+            
             if (!session) {
                 alert('Please login first');
                 window.location.href = 'index.html';
@@ -170,7 +175,6 @@
             initializeJitsi();
         }
 
-        // CRITICAL FIX: Configuration matching hosted Jitsi behavior
         function initializeJitsi() {
             if (typeof JitsiMeetExternalAPI === 'undefined') {
                 document.getElementById('loading-text').textContent = 'Error: Jitsi API not loaded';
@@ -179,7 +183,6 @@
 
             const domain = 'meet.jit.si';
             
-            // Use the same config as hosted Jitsi - minimal overrides
             const options = {
                 roomName: roomId,
                 width: '100%',
@@ -189,21 +192,10 @@
                     displayName: displayName
                 },
                 
-                // KEY FIX: Minimal configOverwrite - let Jitsi use defaults
                 configOverwrite: {
-                    // Don't disable things that help connection
                     prejoinPageEnabled: false,
                     startWithAudioMuted: false,
                     startWithVideoMuted: false,
-                    
-                    // CRITICAL: Don't disable deep linking features that help connection
-                    // disableDeepLinking: true,  // REMOVED - can block mobile/relay
-                    
-                    // Don't hide lobby - it helps with connection negotiation
-                    // hideLobbyButton: true,  // REMOVED
-                    // enableLobby: false,  // REMOVED
-                    
-                    // Keep these disabled for UI
                     enableWelcomePage: false,
                     enableClosePage: false,
                     readOnlyName: true,
@@ -211,23 +203,11 @@
                     defaultLogoUrl: '',
                     toolbarButtons: [],
                     SHOW_CHROME_EXTENSION_BANNER: false,
-                    
-                    // IMPORTANT: Let Jitsi manage video constraints
-                    // constraints: { ... },  // REMOVED - use defaults
-                    
-                    // CRITICAL FIX: Enable TURN/relay by default
                     useTurnUdp: true,
                     useTurnTcp: true,
-                    
-                    // Allow bridge selection
                     openBridgeChannel: 'websocket',
-                    
-                    // Don't force specific transports
-                    // webrtcIceUdpDisable: false,
-                    // webrtcIceTcpDisable: false,
                 },
                 
-                // KEY FIX: Minimal interface config
                 interfaceConfigOverwrite: {
                     TOOLBAR_BUTTONS: [],
                     SHOW_JITSI_WATERMARK: false,
@@ -236,7 +216,6 @@
                     MOBILE_APP_PROMO: false,
                     DEFAULT_LOCAL_DISPLAY_NAME: displayName,
                     DEFAULT_BACKGROUND: '#1B365D'
-                    // Removed other overrides that might interfere
                 }
             };
 
@@ -244,19 +223,21 @@
                 connectionAttempted = true;
                 jitsiApi = new JitsiMeetExternalAPI(domain, options);
 
-                // Success handler
                 jitsiApi.addEventListener('videoConferenceJoined', () => {
                     clearTimeout(loadingTimeout);
                     document.getElementById('loading').classList.add('hidden');
                     updateParticipantCount();
-                    console.log('Joined:', roomId);
+                    
+                    setTimeout(() => {
+                        try {
+                            jitsiApi.executeCommand('setTileView', true);
+                        } catch(e) {}
+                    }, 1500);
                 });
 
-                // Participant events
                 jitsiApi.addEventListener('participantJoined', updateParticipantCount);
                 jitsiApi.addEventListener('participantLeft', updateParticipantCount);
 
-                // State sync
                 jitsiApi.addEventListener('audioMuteStatusChanged', (data) => {
                     isAudioOn = !data.muted;
                     updateButtonState('btn-audio', isAudioOn, 'fa-microphone', 'fa-microphone-slash');
@@ -267,25 +248,19 @@
                     updateButtonState('btn-video', isVideoOn, 'fa-video', 'fa-video-slash');
                 });
 
-                // Close handler
                 jitsiApi.addEventListener('readyToClose', () => {
                     window.location.href = 'index.html';
                 });
 
-                // CRITICAL FIX: Handle specific connection errors
                 jitsiApi.addEventListener('errorOccurred', (error) => {
                     console.error('Jitsi error:', error);
-                    
                     if (error.error === 'conference.connectionError' || 
                         error.error === 'connection.passwordRequired' ||
                         error.error === 'conference.focusDisconnected') {
-                        
-                        // Don't immediately fail - Jitsi may retry
                         document.getElementById('loading-text').textContent = 'Retrying connection...';
                     }
                 });
 
-                // Password for host
                 if (isHost) {
                     setTimeout(() => {
                         try {
@@ -296,7 +271,6 @@
                     }, 5000);
                 }
 
-                // 30 second timeout with retry option
                 loadingTimeout = setTimeout(() => {
                     if (!document.getElementById('loading').classList.contains('hidden')) {
                         document.getElementById('loading').innerHTML = `
@@ -346,12 +320,10 @@
             setTimeout(initializeJitsi, 1000);
         }
 
-        // BYPASS: Open directly in Jitsi hosted interface
         function openInJitsiDirectly() {
             const jitsiUrl = `https://meet.jit.si/${roomId}#userInfo.displayName="${encodeURIComponent(displayName)}"&config.prejoinPageEnabled=false`;
             window.open(jitsiUrl, '_blank');
             
-            // Also close this window or go back
             setTimeout(() => {
                 window.location.href = 'index.html';
             }, 2000);

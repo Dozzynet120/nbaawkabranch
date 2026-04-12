@@ -53,6 +53,7 @@
     <nav class="bg-nba-navy text-white shadow-lg sticky top-0 z-50">
         <div class="container mx-auto px-4">
             <div class="flex justify-between items-center h-20">
+                <!-- FIXED: Link to index.html -->
                 <a href="index.html" class="flex items-center space-x-3">
                     <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center">
                         <i class="fas fa-balance-scale text-nba-gold text-xl"></i>
@@ -64,9 +65,9 @@
                 </a>
 
                 <div class="hidden md:flex items-center space-x-6">
-                    <a href="admin-dashboard.html" class="hover:text-nba-gold transition">Dashboard</a>
-                    <a href="admin-meetings.html" class="text-nba-gold font-medium">Meetings</a>
-                    <a href="admin-members.html" class="hover:text-nba-gold transition">Members</a>
+                    <a href="index.html" class="hover:text-nba-gold transition">Dashboard</a>
+                    <a href="#" class="text-nba-gold font-medium">Meetings</a>
+                    <a href="index.html" class="hover:text-nba-gold transition">Members</a>
                     <div class="flex items-center space-x-3 pl-4 border-l border-gray-600">
                         <span class="text-sm">Admin</span>
                         <button onclick="logout()" class="text-red-400 hover:text-red-300">
@@ -162,9 +163,7 @@
         </div>
 
         <!-- Meetings Grid -->
-        <div id="meetings-grid" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            <!-- Meetings will be populated here -->
-        </div>
+        <div id="meetings-grid" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"></div>
 
         <!-- Empty State -->
         <div id="empty-state" class="hidden text-center py-16">
@@ -271,15 +270,12 @@
     <div id="toast" class="toast"></div>
 
     <script>
-        // Initialize
         let meetings = JSON.parse(localStorage.getItem('nba_meetings')) || [];
         let currentFilter = 'all';
 
-        // Check admin auth
         document.addEventListener('DOMContentLoaded', function() {
-            const adminSession = sessionStorage.getItem('nba_admin_session');
+            const adminSession = sessionStorage.getItem('nba_admin_session') || localStorage.getItem('nba_session');
             if (!adminSession) {
-                // For demo, create admin session
                 sessionStorage.setItem('nba_admin_session', JSON.stringify({
                     email: 'admin@nbaawka.org.ng',
                     role: 'admin',
@@ -290,27 +286,23 @@
             loadMeetings();
             updateStats();
             
-            // Set minimum date to today
             document.getElementById('meeting-date').min = new Date().toISOString().split('T')[0];
         });
 
-        // Load and display meetings
         function loadMeetings() {
             const grid = document.getElementById('meetings-grid');
             const emptyState = document.getElementById('empty-state');
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             
-            // Update meeting statuses
             updateMeetingStatuses();
             
             let filteredMeetings = meetings.filter(m => {
                 const matchesSearch = m.title.toLowerCase().includes(searchTerm) || 
-                                    m.description.toLowerCase().includes(searchTerm);
+                                    (m.description && m.description.toLowerCase().includes(searchTerm));
                 const matchesFilter = currentFilter === 'all' || m.status === currentFilter;
                 return matchesSearch && matchesFilter;
             });
 
-            // Sort by date/time
             filteredMeetings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
             if (filteredMeetings.length === 0) {
@@ -419,7 +411,10 @@
                                         <span id="tooltip-${meeting.id}" class="copy-tooltip">Copied!</span>
                                     </button>
                                     ${meeting.status !== 'ended' ? `
-                                        <a href="meeting-room.html?id=${meeting.id}&host=1" target="_blank" class="px-3 py-1 bg-nba-navy text-white rounded text-sm font-medium hover:bg-blue-900 transition">
+                                        <!-- FIXED: Use correct URL parameters matching meeting-room.html -->
+                                        <a href="meeting-room.html?room=${meeting.meetingId}&host=1&title=${encodeURIComponent(meeting.title)}&uid=admin" 
+                                           target="_blank" 
+                                           class="px-3 py-1 bg-nba-navy text-white rounded text-sm font-medium hover:bg-blue-900 transition">
                                             <i class="fas fa-video mr-1"></i> ${meeting.status === 'live' ? 'Join' : 'Start'}
                                         </a>
                                     ` : '<span class="px-3 py-1 bg-gray-100 text-gray-500 rounded text-sm">Ended</span>'}
@@ -439,11 +434,9 @@
             document.getElementById('stat-ended').textContent = meetings.filter(m => m.status === 'ended').length;
         }
 
-        // Filter functionality
         function filterMeetings(filter) {
             currentFilter = filter;
             
-            // Update button styles
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 if (btn.dataset.filter === filter) {
                     btn.classList.remove('bg-gray-100', 'text-gray-700');
@@ -457,10 +450,8 @@
             loadMeetings();
         }
 
-        // Search functionality
         document.getElementById('search-input').addEventListener('input', loadMeetings);
 
-        // Modal functions
         function openScheduleModal() {
             document.getElementById('schedule-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -472,7 +463,6 @@
             document.getElementById('schedule-form').reset();
         }
 
-        // Schedule meeting
         document.getElementById('schedule-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -482,7 +472,6 @@
             btnText.textContent = 'Scheduling...';
             spinner.classList.remove('hidden');
 
-            // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1500));
 
             const meetingId = 'NBA' + Math.random().toString(36).substr(2, 6).toUpperCase();
@@ -500,7 +489,8 @@
                 status: 'scheduled',
                 createdAt: new Date().toISOString(),
                 createdBy: 'admin@nbaawka.org.ng',
-                joinUrl: `${window.location.origin}/meeting-room.html?id=${Date.now().toString()}`
+                // FIXED: Correct join URL with 'room' parameter
+                joinUrl: `${window.location.origin}/meeting-room.html?room=${meetingId}&title=${encodeURIComponent(document.getElementById('meeting-title').value)}`
             };
 
             meetings.push(newMeeting);
@@ -515,7 +505,6 @@
             spinner.classList.add('hidden');
         });
 
-        // Meeting actions
         function toggleMenu(meetingId) {
             const menu = document.getElementById(`menu-${meetingId}`);
             const allMenus = document.querySelectorAll('[id^="menu-"]');
@@ -527,17 +516,21 @@
             menu.classList.toggle('hidden');
         }
 
+        // FIXED: Start meeting function with correct parameters
         function startMeeting(meetingId) {
             const meeting = meetings.find(m => m.id === meetingId);
             if (meeting) {
-                window.open(`meeting-room.html?id=${meetingId}&host=1`, '_blank');
+                // FIXED: Use 'room' parameter and include 'title' and 'uid'
+                const url = `meeting-room.html?room=${meeting.meetingId}&host=1&title=${encodeURIComponent(meeting.title)}&uid=admin`;
+                window.open(url, '_blank');
             }
         }
 
         function copyMeetingLink(meetingId) {
             const meeting = meetings.find(m => m.id === meetingId);
             if (meeting) {
-                const link = meeting.joinUrl;
+                // FIXED: Use correct URL format
+                const link = `${window.location.origin}/meeting-room.html?room=${meeting.meetingId}&title=${encodeURIComponent(meeting.title)}`;
                 navigator.clipboard.writeText(link).then(() => {
                     const tooltip = document.getElementById(`tooltip-${meetingId}`);
                     if (tooltip) {
@@ -564,7 +557,6 @@
             }
         }
 
-        // Toast notification
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -576,20 +568,18 @@
             }, 3000);
         }
 
-        // Logout
         function logout() {
             sessionStorage.removeItem('nba_admin_session');
+            localStorage.removeItem('nba_session');
             window.location.href = 'index.html';
         }
 
-        // Close menus when clicking outside
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.relative')) {
                 document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden'));
             }
         });
 
-        // Close modal on escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeScheduleModal();
