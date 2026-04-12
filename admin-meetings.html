@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Meeting Management | NBA Awka</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nba: {
+                            gold: '#D4AF37',
+                            darkgold: '#B8960C',
+                            navy: '#1B365D',
+                            darknavy: '#0F1F33',
+                            cream: '#F5F5DC',
+                            lightgray: '#F8F9FA'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal.active { display: flex; }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 16px 24px; border-radius: 8px; color: white; font-weight: 500; z-index: 2000; transform: translateX(400px); transition: transform 0.3s ease; }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: #10B981; }
+        .toast.error { background: #EF4444; }
+        .meeting-card { transition: all 0.3s ease; }
+        .meeting-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .status-live { background: #10B981; color: white; }
+        .status-scheduled { background: #3B82F6; color: white; }
+        .status-ended { background: #6B7280; color: white; }
+        .copy-tooltip { position: absolute; background: #1B365D; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; top: -30px; right: 0; opacity: 0; transition: opacity 0.2s; }
+        .copy-tooltip.show { opacity: 1; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+
+    <!-- NAVBAR -->
+    <nav class="bg-nba-navy text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <a href="index.html" class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                        <i class="fas fa-balance-scale text-nba-gold text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-serif font-bold text-xl leading-tight">NBA AWKA</h1>
+                        <p class="text-xs text-gray-300">Admin Portal</p>
+                    </div>
+                </a>
+
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="admin-dashboard.html" class="hover:text-nba-gold transition">Dashboard</a>
+                    <a href="admin-meetings.html" class="text-nba-gold font-medium">Meetings</a>
+                    <a href="admin-members.html" class="hover:text-nba-gold transition">Members</a>
+                    <div class="flex items-center space-x-3 pl-4 border-l border-gray-600">
+                        <span class="text-sm">Admin</span>
+                        <button onclick="logout()" class="text-red-400 hover:text-red-300">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button id="mobile-menu-btn" class="md:hidden text-white text-2xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h2 class="font-serif font-bold text-3xl text-nba-navy">Meeting Management</h2>
+                <p class="text-gray-600 mt-1">Schedule, manage, and monitor all association meetings</p>
+            </div>
+            <button onclick="openScheduleModal()" class="bg-nba-gold text-nba-navy px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition flex items-center space-x-2">
+                <i class="fas fa-plus"></i>
+                <span>Schedule New Meeting</span>
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Meetings</p>
+                        <p class="text-2xl font-bold text-nba-navy" id="stat-total">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-calendar-alt text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Live Now</p>
+                        <p class="text-2xl font-bold text-green-600" id="stat-live">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-video text-green-600"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Scheduled</p>
+                        <p class="text-2xl font-bold text-blue-600" id="stat-scheduled">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-clock text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Ended</p>
+                        <p class="text-2xl font-bold text-gray-600" id="stat-ended">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-check-circle text-gray-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div class="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
+                    <button onclick="filterMeetings('all')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-nba-navy text-white" data-filter="all">All Meetings</button>
+                    <button onclick="filterMeetings('live')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200" data-filter="live">Live Now</button>
+                    <button onclick="filterMeetings('scheduled')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200" data-filter="scheduled">Scheduled</button>
+                    <button onclick="filterMeetings('ended')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200" data-filter="ended">Ended</button>
+                </div>
+                <div class="relative w-full md:w-64">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <input type="text" id="search-input" placeholder="Search meetings..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold">
+                </div>
+            </div>
+        </div>
+
+        <!-- Meetings Grid -->
+        <div id="meetings-grid" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <!-- Meetings will be populated here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-16">
+            <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-calendar-times text-gray-400 text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">No meetings found</h3>
+            <p class="text-gray-500">Schedule your first meeting to get started</p>
+        </div>
+    </main>
+
+    <!-- Schedule Meeting Modal -->
+    <div id="schedule-modal" class="modal items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto fade-in">
+            <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+                <h3 class="font-serif font-bold text-2xl text-nba-navy">Schedule New Meeting</h3>
+                <button onclick="closeScheduleModal()" class="text-gray-400 hover:text-gray-600 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="schedule-form" class="p-6 space-y-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Meeting Title <span class="text-red-500">*</span></label>
+                        <input type="text" id="meeting-title" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20" placeholder="e.g., Monthly General Meeting">
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <textarea id="meeting-description" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20" placeholder="Meeting agenda and details..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Date <span class="text-red-500">*</span></label>
+                        <input type="date" id="meeting-date" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Time <span class="text-red-500">*</span></label>
+                        <input type="time" id="meeting-time" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
+                        <select id="meeting-duration" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20">
+                            <option value="30">30 minutes</option>
+                            <option value="60" selected>1 hour</option>
+                            <option value="90">1.5 hours</option>
+                            <option value="120">2 hours</option>
+                            <option value="180">3 hours</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Meeting Type</label>
+                        <select id="meeting-type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold focus:ring-2 focus:ring-nba-gold/20">
+                            <option value="general">General Meeting</option>
+                            <option value="executive">Executive Committee</option>
+                            <option value="committee">Committee Meeting</option>
+                            <option value="agm">Annual General Meeting</option>
+                            <option value="emergency">Emergency Meeting</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Access Settings</label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="access" value="all" checked class="text-nba-gold focus:ring-nba-gold">
+                                <span>All Members</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="access" value="executive" class="text-nba-gold focus:ring-nba-gold">
+                                <span>Executive Only</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="access" value="committee" class="text-nba-gold focus:ring-nba-gold">
+                                <span>Committee Members</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="auto-start" class="w-4 h-4 text-nba-gold border-gray-300 rounded focus:ring-nba-gold">
+                            <span class="text-sm text-gray-700">Auto-start meeting at scheduled time</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 pt-4 border-t">
+                    <button type="button" onclick="closeScheduleModal()" class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">Cancel</button>
+                    <button type="submit" class="flex-1 px-6 py-3 bg-nba-navy text-white rounded-lg hover:bg-blue-900 transition flex items-center justify-center space-x-2">
+                        <span id="schedule-btn-text">Schedule Meeting</span>
+                        <div id="schedule-spinner" class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Initialize
+        let meetings = JSON.parse(localStorage.getItem('nba_meetings')) || [];
+        let currentFilter = 'all';
+
+        // Check admin auth
+        document.addEventListener('DOMContentLoaded', function() {
+            const adminSession = sessionStorage.getItem('nba_admin_session');
+            if (!adminSession) {
+                // For demo, create admin session
+                sessionStorage.setItem('nba_admin_session', JSON.stringify({
+                    email: 'admin@nbaawka.org.ng',
+                    role: 'admin',
+                    loginTime: new Date().toISOString()
+                }));
+            }
+            
+            loadMeetings();
+            updateStats();
+            
+            // Set minimum date to today
+            document.getElementById('meeting-date').min = new Date().toISOString().split('T')[0];
+        });
+
+        // Load and display meetings
+        function loadMeetings() {
+            const grid = document.getElementById('meetings-grid');
+            const emptyState = document.getElementById('empty-state');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            
+            // Update meeting statuses
+            updateMeetingStatuses();
+            
+            let filteredMeetings = meetings.filter(m => {
+                const matchesSearch = m.title.toLowerCase().includes(searchTerm) || 
+                                    m.description.toLowerCase().includes(searchTerm);
+                const matchesFilter = currentFilter === 'all' || m.status === currentFilter;
+                return matchesSearch && matchesFilter;
+            });
+
+            // Sort by date/time
+            filteredMeetings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            if (filteredMeetings.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = filteredMeetings.map(meeting => createMeetingCard(meeting)).join('');
+        }
+
+        function updateMeetingStatuses() {
+            const now = new Date();
+            meetings.forEach(meeting => {
+                const meetingDate = new Date(meeting.date + 'T' + meeting.time);
+                const endTime = new Date(meetingDate.getTime() + meeting.duration * 60000);
+                
+                if (now < meetingDate) {
+                    meeting.status = 'scheduled';
+                } else if (now >= meetingDate && now <= endTime) {
+                    meeting.status = 'live';
+                } else {
+                    meeting.status = 'ended';
+                }
+            });
+            localStorage.setItem('nba_meetings', JSON.stringify(meetings));
+        }
+
+        function createMeetingCard(meeting) {
+            const statusColors = {
+                live: 'status-live',
+                scheduled: 'status-scheduled',
+                ended: 'status-ended'
+            };
+
+            const statusIcons = {
+                live: 'fa-video',
+                scheduled: 'fa-clock',
+                ended: 'fa-check-circle'
+            };
+
+            const meetingDate = new Date(meeting.date + 'T' + meeting.time);
+            const formattedDate = meetingDate.toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            const formattedTime = meetingDate.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
+
+            return `
+                <div class="meeting-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden fade-in">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="${statusColors[meeting.status]} px-3 py-1 rounded-full text-xs font-semibold flex items-center space-x-1">
+                                <i class="fas ${statusIcons[meeting.status]}"></i>
+                                <span>${meeting.status.toUpperCase()}</span>
+                            </span>
+                            <div class="relative">
+                                <button onclick="toggleMenu('${meeting.id}')" class="text-gray-400 hover:text-gray-600 p-1">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div id="menu-${meeting.id}" class="hidden absolute right-0 top-8 bg-white shadow-lg rounded-lg border border-gray-100 py-2 w-48 z-10">
+                                    ${meeting.status !== 'ended' ? `
+                                        <button onclick="startMeeting('${meeting.id}')" class="w-full text-left px-4 py-2 hover:bg-gray-50 text-green-600 flex items-center space-x-2">
+                                            <i class="fas fa-play"></i>
+                                            <span>${meeting.status === 'live' ? 'Join Meeting' : 'Start Now'}</span>
+                                        </button>
+                                    ` : ''}
+                                    <button onclick="copyMeetingLink('${meeting.id}')" class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center space-x-2">
+                                        <i class="fas fa-link"></i>
+                                        <span>Copy Link</span>
+                                    </button>
+                                    <button onclick="editMeeting('${meeting.id}')" class="w-full text-left px-4 py-2 hover:bg-gray-50 text-blue-600 flex items-center space-x-2">
+                                        <i class="fas fa-edit"></i>
+                                        <span>Edit</span>
+                                    </button>
+                                    <button onclick="deleteMeeting('${meeting.id}')" class="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600 flex items-center space-x-2">
+                                        <i class="fas fa-trash"></i>
+                                        <span>Delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="font-serif font-bold text-lg text-nba-navy mb-2 line-clamp-2">${meeting.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">${meeting.description || 'No description provided'}</p>
+
+                        <div class="space-y-2 text-sm text-gray-600 mb-4">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-calendar text-nba-gold w-5"></i>
+                                <span>${formattedDate}</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-clock text-nba-gold w-5"></i>
+                                <span>${formattedTime} (${meeting.duration} mins)</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-users text-nba-gold w-5"></i>
+                                <span class="capitalize">${meeting.access} Access</span>
+                            </div>
+                        </div>
+
+                        <div class="border-t pt-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">Meeting ID: ${meeting.meetingId}</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="copyMeetingLink('${meeting.id}')" class="relative px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium transition" title="Copy meeting link">
+                                        <i class="fas fa-copy mr-1"></i> Copy Link
+                                        <span id="tooltip-${meeting.id}" class="copy-tooltip">Copied!</span>
+                                    </button>
+                                    ${meeting.status !== 'ended' ? `
+                                        <a href="meeting-room.html?id=${meeting.id}&host=1" target="_blank" class="px-3 py-1 bg-nba-navy text-white rounded text-sm font-medium hover:bg-blue-900 transition">
+                                            <i class="fas fa-video mr-1"></i> ${meeting.status === 'live' ? 'Join' : 'Start'}
+                                        </a>
+                                    ` : '<span class="px-3 py-1 bg-gray-100 text-gray-500 rounded text-sm">Ended</span>'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateStats() {
+            updateMeetingStatuses();
+            document.getElementById('stat-total').textContent = meetings.length;
+            document.getElementById('stat-live').textContent = meetings.filter(m => m.status === 'live').length;
+            document.getElementById('stat-scheduled').textContent = meetings.filter(m => m.status === 'scheduled').length;
+            document.getElementById('stat-ended').textContent = meetings.filter(m => m.status === 'ended').length;
+        }
+
+        // Filter functionality
+        function filterMeetings(filter) {
+            currentFilter = filter;
+            
+            // Update button styles
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filter) {
+                    btn.classList.remove('bg-gray-100', 'text-gray-700');
+                    btn.classList.add('bg-nba-navy', 'text-white');
+                } else {
+                    btn.classList.remove('bg-nba-navy', 'text-white');
+                    btn.classList.add('bg-gray-100', 'text-gray-700');
+                }
+            });
+            
+            loadMeetings();
+        }
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', loadMeetings);
+
+        // Modal functions
+        function openScheduleModal() {
+            document.getElementById('schedule-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeScheduleModal() {
+            document.getElementById('schedule-modal').classList.remove('active');
+            document.body.style.overflow = '';
+            document.getElementById('schedule-form').reset();
+        }
+
+        // Schedule meeting
+        document.getElementById('schedule-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btnText = document.getElementById('schedule-btn-text');
+            const spinner = document.getElementById('schedule-spinner');
+            
+            btnText.textContent = 'Scheduling...';
+            spinner.classList.remove('hidden');
+
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            const meetingId = 'NBA' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            const newMeeting = {
+                id: Date.now().toString(),
+                meetingId: meetingId,
+                title: document.getElementById('meeting-title').value,
+                description: document.getElementById('meeting-description').value,
+                date: document.getElementById('meeting-date').value,
+                time: document.getElementById('meeting-time').value,
+                duration: parseInt(document.getElementById('meeting-duration').value),
+                type: document.getElementById('meeting-type').value,
+                access: document.querySelector('input[name="access"]:checked').value,
+                autoStart: document.getElementById('auto-start').checked,
+                status: 'scheduled',
+                createdAt: new Date().toISOString(),
+                createdBy: 'admin@nbaawka.org.ng',
+                joinUrl: `${window.location.origin}/meeting-room.html?id=${Date.now().toString()}`
+            };
+
+            meetings.push(newMeeting);
+            localStorage.setItem('nba_meetings', JSON.stringify(meetings));
+            
+            closeScheduleModal();
+            loadMeetings();
+            updateStats();
+            showToast('Meeting scheduled successfully!', 'success');
+            
+            btnText.textContent = 'Schedule Meeting';
+            spinner.classList.add('hidden');
+        });
+
+        // Meeting actions
+        function toggleMenu(meetingId) {
+            const menu = document.getElementById(`menu-${meetingId}`);
+            const allMenus = document.querySelectorAll('[id^="menu-"]');
+            
+            allMenus.forEach(m => {
+                if (m !== menu) m.classList.add('hidden');
+            });
+            
+            menu.classList.toggle('hidden');
+        }
+
+        function startMeeting(meetingId) {
+            const meeting = meetings.find(m => m.id === meetingId);
+            if (meeting) {
+                window.open(`meeting-room.html?id=${meetingId}&host=1`, '_blank');
+            }
+        }
+
+        function copyMeetingLink(meetingId) {
+            const meeting = meetings.find(m => m.id === meetingId);
+            if (meeting) {
+                const link = meeting.joinUrl;
+                navigator.clipboard.writeText(link).then(() => {
+                    const tooltip = document.getElementById(`tooltip-${meetingId}`);
+                    if (tooltip) {
+                        tooltip.classList.add('show');
+                        setTimeout(() => tooltip.classList.remove('show'), 2000);
+                    }
+                    showToast('Meeting link copied to clipboard!', 'success');
+                });
+            }
+        }
+
+        function editMeeting(meetingId) {
+            showToast('Edit feature coming soon!', 'success');
+            toggleMenu(meetingId);
+        }
+
+        function deleteMeeting(meetingId) {
+            if (confirm('Are you sure you want to delete this meeting? This action cannot be undone.')) {
+                meetings = meetings.filter(m => m.id !== meetingId);
+                localStorage.setItem('nba_meetings', JSON.stringify(meetings));
+                loadMeetings();
+                updateStats();
+                showToast('Meeting deleted successfully', 'success');
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Logout
+        function logout() {
+            sessionStorage.removeItem('nba_admin_session');
+            window.location.href = 'index.html';
+        }
+
+        // Close menus when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.relative')) {
+                document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden'));
+            }
+        });
+
+        // Close modal on escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeScheduleModal();
+            }
+        });
+    </script>
+</body>
+</html>

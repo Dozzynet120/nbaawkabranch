@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Room | NBA Awka</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://meet.jit.si/external_api.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nba: {
+                            gold: '#D4AF37',
+                            navy: '#1B365D',
+                            darknavy: '#0F1F33'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #1a1a1a; }
+        #jitsi-container { width: 100vw; height: 100vh; }
+        .loading-overlay {
+            position: fixed; inset: 0; background: #1B365D; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; transition: opacity 0.3s;
+        }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+        .spinner {
+            width: 60px; height: 60px; border: 4px solid #D4AF37;
+            border-top-color: transparent; border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Custom toolbar overlay */
+        .meeting-toolbar {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(27, 54, 93, 0.95); backdrop-filter: blur(10px);
+            padding: 12px 24px; border-radius: 50px; display: flex; gap: 16px;
+            z-index: 100; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .tool-btn {
+            width: 50px; height: 50px; border-radius: 50%; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; transition: all 0.3s; color: white;
+        }
+        .tool-btn:hover { transform: scale(1.1); }
+        .tool-btn.secondary { background: rgba(255,255,255,0.2); }
+        .tool-btn.danger { background: #dc2626; }
+        .tool-btn.gold { background: #D4AF37; color: #1B365D; }
+        
+        .meeting-info {
+            position: fixed; top: 20px; left: 20px;
+            background: rgba(0,0,0,0.6); color: white;
+            padding: 12px 20px; border-radius: 30px;
+            display: flex; align-items: center; gap: 12px;
+            z-index: 100; backdrop-filter: blur(5px);
+        }
+        .live-badge {
+            background: #dc2626; color: white; padding: 4px 12px;
+            border-radius: 20px; font-size: 12px; font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        
+        /* Full face and shoulder view - contain instead of cover */
+        .video-item { 
+            position: relative; 
+            background: #1a1a1a; 
+            border-radius: 12px; 
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+        }
+        .video-item video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain !important; /* Changed from cover to contain for full face/shoulder */
+            background: #1a1a1a;
+        }
+        
+        /* Larger video grid for better visibility */
+        .video-grid { 
+            display: grid; 
+            gap: 1rem; 
+            height: calc(100vh - 200px);
+            padding: 0 2rem;
+        }
+        .video-grid-1 { grid-template-columns: 1fr; max-width: 1200px; margin: 0 auto; }
+        .video-grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .video-grid-3 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+        .video-grid-4 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+        
+        /* Center video when solo */
+        .solo-view {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 200px);
+        }
+        .solo-view .video-item {
+            width: 100%;
+            max-width: 1400px;
+            height: 100%;
+            max-height: 800px;
+        }
+        
+        .participant-name { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 20px; 
+            background: rgba(0,0,0,0.7); 
+            color: white; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .media-indicators {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .media-indicator {
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            font-size: 14px;
+        }
+        .media-indicator.muted {
+            background: #dc2626;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 overflow-hidden">
+
+    <!-- Loading Screen -->
+    <div class="loading-overlay" id="loading">
+        <div class="spinner"></div>
+        <h2 class="text-xl font-semibold mb-2">Joining Meeting...</h2>
+        <p class="text-gray-300" id="loading-text">Connecting to secure room</p>
+    </div>
+
+    <!-- Meeting Info Header -->
+    <div class="meeting-info">
+        <span class="live-badge">● LIVE</span>
+        <div>
+            <h3 class="font-semibold text-sm" id="meeting-title">NBA Awka Meeting</h3>
+            <p class="text-xs text-gray-300" id="participant-count">Connecting...</p>
+        </div>
+    </div>
+
+    <!-- Jitsi Container (Full Screen) -->
+    <div id="jitsi-container"></div>
+
+    <!-- Custom Toolbar -->
+    <div class="meeting-toolbar">
+        <button onclick="toggleAudio()" id="btn-audio" class="tool-btn secondary" title="Toggle microphone (Ctrl+D)">
+            <i class="fas fa-microphone"></i>
+        </button>
+        <button onclick="toggleVideo()" id="btn-video" class="tool-btn secondary" title="Toggle camera (Ctrl+V)">
+            <i class="fas fa-video"></i>
+        </button>
+        <button onclick="toggleScreenShare()" id="btn-screen" class="tool-btn secondary" title="Share screen">
+            <i class="fas fa-desktop"></i>
+        </button>
+        <button onclick="toggleChat()" id="btn-chat" class="tool-btn secondary" title="Toggle chat">
+            <i class="fas fa-comments"></i>
+        </button>
+        <button onclick="showParticipants()" id="btn-participants" class="tool-btn secondary" title="Participants">
+            <i class="fas fa-users"></i>
+        </button>
+        <button onclick="leaveMeeting()" class="tool-btn danger" title="Leave meeting (Ctrl+E)">
+            <i class="fas fa-phone-slash"></i>
+        </button>
+    </div>
+
+    <script>
+        // Get meeting parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('room') || 'nba-awka-default';
+        const displayName = urlParams.get('name') || 'Guest';
+        const isHost = urlParams.get('host') === '1';
+        const meetingTitle = decodeURIComponent(urlParams.get('title') || 'NBA Awka Meeting');
+        const userId = urlParams.get('uid') || '';
+
+        let jitsiApi = null;
+        let isAudioOn = true;
+        let isVideoOn = true;
+
+        // Initialize meeting when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('meeting-title').textContent = meetingTitle;
+            
+            // Verify user is authenticated
+            checkAuthentication();
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'd') {
+                    e.preventDefault();
+                    toggleAudio();
+                }
+                if (e.ctrlKey && e.key === 'v') {
+                    e.preventDefault();
+                    toggleVideo();
+                }
+                if (e.ctrlKey && e.key === 'e') {
+                    e.preventDefault();
+                    leaveMeeting();
+                }
+            });
+        });
+
+        function checkAuthentication() {
+            const session = localStorage.getItem('nba_session');
+            if (!session) {
+                alert('Please login first');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            const user = JSON.parse(session);
+            
+            // Verify the user matches the URL parameter
+            if (userId && user.id !== userId) {
+                console.warn('User ID mismatch, but continuing...');
+            }
+            
+            initializeJitsi();
+        }
+
+        function initializeJitsi() {
+            if (typeof JitsiMeetExternalAPI === 'undefined') {
+                document.getElementById('loading-text').textContent = 'Error: Jitsi API not loaded';
+                setTimeout(() => location.reload(), 3000);
+                return;
+            }
+
+            const domain = 'meet.jit.si';
+            const options = {
+                roomName: roomId,
+                width: '100%',
+                height: '100%',
+                parentNode: document.getElementById('jitsi-container'),
+                userInfo: {
+                    displayName: displayName
+                },
+                configOverwrite: {
+                    startWithAudioMuted: false,
+                    startWithVideoMuted: false,
+                    prejoinPageEnabled: false,
+                    disableDeepLinking: true,
+                    enableWelcomePage: false,
+                    enableClosePage: false,
+                    hideLobbyButton: true,
+                    enableLobby: false,
+                    readOnlyName: true,
+                    disableProfile: true,
+                    defaultLogoUrl: '',
+                    toolbarButtons: [], // Hide default toolbar, we use custom
+                    SHOW_CHROME_EXTENSION_BANNER: false,
+                    // Video settings for full face/shoulder view
+                    constraints: {
+                        video: {
+                            aspectRatio: 16/9,
+                            height: { ideal: 720, max: 1080 },
+                            width: { ideal: 1280, max: 1920 }
+                        }
+                    }
+                },
+                interfaceConfigOverwrite: {
+                    TOOLBAR_BUTTONS: [],
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_WATERMARK_FOR_GUESTS: false,
+                    SHOW_CHROME_EXTENSION_BANNER: false,
+                    TOOLBAR_ALWAYS_VISIBLE: false,
+                    DEFAULT_BACKGROUND: '#1B365D',
+                    DEFAULT_LOCAL_DISPLAY_NAME: displayName,
+                    MOBILE_APP_PROMO: false,
+                    HIDE_INVITE_MORE_HEADER: true,
+                    // Filmstrip and tile view settings for better visibility
+                    FILM_STRIP_MAX_HEIGHT: 200,
+                    TILE_VIEW_MAX_COLUMNS: 2,
+                    // Video layout settings
+                    VIDEO_QUALITY_LABEL_DISABLED: false,
+                    RECENT_LIST_ENABLED: false
+                }
+            };
+
+            try {
+                jitsiApi = new JitsiMeetExternalAPI(domain, options);
+
+                // Event listeners
+                jitsiApi.addEventListener('videoConferenceJoined', () => {
+                    document.getElementById('loading').classList.add('hidden');
+                    updateParticipantCount();
+                    
+                    // Set tile view for better face/shoulder visibility when multiple participants
+                    setTimeout(() => {
+                        jitsiApi.executeCommand('setTileView', true);
+                    }, 1000);
+                    
+                    console.log('Joined conference:', roomId);
+                });
+
+                jitsiApi.addEventListener('participantJoined', (participant) => {
+                    updateParticipantCount();
+                    showNotification(`${participant.displayName} joined`);
+                });
+
+                jitsiApi.addEventListener('participantLeft', (participant) => {
+                    updateParticipantCount();
+                    showNotification(`${participant.displayName} left`);
+                });
+
+                jitsiApi.addEventListener('readyToClose', () => {
+                    leaveMeeting();
+                });
+
+                jitsiApi.addEventListener('errorOccurred', (error) => {
+                    console.error('Jitsi error:', error);
+                    document.getElementById('loading-text').textContent = 'Connection error. Retrying...';
+                });
+
+                // Set password if host
+                if (isHost) {
+                    setTimeout(() => {
+                        try {
+                            jitsiApi.executeCommand('password', 'nba-awka-' + roomId);
+                        } catch (e) {
+                            console.log('Could not set password:', e);
+                        }
+                    }, 3000);
+                }
+
+            } catch (error) {
+                console.error('Failed to initialize Jitsi:', error);
+                document.getElementById('loading-text').textContent = 'Failed to load meeting';
+            }
+        }
+
+        function updateParticipantCount() {
+            try {
+                const count = jitsiApi.getNumberOfParticipants();
+                document.getElementById('participant-count').textContent = 
+                    `${count} participant${count !== 1 ? 's' : ''}`;
+            } catch (e) {
+                document.getElementById('participant-count').textContent = 'Connected';
+            }
+        }
+
+        function toggleAudio() {
+            if (!jitsiApi) return;
+            jitsiApi.executeCommand('toggleAudio');
+            isAudioOn = !isAudioOn;
+            updateButtonState('btn-audio', isAudioOn, 'fa-microphone', 'fa-microphone-slash');
+        }
+
+        function toggleVideo() {
+            if (!jitsiApi) return;
+            jitsiApi.executeCommand('toggleVideo');
+            isVideoOn = !isVideoOn;
+            updateButtonState('btn-video', isVideoOn, 'fa-video', 'fa-video-slash');
+        }
+
+        function updateButtonState(btnId, isOn, onIcon, offIcon) {
+            const btn = document.getElementById(btnId);
+            const icon = btn.querySelector('i');
+            
+            if (isOn) {
+                icon.className = `fas ${onIcon}`;
+                btn.classList.remove('danger');
+                btn.classList.add('secondary');
+            } else {
+                icon.className = `fas ${offIcon}`;
+                btn.classList.remove('secondary');
+                btn.classList.add('danger');
+            }
+        }
+
+        function toggleScreenShare() {
+            if (!jitsiApi) return;
+            jitsiApi.executeCommand('toggleShareScreen');
+        }
+
+        function toggleChat() {
+            if (!jitsiApi) return;
+            jitsiApi.executeCommand('toggleChat');
+        }
+
+        function showParticipants() {
+            if (!jitsiApi) return;
+            jitsiApi.executeCommand('toggleParticipantsPane');
+        }
+
+        function leaveMeeting() {
+            if (confirm('Are you sure you want to leave the meeting?')) {
+                if (jitsiApi) {
+                    jitsiApi.executeCommand('hangup');
+                    setTimeout(() => {
+                        jitsiApi.dispose();
+                    }, 1000);
+                }
+                
+                // Redirect back to meetings page
+                const session = localStorage.getItem('nba_session');
+                const user = session ? JSON.parse(session) : null;
+                
+                if (user && user.type === 'admin') {
+                    window.location.href = 'meetings.html';
+                } else {
+                    window.location.href = 'meetings.html';
+                }
+            }
+        }
+
+        function showNotification(message) {
+            const div = document.createElement('div');
+            div.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 bg-nba-navy text-white px-6 py-3 rounded-lg shadow-lg z-[300]';
+            div.style.animation = 'fadeIn 0.3s ease';
+            div.textContent = message;
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                div.style.opacity = '0';
+                setTimeout(() => div.remove(), 300);
+            }, 3000);
+        }
+
+        // Prevent accidental close
+        window.addEventListener('beforeunload', (e) => {
+            if (jitsiApi) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    </script>
+</body>
+</html>

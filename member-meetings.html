@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Meetings | NBA Awka Member Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nba: {
+                            gold: '#D4AF37',
+                            darkgold: '#B8960C',
+                            navy: '#1B365D',
+                            darknavy: '#0F1F33',
+                            cream: '#F5F5DC',
+                            lightgray: '#F8F9FA'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .pulse-live { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .meeting-card { transition: all 0.3s ease; }
+        .meeting-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .countdown { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+
+    <!-- NAVBAR -->
+    <nav class="bg-nba-navy text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <a href="index.html" class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                        <i class="fas fa-balance-scale text-nba-gold text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-serif font-bold text-xl leading-tight">NBA AWKA</h1>
+                        <p class="text-xs text-gray-300">Member Portal</p>
+                    </div>
+                </a>
+
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="member-dashboard.html" class="hover:text-nba-gold transition">Dashboard</a>
+                    <a href="member-meetings.html" class="text-nba-gold font-medium">Meetings</a>
+                    <a href="member-profile.html" class="hover:text-nba-gold transition">My Profile</a>
+                    <a href="member-dues.html" class="hover:text-nba-gold transition">Dues</a>
+                    <div class="flex items-center space-x-3 pl-4 border-l border-gray-600">
+                        <span class="text-sm" id="member-name">Member</span>
+                        <button onclick="logout()" class="text-red-400 hover:text-red-300">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button id="mobile-menu-btn" class="md:hidden text-white text-2xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden fixed top-20 left-0 w-full bg-white z-40 shadow-lg">
+        <div class="flex flex-col p-4 space-y-3">
+            <a href="member-dashboard.html" class="text-gray-700 hover:text-nba-gold py-2">Dashboard</a>
+            <a href="member-meetings.html" class="text-nba-gold font-medium py-2">Meetings</a>
+            <a href="member-profile.html" class="text-gray-700 hover:text-nba-gold py-2">My Profile</a>
+            <a href="member-dues.html" class="text-gray-700 hover:text-nba-gold py-2">Dues</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-nba-navy to-blue-900 rounded-2xl p-8 text-white mb-8 fade-in">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="font-serif font-bold text-3xl mb-2">Upcoming Meetings</h2>
+                    <p class="text-blue-200">Stay connected with your colleagues. Join live meetings or view past recordings.</p>
+                </div>
+                <div class="flex items-center space-x-4 bg-white/10 rounded-lg p-4">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold" id="live-count">0</p>
+                        <p class="text-xs text-blue-200">Live Now</p>
+                    </div>
+                    <div class="w-px h-10 bg-white/20"></div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold" id="upcoming-count">0</p>
+                        <p class="text-xs text-blue-200">Upcoming</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Now Section -->
+        <div id="live-section" class="mb-8 hidden">
+            <h3 class="font-serif font-bold text-xl text-nba-navy mb-4 flex items-center">
+                <span class="w-3 h-3 bg-red-500 rounded-full mr-2 pulse-live"></span>
+                Live Now
+            </h3>
+            <div id="live-meetings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- Upcoming Meetings -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-serif font-bold text-xl text-nba-navy">Upcoming Meetings</h3>
+                <div class="flex gap-2">
+                    <button onclick="filterView('all')" class="view-filter px-4 py-2 rounded-lg text-sm font-medium bg-nba-navy text-white" data-view="all">All</button>
+                    <button onclick="filterView('general')" class="view-filter px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200" data-view="general">General</button>
+                    <button onclick="filterView('committee')" class="view-filter px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200" data-view="committee">Committee</button>
+                </div>
+            </div>
+            <div id="upcoming-meetings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="no-upcoming" class="hidden text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+                <i class="fas fa-calendar text-gray-300 text-4xl mb-3"></i>
+                <p class="text-gray-500">No upcoming meetings scheduled</p>
+            </div>
+        </div>
+
+        <!-- Past Meetings -->
+        <div>
+            <h3 class="font-serif font-bold text-xl text-nba-navy mb-4">Past Meetings</h3>
+            <div id="past-meetings" class="space-y-4"></div>
+            <div id="no-past" class="hidden text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+                <i class="fas fa-history text-gray-300 text-4xl mb-3"></i>
+                <p class="text-gray-500">No past meetings</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Join Meeting Modal -->
+    <div id="join-modal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 fade-in">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-nba-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-video text-nba-gold text-2xl"></i>
+                </div>
+                <h3 class="font-serif font-bold text-xl text-nba-navy" id="join-meeting-title">Meeting Title</h3>
+                <p class="text-gray-600 mt-1" id="join-meeting-time">Starting now</p>
+            </div>
+            
+            <div class="space-y-4 mb-6">
+                <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <i class="fas fa-info-circle text-nba-gold"></i>
+                    <p class="text-sm text-gray-600">Please ensure your camera and microphone are working before joining.</p>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <input type="text" id="display-name" placeholder="Your display name" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-nba-gold">
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <input type="checkbox" id="join-audio" checked class="w-4 h-4 text-nba-gold rounded">
+                    <label for="join-audio" class="text-sm text-gray-700">Connect with audio</label>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <input type="checkbox" id="join-video" checked class="w-4 h-4 text-nba-gold rounded">
+                    <label for="join-video" class="text-sm text-gray-700">Connect with video</label>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeJoinModal()" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+                <button onclick="confirmJoin()" class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold">
+                    Join Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let meetings = [];
+        let currentMember = null;
+        let selectedMeetingId = null;
+        let currentView = 'all';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load member session
+            const session = sessionStorage.getItem('nba_member_session');
+            if (session) {
+                currentMember = JSON.parse(session);
+                document.getElementById('member-name').textContent = currentMember.firstName || 'Member';
+            } else {
+                // Demo mode - create sample member
+                currentMember = {
+                    email: 'demo@member.com',
+                    firstName: 'Demo',
+                    lastName: 'Member',
+                    enrollment: 'NBA/AWK/12345'
+                };
+                sessionStorage.setItem('nba_member_session', JSON.stringify(currentMember));
+                document.getElementById('member-name').textContent = 'Demo Member';
+            }
+
+            loadMeetings();
+            
+            // Update countdowns every second
+            setInterval(updateCountdowns, 1000);
+        });
+
+        function loadMeetings() {
+            meetings = JSON.parse(localStorage.getItem('nba_meetings')) || [];
+            
+            // Update statuses
+            const now = new Date();
+            meetings.forEach(m => {
+                const meetingDate = new Date(m.date + 'T' + m.time);
+                const endTime = new Date(meetingDate.getTime() + m.duration * 60000);
+                
+                if (now < meetingDate) m.status = 'scheduled';
+                else if (now >= meetingDate && now <= endTime) m.status = 'live';
+                else m.status = 'ended';
+            });
+
+            // Filter for this member's access
+            const accessibleMeetings = meetings.filter(m => {
+                if (m.access === 'all') return true;
+                if (m.access === 'executive' && currentMember?.role === 'executive') return true;
+                if (m.access === 'committee' && currentMember?.committee) return true;
+                return true; // Demo: show all
+            });
+
+            renderMeetings(accessibleMeetings);
+        }
+
+        function renderMeetings(meetingsList) {
+            const now = new Date();
+            
+            // Live meetings
+            const liveMeetings = meetingsList.filter(m => m.status === 'live');
+            const liveSection = document.getElementById('live-section');
+            const liveContainer = document.getElementById('live-meetings');
+            
+            if (liveMeetings.length > 0) {
+                liveSection.classList.remove('hidden');
+                liveContainer.innerHTML = liveMeetings.map(m => createLiveCard(m)).join('');
+            } else {
+                liveSection.classList.add('hidden');
+            }
+            
+            document.getElementById('live-count').textContent = liveMeetings.length;
+
+            // Upcoming meetings
+            let upcomingMeetings = meetingsList.filter(m => m.status === 'scheduled');
+            if (currentView !== 'all') {
+                upcomingMeetings = upcomingMeetings.filter(m => m.type === currentView);
+            }
+            
+            const upcomingContainer = document.getElementById('upcoming-meetings');
+            const noUpcoming = document.getElementById('no-upcoming');
+            
+            if (upcomingMeetings.length > 0) {
+                upcomingContainer.innerHTML = upcomingMeetings.map(m => createUpcomingCard(m)).join('');
+                upcomingContainer.classList.remove('hidden');
+                noUpcoming.classList.add('hidden');
+            } else {
+                upcomingContainer.classList.add('hidden');
+                noUpcoming.classList.remove('hidden');
+            }
+            
+            document.getElementById('upcoming-count').textContent = upcomingMeetings.length;
+
+            // Past meetings
+            const pastMeetings = meetingsList.filter(m => m.status === 'ended')
+                .sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
+            
+            const pastContainer = document.getElementById('past-meetings');
+            const noPast = document.getElementById('no-past');
+            
+            if (pastMeetings.length > 0) {
+                pastContainer.innerHTML = pastMeetings.map(m => createPastCard(m)).join('');
+                pastContainer.classList.remove('hidden');
+                noPast.classList.add('hidden');
+            } else {
+                pastContainer.classList.add('hidden');
+                noPast.classList.remove('hidden');
+            }
+        }
+
+        function createLiveCard(meeting) {
+            return `
+                <div class="meeting-card bg-white rounded-xl shadow-lg border-2 border-red-500 overflow-hidden fade-in">
+                    <div class="bg-red-500 text-white px-4 py-2 flex items-center justify-between">
+                        <span class="font-semibold text-sm flex items-center">
+                            <span class="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+                            LIVE NOW
+                        </span>
+                        <span class="text-xs opacity-90">${meeting.participants || 0} participants</span>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-serif font-bold text-lg text-nba-navy mb-2">${meeting.title}</h4>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">${meeting.description || ''}</p>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-500">
+                                <i class="fas fa-user-tie mr-1"></i> Host: Admin
+                            </span>
+                            <button onclick="openJoinModal('${meeting.id}')" class="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition flex items-center space-x-2">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>Join Now</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createUpcomingCard(meeting) {
+            const meetingDate = new Date(meeting.date + 'T' + meeting.time);
+            const formattedDate = meetingDate.toLocaleDateString('en-NG', { weekday: 'short', day: 'numeric', month: 'short' });
+            const formattedTime = meetingDate.toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' });
+            
+            const typeLabels = {
+                general: 'General Meeting',
+                executive: 'Executive Committee',
+                committee: 'Committee Meeting',
+                agm: 'Annual General Meeting',
+                emergency: 'Emergency Meeting'
+            };
+
+            return `
+                <div class="meeting-card bg-white rounded-xl shadow-sm border border-gray-100 p-6 fade-in">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                            ${typeLabels[meeting.type] || meeting.type}
+                        </span>
+                        <span class="text-xs text-gray-500 capitalize">${meeting.access} Access</span>
+                    </div>
+                    
+                    <h4 class="font-serif font-bold text-lg text-nba-navy mb-2">${meeting.title}</h4>
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">${meeting.description || 'No description'}</p>
+                    
+                    <div class="space-y-2 text-sm text-gray-600 mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar text-nba-gold w-5"></i>
+                            <span>${formattedDate}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-clock text-nba-gold w-5"></i>
+                            <span>${formattedTime} (${meeting.duration} mins)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <div class="flex items-center justify-between">
+                            <span class="countdown text-nba-navy font-semibold text-sm" data-time="${meeting.date}T${meeting.time}">
+                                Calculating...
+                            </span>
+                            <button onclick="openJoinModal('${meeting.id}')" class="text-nba-navy hover:text-nba-gold font-medium text-sm transition">
+                                Details <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createPastCard(meeting) {
+            const meetingDate = new Date(meeting.date + 'T' + meeting.time);
+            const formattedDate = meetingDate.toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            return `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center justify-between fade-in opacity-75 hover:opacity-100 transition">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-video text-gray-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-nba-navy">${meeting.title}</h4>
+                            <p class="text-sm text-gray-500">${formattedDate} • ${meeting.duration} mins</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">Ended</span>
+                        ${meeting.recording ? `
+                            <button class="p-2 text-nba-gold hover:bg-nba-gold/10 rounded-lg transition" title="View Recording">
+                                <i class="fas fa-play-circle"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateCountdowns() {
+            document.querySelectorAll('.countdown').forEach(el => {
+                const targetTime = new Date(el.dataset.time);
+                const now = new Date();
+                const diff = targetTime - now;
+
+                if (diff > 0) {
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    if (days > 0) {
+                        el.textContent = `Starts in ${days}d ${hours}h`;
+                    } else if (hours > 0) {
+                        el.textContent = `Starts in ${hours}h ${minutes}m`;
+                    } else {
+                        el.textContent = `Starts in ${minutes}m`;
+                        el.classList.add('text-orange-600');
+                    }
+                } else {
+                    el.textContent = 'Starting now...';
+                    el.classList.add('text-green-600');
+                }
+            });
+        }
+
+        function filterView(view) {
+            currentView = view;
+            
+            document.querySelectorAll('.view-filter').forEach(btn => {
+                if (btn.dataset.view === view) {
+                    btn.classList.remove('bg-gray-100', 'text-gray-700');
+                    btn.classList.add('bg-nba-navy', 'text-white');
+                } else {
+                    btn.classList.remove('bg-nba-navy', 'text-white');
+                    btn.classList.add('bg-gray-100', 'text-gray-700');
+                }
+            });
+            
+            loadMeetings();
+        }
+
+        function openJoinModal(meetingId) {
+            selectedMeetingId = meetingId;
+            const meeting = meetings.find(m => m.id === meetingId);
+            if (!meeting) return;
+
+            document.getElementById('join-meeting-title').textContent = meeting.title;
+            
+            const meetingDate = new Date(meeting.date + 'T' + meeting.time);
+            const now = new Date();
+            
+            if (meeting.status === 'live') {
+                document.getElementById('join-meeting-time').textContent = '🔴 Live now - Join the meeting';
+                document.getElementById('join-meeting-time').classList.add('text-red-600', 'font-semibold');
+            } else {
+                const timeStr = meetingDate.toLocaleString('en-NG', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                document.getElementById('join-meeting-time').textContent = `Scheduled for ${timeStr}`;
+                document.getElementById('join-meeting-time').classList.remove('text-red-600', 'font-semibold');
+            }
+
+            document.getElementById('display-name').value = `${currentMember?.firstName || ''} ${currentMember?.lastName || ''}`.trim();
+            
+            document.getElementById('join-modal').classList.remove('hidden');
+            document.getElementById('join-modal').classList.add('flex');
+        }
+
+        function closeJoinModal() {
+            document.getElementById('join-modal').classList.add('hidden');
+            document.getElementById('join-modal').classList.remove('flex');
+            selectedMeetingId = null;
+        }
+
+        function confirmJoin() {
+            const displayName = document.getElementById('display-name').value.trim();
+            const withAudio = document.getElementById('join-audio').checked;
+            const withVideo = document.getElementById('join-video').checked;
+
+            if (!displayName) {
+                alert('Please enter your display name');
+                return;
+            }
+
+            const meeting = meetings.find(m => m.id === selectedMeetingId);
+            if (meeting) {
+                const params = new URLSearchParams({
+                    id: selectedMeetingId,
+                    name: displayName,
+                    audio: withAudio,
+                    video: withVideo
+                });
+                
+                window.open(`meeting-room.html?${params.toString()}`, '_blank');
+                closeJoinModal();
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('nba_member_session');
+            window.location.href = 'membershiplogin.html';
+        }
+
+        // Mobile menu
+        document.getElementById('mobile-menu-btn')?.addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Refresh meetings periodically
+        setInterval(loadMeetings, 30000); // Every 30 seconds
+    </script>
+</body>
+</html>

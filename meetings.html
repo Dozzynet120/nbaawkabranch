@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Meetings - NBA Awka Branch</title>
+    <title>NBA Awka Virtual Chambers - Admin & Member Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://meet.jit.si/external_api.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -21,7 +20,8 @@
                             cream: '#F5F5DC',
                             lightgray: '#F8F9FA',
                             green: '#059669',
-                            red: '#DC2626'
+                            red: '#DC2626',
+                            orange: '#F97316'
                         }
                     },
                     fontFamily: {
@@ -36,299 +36,923 @@
         .meeting-card { transition: all 0.3s ease; }
         .meeting-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
         .live-indicator { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .modal {
-            display: none;
-            background: rgba(0,0,0,0.5);
-        }
-        .modal.active {
-            display: flex;
-        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .modal { display: none; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+        .modal.active { display: flex; }
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .waiting-room { background: repeating-linear-gradient(45deg, #f3f4f6, #f3f4f6 10px, #e5e7eb 10px, #e5e7eb 20px); }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 16px 24px; border-radius: 8px; color: white; font-weight: 500; z-index: 2000; transform: translateX(400px); transition: transform 0.3s ease; }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: #10B981; }
+        .toast.error { background: #EF4444; }
+        .toast.info { background: #3B82F6; }
+        .member-chip { transition: all 0.2s; }
+        .member-chip:hover { transform: scale(1.05); }
+        .status-badge { animation: none; }
+        .status-badge.waiting { background: #F97316; animation: pulse 1.5s infinite; }
+        .status-badge.approved { background: #10B981; }
+        .status-badge.rejected { background: #DC2626; }
     </style>
 </head>
 <body class="bg-nba-lightgray font-sans antialiased">
 
-    <!-- Navigation -->
+    <!-- Authentication Check -->
+    <div id="authCheck" class="fixed inset-0 bg-nba-navy z-[9999] flex items-center justify-center">
+        <div class="text-center text-white">
+            <div class="w-16 h-16 border-4 border-nba-gold border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p>Checking authentication...</p>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal fixed inset-0 z-[9998] items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 fade-in">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-nba-gold rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-balance-scale text-nba-navy text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-serif font-bold text-nba-navy">NBA Awka Portal</h2>
+                <p class="text-gray-600 mt-2">Sign in to access virtual chambers</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <input type="email" id="loginEmail" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" placeholder="your@email.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="loginPassword" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" placeholder="••••••••">
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button onclick="login('member')" class="flex-1 bg-nba-navy text-white py-3 rounded-lg font-semibold hover:bg-nba-darknavy transition">
+                        Member Login
+                    </button>
+                    <button onclick="login('admin')" class="flex-1 bg-nba-gold text-nba-navy py-3 rounded-lg font-semibold hover:bg-yellow-500 transition">
+                        Admin Login
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg text-sm text-gray-600">
+                <p class="font-semibold mb-2">Demo Credentials:</p>
+                <p><strong>Admin:</strong> admin@nbaawka.org.ng / admin123</p>
+                <p><strong>Member:</strong> member@nbaawka.org.ng / member123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
     <nav class="bg-nba-navy text-nba-cream sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-            <a href="index.html" class="flex items-center space-x-4">
+            <a href="#" class="flex items-center space-x-4">
                 <div class="w-12 h-12 bg-nba-gold rounded-full flex items-center justify-center">
                     <i class="fas fa-balance-scale text-nba-navy text-xl"></i>
                 </div>
                 <div class="hidden sm:block">
                     <h1 class="font-serif text-xl font-bold leading-tight">NBA Awka Branch</h1>
-                    <p class="text-nba-gold text-xs tracking-wider uppercase">The Capital Bar</p>
+                    <p class="text-nba-gold text-xs tracking-wider uppercase" id="userRole">The Capital Bar</p>
                 </div>
             </a>
             <div class="flex items-center space-x-6">
-                <a href="index.html" class="text-sm hover:text-nba-gold transition">← Back to Home</a>
-                <div class="bg-nba-green/20 text-nba-green px-4 py-2 rounded-full text-sm font-semibold border border-nba-green/30">
-                    <i class="fas fa-video mr-2"></i>Virtual Meetings
-                </div>
+                <span id="userDisplay" class="text-sm text-gray-300 hidden md:block"></span>
+                <button onclick="logout()" class="text-sm hover:text-nba-gold transition">
+                    <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header class="relative bg-gradient-to-br from-nba-navy via-nba-darknavy to-nba-navy text-nba-cream py-16">
-        <div class="absolute inset-0 opacity-10">
-            <div class="absolute top-0 left-0 w-96 h-96 bg-nba-gold rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
-        </div>
-        <div class="relative max-w-4xl mx-auto px-6 text-center">
-            <div class="inline-flex items-center mb-4 px-4 py-2 bg-nba-green/20 border border-nba-green/30 rounded-full text-nba-green text-sm font-medium">
-                <span class="live-indicator w-2 h-2 bg-nba-green rounded-full mr-2"></span>
-                Virtual Meeting Center
-            </div>
-            <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">NBA Awka Virtual Chambers</h1>
-            <p class="text-lg text-gray-300 max-w-2xl mx-auto">
-                Join live meetings, CLE sessions, and branch discussions from anywhere. 
-                Secure, professional video conferencing for all members.
-            </p>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-6 py-12">
-        
-        <!-- Quick Join Section -->
-        <section class="mb-12">
-            <div class="bg-white rounded-2xl shadow-lg p-8">
-                <h2 class="text-2xl font-serif font-bold text-nba-navy mb-6">Quick Join</h2>
-                <div class="grid md:grid-cols-2 gap-6">
+    <!-- ADMIN DASHBOARD -->
+    <div id="adminDashboard" class="hidden">
+        <header class="bg-gradient-to-br from-nba-navy via-nba-darknavy to-nba-navy text-nba-cream py-12">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="flex items-center justify-between">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Enter Meeting ID or Room Name</label>
-                        <div class="flex gap-3">
-                            <input type="text" id="roomInput" placeholder="e.g., nba-awka-agm-2024" 
-                                   class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none">
-                            <button onclick="joinCustomRoom()" class="px-6 py-3 bg-nba-navy text-white rounded-lg font-semibold hover:bg-nba-darknavy transition">
-                                <i class="fas fa-sign-in-alt mr-2"></i>Join
-                            </button>
+                        <div class="inline-flex items-center mb-4 px-4 py-2 bg-nba-gold/20 border border-nba-gold/30 rounded-full text-nba-gold text-sm font-medium">
+                            <i class="fas fa-shield-alt mr-2"></i>Administrator Portal
                         </div>
-                        <p class="text-xs text-gray-500 mt-2">Leave blank to create a new instant meeting</p>
+                        <h1 class="text-4xl font-serif font-bold mb-2">Meeting Management</h1>
+                        <p class="text-gray-300">Schedule meetings, manage invitations, and control access</p>
                     </div>
-                    <div class="bg-nba-lightgray rounded-xl p-6 flex items-center justify-between">
-                        <div>
-                            <h3 class="font-bold text-nba-navy">Start Instant Meeting</h3>
-                            <p class="text-sm text-gray-600">Create a new meeting room immediately</p>
+                    <div class="hidden md:flex gap-4">
+                        <div class="text-center px-6 py-3 bg-white/10 rounded-xl">
+                            <p class="text-2xl font-bold text-nba-gold" id="adminStatsTotal">0</p>
+                            <p class="text-xs text-gray-300">Total Meetings</p>
                         </div>
-                        <button onclick="startInstantMeeting()" class="px-6 py-3 bg-nba-green text-white rounded-lg font-semibold hover:bg-green-700 transition">
-                            <i class="fas fa-plus-circle mr-2"></i>Start Now
-                        </button>
+                        <div class="text-center px-6 py-3 bg-white/10 rounded-xl">
+                            <p class="text-2xl font-bold text-nba-green" id="adminStatsLive">0</p>
+                            <p class="text-xs text-gray-300">Live Now</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </header>
 
-        <!-- Scheduled Meetings -->
-        <section class="mb-12">
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center">
+        <main class="max-w-7xl mx-auto px-6 py-8">
+            <div class="grid md:grid-cols-4 gap-4 mb-8">
+                <button onclick="showScheduleModal()" class="bg-nba-navy text-white p-6 rounded-xl hover:bg-nba-darknavy transition text-left group">
+                    <i class="fas fa-calendar-plus text-3xl mb-3 text-nba-gold group-hover:scale-110 transition-transform block"></i>
+                    <h3 class="font-bold">Schedule Meeting</h3>
+                    <p class="text-sm text-gray-300 mt-1">Create new meeting</p>
+                </button>
+                <button onclick="showMembersModal()" class="bg-white p-6 rounded-xl hover:shadow-lg transition text-left group border border-gray-200">
+                    <i class="fas fa-users text-3xl mb-3 text-nba-navy group-hover:scale-110 transition-transform block"></i>
+                    <h3 class="font-bold text-nba-navy">Manage Members</h3>
+                    <p class="text-sm text-gray-600 mt-1">View all members</p>
+                </button>
+                <button onclick="showInvitationsModal()" class="bg-white p-6 rounded-xl hover:shadow-lg transition text-left group border border-gray-200">
+                    <i class="fas fa-envelope text-3xl mb-3 text-nba-orange group-hover:scale-110 transition-transform block"></i>
+                    <h3 class="font-bold text-nba-navy">Invitations</h3>
+                    <p class="text-sm text-gray-600 mt-1">Pending invites</p>
+                </button>
+                <button onclick="showReportsModal()" class="bg-white p-6 rounded-xl hover:shadow-lg transition text-left group border border-gray-200">
+                    <i class="fas fa-chart-bar text-3xl mb-3 text-nba-green group-hover:scale-110 transition-transform block"></i>
+                    <h3 class="font-bold text-nba-navy">Reports</h3>
+                    <p class="text-sm text-gray-600 mt-1">Meeting analytics</p>
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="p-6 border-b flex items-center justify-between">
+                    <h2 class="text-xl font-serif font-bold text-nba-navy">All Meetings</h2>
+                    <div class="flex gap-2">
+                        <select id="adminFilter" onchange="renderAdminMeetings()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-nba-gold focus:outline-none">
+                            <option value="all">All Meetings</option>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="live">Live Now</option>
+                            <option value="ended">Ended</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="adminMeetingsList" class="divide-y"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MEMBER DASHBOARD -->
+    <div id="memberDashboard" class="hidden">
+        <header class="relative bg-gradient-to-br from-nba-navy via-nba-darknavy to-nba-navy text-nba-cream py-12">
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-0 left-0 w-96 h-96 bg-nba-gold rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+            </div>
+            <div class="relative max-w-4xl mx-auto px-6 text-center">
+                <div class="inline-flex items-center mb-4 px-4 py-2 bg-nba-green/20 border border-nba-green/30 rounded-full text-nba-green text-sm font-medium">
+                    <span class="live-indicator w-2 h-2 bg-nba-green rounded-full mr-2"></span>
+                    Member Portal
+                </div>
+                <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">NBA Awka Virtual Chambers</h1>
+                <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+                    Join live meetings, CLE sessions, and branch discussions. 
+                    Wait for admin approval to enter scheduled meetings.
+                </p>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-6 py-12">
+            <div id="waitingBanner" class="hidden mb-8 bg-nba-orange/10 border-2 border-nba-orange rounded-xl p-6 flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-nba-orange rounded-full flex items-center justify-center animate-pulse">
+                        <i class="fas fa-clock text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-nba-navy text-lg">Waiting for Approval</h3>
+                        <p class="text-gray-600">Your request to join "<span id="waitingMeetingName"></span>" is pending admin approval</p>
+                    </div>
+                </div>
+                <button onclick="cancelJoinRequest()" class="px-4 py-2 border-2 border-nba-orange text-nba-orange rounded-lg hover:bg-nba-orange hover:text-white transition">
+                    Cancel Request
+                </button>
+            </div>
+
+            <section class="mb-12" id="invitationsSection">
+                <div class="flex items-center mb-6">
                     <div class="w-1 h-8 bg-nba-gold mr-4"></div>
-                    <h2 class="text-2xl font-serif font-bold text-nba-navy">Scheduled Meetings</h2>
+                    <h2 class="text-2xl font-serif font-bold text-nba-navy">My Invitations</h2>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="showAddMeetingModal()" class="px-4 py-2 bg-nba-navy text-white rounded-lg hover:bg-nba-darknavy transition text-sm">
-                        <i class="fas fa-calendar-plus mr-2"></i>Schedule Meeting
-                    </button>
-                </div>
-            </div>
+                <div id="memberInvitations" class="grid md:grid-cols-2 gap-4"></div>
+            </section>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="meetingsList">
-                <!-- Meeting cards loaded dynamically -->
-            </div>
-        </section>
-
-        <!-- Active Meeting Container -->
-        <section id="activeMeetingSection" class="hidden mb-12">
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
-                <div class="bg-nba-navy text-white p-4 flex items-center justify-between">
-                    <div class="flex items-center space-x-4">
-                        <span class="live-indicator w-3 h-3 bg-nba-red rounded-full"></span>
-                        <h3 class="font-bold" id="activeMeetingTitle">Active Meeting</h3>
-                        <span class="text-sm text-gray-300" id="activeMeetingId">Room: ---</span>
+            <section class="mb-12">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <div class="w-1 h-8 bg-nba-gold mr-4"></div>
+                        <h2 class="text-2xl font-serif font-bold text-nba-navy">Available Meetings</h2>
                     </div>
-                    <div class="flex items-center space-x-3">
-                        <button onclick="copyMeetingLink()" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition text-sm">
-                            <i class="fas fa-copy mr-2"></i>Copy Link
-                        </button>
-                        <button onclick="endMeeting()" class="px-4 py-2 bg-nba-red rounded-lg hover:bg-red-700 transition font-semibold">
-                            <i class="fas fa-phone-slash mr-2"></i>End Call
+                    <div class="flex gap-2">
+                        <button onclick="showJoinByIdModal()" class="px-4 py-2 bg-nba-navy text-white rounded-lg hover:bg-nba-darknavy transition text-sm">
+                            <i class="fas fa-key mr-2"></i>Join by ID
                         </button>
                     </div>
                 </div>
-                <div id="jitsiContainer" class="w-full" style="height: 600px;"></div>
-            </div>
-        </section>
+                <div id="memberMeetingsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+        </main>
+    </div>
 
-        <!-- Meeting Guidelines -->
-        <section class="mb-12">
-            <div class="bg-nba-gold/10 border border-nba-gold/30 rounded-xl p-6">
-                <h3 class="font-bold text-nba-navy mb-4 flex items-center">
-                    <i class="fas fa-info-circle text-nba-gold mr-2"></i>
-                    Meeting Guidelines
-                </h3>
-                <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
-                    <ul class="space-y-2">
-                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Join with your full name for identification</li>
-                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Mute microphone when not speaking</li>
-                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Use professional background or blur</li>
-                    </ul>
-                    <ul class="space-y-2">
-                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Test audio/video before important meetings</li>
-                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Raise hand feature for questions</li>
-                        <li class="flex items-start"><i class="fas fa-check text-nba-green mr-2 mt-1"></i>Chat for sharing links and documents</li>
-                    </ul>
-                </div>
+    <!-- Schedule Meeting Modal -->
+    <div id="scheduleModal" class="modal fixed inset-0 z-50 items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-serif font-bold text-nba-navy">Schedule New Meeting</h3>
+                <button onclick="closeScheduleModal()" class="text-gray-400 hover:text-gray-600 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-        </section>
-
-        <!-- Tech Support -->
-        <section>
-            <div class="bg-nba-navy rounded-2xl p-8 text-white">
-                <div class="grid md:grid-cols-2 gap-8 items-center">
-                    <div>
-                        <h3 class="text-2xl font-serif font-bold mb-4">Need Technical Support?</h3>
-                        <p class="text-gray-300 mb-4">
-                            Having trouble joining a meeting? Contact our technical team for assistance.
-                        </p>
-                        <div class="space-y-2 text-sm">
-                            <p><i class="fas fa-envelope text-nba-gold mr-2"></i>techsupport@nbaawka.org.ng</p>
-                            <p><i class="fas fa-phone text-nba-gold mr-2"></i>+234 803 XXX XXXX</p>
-                        </div>
+            
+            <form onsubmit="saveScheduledMeeting(event)" class="space-y-6">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Meeting Title *</label>
+                        <input type="text" id="schedTitle" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" placeholder="e.g., Monthly General Meeting">
                     </div>
-                    <div class="flex justify-center md:justify-end">
-                        <a href="https://meet.jit.si" target="_blank" class="px-6 py-3 bg-nba-gold text-nba-navy rounded-lg font-bold hover:bg-white transition">
-                            <i class="fas fa-external-link-alt mr-2"></i>Open Jitsi Meet
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Add Meeting Modal -->
-    <div id="addMeetingModal" class="modal fixed inset-0 z-50 items-center justify-center">
-        <div class="bg-white rounded-2xl p-8 max-w-lg w-full mx-4">
-            <h3 class="text-2xl font-serif font-bold text-nba-navy mb-6">Schedule New Meeting</h3>
-            <form onsubmit="saveMeeting(event)">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Meeting Title *</label>
-                    <input type="text" id="meetingTitle" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" placeholder="e.g., Monthly Branch Meeting">
-                </div>
-                <div class="grid grid-cols-2 gap-4 mb-4">
+                    
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Date *</label>
-                        <input type="date" id="meetingDate" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none">
+                        <input type="date" id="schedDate" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Time *</label>
-                        <input type="time" id="meetingTime" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none">
+                        <input type="time" id="schedTime" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Duration</label>
+                        <select id="schedDuration" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none">
+                            <option value="30">30 minutes</option>
+                            <option value="60" selected>1 hour</option>
+                            <option value="90">1.5 hours</option>
+                            <option value="120">2 hours</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Meeting Type</label>
+                        <select id="schedType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none">
+                            <option value="general">General Meeting</option>
+                            <option value="executive">Executive Committee</option>
+                            <option value="cle">CLE Session</option>
+                            <option value="agm">Annual General Meeting</option>
+                        </select>
                     </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Meeting ID (optional)</label>
-                    <input type="text" id="meetingRoom" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" placeholder="Auto-generated if blank">
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Custom Room ID (optional)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="schedRoomId" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" placeholder="Auto-generated if blank">
+                        <button type="button" onclick="generateRoomId()" class="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+                            <i class="fas fa-random"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="mb-6">
+
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                    <textarea id="meetingDesc" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none resize-none" placeholder="Meeting agenda and details..."></textarea>
+                    <textarea id="schedDesc" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none resize-none" placeholder="Meeting agenda..."></textarea>
                 </div>
-                <div class="flex gap-4">
-                    <button type="submit" class="flex-1 bg-nba-navy text-white py-3 rounded-lg font-semibold hover:bg-nba-darknavy transition">Save Meeting</button>
-                    <button type="button" onclick="closeAddMeetingModal()" class="flex-1 border-2 border-gray-300 text-gray-600 py-3 rounded-lg font-semibold hover:border-nba-navy hover:text-nba-navy transition">Cancel</button>
+
+                <div class="border-t pt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Invite Members *</label>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="selectAllMembers()" class="text-sm text-nba-navy hover:text-nba-gold">Select All</button>
+                            <span class="text-gray-300">|</span>
+                            <button type="button" onclick="clearAllMembers()" class="text-sm text-nba-navy hover:text-nba-gold">Clear</button>
+                        </div>
+                    </div>
+                    <div id="memberSelectionList" class="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-48 overflow-y-auto p-4 bg-gray-50 rounded-lg"></div>
+                    <p class="text-xs text-gray-500 mt-2"><span id="selectedCount">0</span> members selected</p>
+                </div>
+
+                <div class="border-t pt-6 space-y-3">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="schedRequireApproval" checked class="w-5 h-5 text-nba-gold rounded focus:ring-nba-gold">
+                        <span class="text-gray-700">Require admin approval for entry</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="schedRecord" class="w-5 h-5 text-nba-gold rounded focus:ring-nba-gold">
+                        <span class="text-gray-700">Auto-record meeting</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="schedWaitingRoom" checked class="w-5 h-5 text-nba-gold rounded focus:ring-nba-gold">
+                        <span class="text-gray-700">Enable waiting room</span>
+                    </label>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-1 bg-nba-navy text-white py-3 rounded-lg font-semibold hover:bg-nba-darknavy transition flex items-center justify-center">
+                        <i class="fas fa-calendar-check mr-2"></i>Schedule & Send Invites
+                    </button>
+                    <button type="button" onclick="closeScheduleModal()" class="flex-1 border-2 border-gray-300 text-gray-600 py-3 rounded-lg font-semibold hover:border-nba-navy hover:text-nba-navy transition">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Meeting Control Modal -->
+    <div id="meetingControlModal" class="modal fixed inset-0 z-50 items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-2xl font-serif font-bold text-nba-navy" id="controlMeetingTitle">Meeting Control</h3>
+                    <p class="text-gray-600" id="controlMeetingId">Room: ---</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="startMeetingNow()" id="btnStartMeeting" class="px-6 py-3 bg-nba-green text-white rounded-lg font-semibold hover:bg-green-700 transition">
+                        <i class="fas fa-play mr-2"></i>Start Meeting
+                    </button>
+                    <button onclick="closeMeetingControlModal()" class="text-gray-400 hover:text-gray-600 text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="md:col-span-2">
+                    <div class="bg-gray-50 rounded-xl p-4 mb-4">
+                        <h4 class="font-bold text-nba-navy mb-4 flex items-center">
+                            <i class="fas fa-user-clock text-nba-orange mr-2"></i>
+                            Waiting Room (<span id="waitingCount">0</span>)
+                        </h4>
+                        <div id="waitingList" class="space-y-2 max-h-64 overflow-y-auto"></div>
+                    </div>
+
+                    <div class="bg-green-50 rounded-xl p-4">
+                        <h4 class="font-bold text-nba-navy mb-4 flex items-center">
+                            <i class="fas fa-check-circle text-nba-green mr-2"></i>
+                            Approved Participants (<span id="approvedCount">0</span>)
+                        </h4>
+                        <div id="approvedList" class="space-y-2 max-h-48 overflow-y-auto"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="bg-nba-lightgray rounded-xl p-4">
+                        <h4 class="font-bold text-nba-navy mb-3">Meeting Link</h4>
+                        <div class="flex gap-2">
+                            <input type="text" id="controlMeetingLink" readonly class="flex-1 px-3 py-2 bg-white border rounded text-sm">
+                            <button onclick="copyControlLink()" class="px-3 py-2 bg-nba-navy text-white rounded hover:bg-nba-darknavy">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-nba-lightgray rounded-xl p-4">
+                        <h4 class="font-bold text-nba-navy mb-3">Quick Actions</h4>
+                        <div class="space-y-2">
+                            <button onclick="inviteMoreMembers()" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg text-left hover:border-nba-gold transition">
+                                <i class="fas fa-user-plus mr-2 text-nba-navy"></i>Invite More
+                            </button>
+                            <button onclick="muteAllParticipants()" class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg text-left hover:border-nba-gold transition">
+                                <i class="fas fa-microphone-slash mr-2 text-nba-orange"></i>Mute All
+                            </button>
+                            <button onclick="endMeetingAdmin()" class="w-full px-4 py-2 bg-white border border-red-300 text-red-600 rounded-lg text-left hover:bg-red-50 transition">
+                                <i class="fas fa-stop-circle mr-2"></i>End for All
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                        <p class="text-sm text-yellow-800">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Only approved participants can join the meeting. Monitor the waiting room and approve members as needed.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join by ID Modal -->
+    <div id="joinByIdModal" class="modal fixed inset-0 z-50 items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 fade-in">
+            <h3 class="text-2xl font-serif font-bold text-nba-navy mb-6">Join Meeting by ID</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Meeting ID or Room Name</label>
+                    <input type="text" id="joinRoomId" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-nba-gold focus:outline-none" placeholder="e.g., nba-awka-meeting-123">
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 text-sm text-gray-600">
+                    <p><i class="fas fa-info-circle text-nba-gold mr-2"></i>Enter the meeting ID provided by your admin or check your email invitation.</p>
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button onclick="requestJoinById()" class="flex-1 bg-nba-navy text-white py-3 rounded-lg font-semibold hover:bg-nba-darknavy transition">
+                        Request to Join
+                    </button>
+                    <button onclick="closeJoinByIdModal()" class="flex-1 border-2 border-gray-300 text-gray-600 py-3 rounded-lg font-semibold hover:border-nba-navy hover:text-nba-navy transition">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
     <!-- Footer -->
     <footer class="bg-nba-navy text-nba-cream py-12 border-t-4 border-nba-gold">
         <div class="max-w-6xl mx-auto px-6 text-center">
             <p>&copy; 2025 NBA Awka Branch – The Capital Bar. All Rights Reserved.</p>
-            <p class="mt-2 text-xs text-gray-500">Powered by Jitsi Meet • Secure & Open Source Video Conferencing</p>
+            <p class="mt-2 text-xs text-gray-500">Secure Virtual Meeting Platform</p>
         </div>
     </footer>
 
     <script>
-        // Sample meetings data
-        let meetings = JSON.parse(localStorage.getItem('nba_meetings')) || [
-            {
-                id: 'nba-awka-agm-2024',
-                title: 'Annual General Meeting 2024',
-                date: '2024-12-15',
-                time: '10:00',
-                description: 'Annual general meeting of the NBA Awka Branch. All members are encouraged to attend.',
-                status: 'upcoming'
-            },
-            {
-                id: 'nba-awka-cle-dec',
-                title: 'CLE Session: Legal Tech Trends',
-                date: '2024-12-20',
-                time: '14:00',
-                description: 'Continuing Legal Education on emerging legal technologies and AI in legal practice.',
-                status: 'upcoming'
-            }
+        // ==================== DATA & STATE ====================
+        
+        const demoMembers = [
+            { id: 'm1', name: 'John Okafor', email: 'john.okafor@lawfirm.com', enrollment: 'NBA/AWK/12345', status: 'active' },
+            { id: 'm2', name: 'Sarah Nnamani', email: 'sarah.n@legal.com', enrollment: 'NBA/AWK/12346', status: 'active' },
+            { id: 'm3', name: 'Michael Adeyemi', email: 'm.adeyemi@justice.ng', enrollment: 'NBA/AWK/12347', status: 'active' },
+            { id: 'm4', name: 'Chioma Eze', email: 'chioma.eze@bar.com', enrollment: 'NBA/AWK/12348', status: 'active' },
+            { id: 'm5', name: 'Emmanuel Obi', email: 'e.obi@courts.gov.ng', enrollment: 'NBA/AWK/12349', status: 'active' },
+            { id: 'm6', name: 'Ngozi Uche', email: 'ngozi.u@law.com', enrollment: 'NBA/AWK/12350', status: 'active' }
         ];
 
-        let activeApi = null;
-        let currentRoom = null;
+        const demoAdmins = [
+            { id: 'a1', name: 'Admin User', email: 'admin@nbaawka.org.ng', password: 'admin123', role: 'admin' }
+        ];
 
-        // Initialize
+        let currentUser = null;
+        let meetings = [];
+        let joinRequests = [];
+        let invitations = [];
+        let currentMeetingId = null;
+        let pollingInterval = null;
+
+        // ==================== AUTHENTICATION ====================
+
         document.addEventListener('DOMContentLoaded', () => {
-            renderMeetings();
-            
-            // Set minimum date to today
+            const session = localStorage.getItem('nba_session');
+            if (session) {
+                currentUser = JSON.parse(session);
+                initializeApp();
+            } else {
+                document.getElementById('authCheck').classList.add('hidden');
+                document.getElementById('loginModal').classList.add('active');
+            }
+
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('meetingDate').min = today;
+            const dateInput = document.getElementById('schedDate');
+            if (dateInput) dateInput.min = today;
         });
 
-        // Render meetings list
-        function renderMeetings() {
-            const container = document.getElementById('meetingsList');
-            const now = new Date();
+        function login(type) {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (type === 'admin') {
+                const admin = demoAdmins.find(a => a.email === email && a.password === password);
+                if (admin) {
+                    currentUser = { ...admin, type: 'admin' };
+                } else if (email === 'admin@nbaawka.org.ng' && password === 'admin123') {
+                    currentUser = { ...demoAdmins[0], type: 'admin' };
+                }
+            } else {
+                const member = demoMembers.find(m => m.email === email);
+                if (member || (email === 'member@nbaawka.org.ng' && password === 'member123')) {
+                    currentUser = { 
+                        ...(member || demoMembers[0]), 
+                        type: 'member',
+                        password: undefined 
+                    };
+                }
+            }
+
+            if (currentUser) {
+                localStorage.setItem('nba_session', JSON.stringify(currentUser));
+                document.getElementById('loginModal').classList.remove('active');
+                initializeApp();
+                showToast(`Welcome, ${currentUser.name || currentUser.email}!`, 'success');
+            } else {
+                showToast('Invalid credentials. Try demo accounts below.', 'error');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('nba_session');
+            currentUser = null;
+            location.reload();
+        }
+
+        function initializeApp() {
+            document.getElementById('authCheck').classList.add('hidden');
+            document.getElementById('userDisplay').textContent = currentUser.name || currentUser.email;
+            document.getElementById('userRole').textContent = currentUser.type === 'admin' ? 'Administrator' : 'Member';
+
+            meetings = JSON.parse(localStorage.getItem('nba_meetings')) || [];
+            joinRequests = JSON.parse(localStorage.getItem('nba_join_requests')) || [];
+            invitations = JSON.parse(localStorage.getItem('nba_invitations')) || [];
+
+            if (currentUser.type === 'admin') {
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                renderAdminMeetings();
+                updateAdminStats();
+                startAdminPolling();
+            } else {
+                document.getElementById('memberDashboard').classList.remove('hidden');
+                renderMemberInvitations();
+                renderMemberMeetings();
+                startMemberPolling();
+            }
+        }
+
+        // ==================== ADMIN FUNCTIONS ====================
+
+        function showScheduleModal() {
+            renderMemberSelection();
+            document.getElementById('scheduleModal').classList.add('active');
+        }
+
+        function closeScheduleModal() {
+            document.getElementById('scheduleModal').classList.remove('active');
+        }
+
+        function renderMemberSelection() {
+            const container = document.getElementById('memberSelectionList');
+            container.innerHTML = demoMembers.map(m => `
+                <label class="member-chip flex items-center space-x-3 p-3 bg-white rounded-lg border cursor-pointer hover:border-nba-gold transition">
+                    <input type="checkbox" name="inviteMember" value="${m.id}" class="w-4 h-4 text-nba-gold rounded focus:ring-nba-gold" onchange="updateSelectedCount()">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium text-sm text-nba-navy truncate">${m.name}</p>
+                        <p class="text-xs text-gray-500 truncate">${m.email}</p>
+                    </div>
+                </label>
+            `).join('');
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const count = document.querySelectorAll('input[name="inviteMember"]:checked').length;
+            document.getElementById('selectedCount').textContent = count;
+        }
+
+        function selectAllMembers() {
+            document.querySelectorAll('input[name="inviteMember"]').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+
+        function clearAllMembers() {
+            document.querySelectorAll('input[name="inviteMember"]').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+
+        function generateRoomId() {
+            const id = 'nba-awka-' + Math.random().toString(36).substring(2, 8) + '-' + Date.now().toString(36).substring(2, 6);
+            document.getElementById('schedRoomId').value = id;
+        }
+
+        function saveScheduledMeeting(e) {
+            e.preventDefault();
+
+            const selectedMembers = Array.from(document.querySelectorAll('input[name="inviteMember"]:checked')).map(cb => cb.value);
             
-            if (meetings.length === 0) {
-                container.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-8">No scheduled meetings. Click "Schedule Meeting" to add one.</div>';
+            if (selectedMembers.length === 0) {
+                showToast('Please select at least one member to invite', 'error');
                 return;
             }
+
+            const meeting = {
+                id: Date.now().toString(),
+                roomId: document.getElementById('schedRoomId').value || 'nba-awka-' + Date.now(),
+                title: document.getElementById('schedTitle').value,
+                date: document.getElementById('schedDate').value,
+                time: document.getElementById('schedTime').value,
+                duration: document.getElementById('schedDuration').value,
+                type: document.getElementById('schedType').value,
+                description: document.getElementById('schedDesc').value,
+                requireApproval: document.getElementById('schedRequireApproval').checked,
+                record: document.getElementById('schedRecord').checked,
+                waitingRoom: document.getElementById('schedWaitingRoom').checked,
+                createdBy: currentUser.id,
+                status: 'scheduled',
+                invitedMembers: selectedMembers,
+                createdAt: new Date().toISOString()
+            };
+
+            meetings.push(meeting);
+            localStorage.setItem('nba_meetings', JSON.stringify(meetings));
+
+            selectedMembers.forEach(memberId => {
+                invitations.push({
+                    id: Date.now() + '-' + memberId,
+                    meetingId: meeting.id,
+                    memberId: memberId,
+                    sentAt: new Date().toISOString(),
+                    status: 'pending'
+                });
+            });
+            localStorage.setItem('nba_invitations', JSON.stringify(invitations));
+
+            closeScheduleModal();
+            renderAdminMeetings();
+            updateAdminStats();
+            showToast(`Meeting scheduled! Invitations sent to ${selectedMembers.length} members.`, 'success');
+            e.target.reset();
+        }
+
+        function renderAdminMeetings() {
+            const filter = document.getElementById('adminFilter')?.value || 'all';
+            const container = document.getElementById('adminMeetingsList');
             
-            container.innerHTML = meetings.map(meeting => {
-                const meetingDate = new Date(meeting.date + 'T' + meeting.time);
-                const isLive = Math.abs(now - meetingDate) < 3600000; // Within 1 hour
-                const isPast = meetingDate < now && !isLive;
+            let filtered = meetings;
+            if (filter !== 'all') {
+                filtered = meetings.filter(m => m.status === filter);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="p-8 text-center text-gray-500">No meetings found</div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(m => {
+                const isLive = m.status === 'live';
+                const isScheduled = m.status === 'scheduled';
                 
+                const waiting = joinRequests.filter(r => r.meetingId === m.id && r.status === 'waiting').length;
+                const approved = joinRequests.filter(r => r.meetingId === m.id && r.status === 'approved').length;
+
                 return `
-                    <div class="meeting-card bg-white rounded-xl shadow-lg overflow-hidden ${isLive ? 'ring-2 ring-nba-green' : ''}">
-                        <div class="p-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="px-3 py-1 rounded-full text-xs font-bold ${isLive ? 'bg-nba-green text-white' : isPast ? 'bg-gray-200 text-gray-600' : 'bg-nba-gold/20 text-nba-navy'}">
-                                    ${isLive ? '● LIVE NOW' : isPast ? 'COMPLETED' : 'UPCOMING'}
-                                </span>
-                                <span class="text-sm text-gray-500">
-                                    <i class="far fa-calendar mr-1"></i>${formatDate(meeting.date)}
-                                </span>
+                    <div class="p-6 hover:bg-gray-50 transition">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="font-bold text-nba-navy text-lg">${m.title}</h3>
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold ${isLive ? 'bg-red-100 text-red-600' : isScheduled ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}">
+                                        ${isLive ? '● LIVE' : m.status.toUpperCase()}
+                                    </span>
+                                    ${waiting > 0 ? `<span class="px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-600 animate-pulse">${waiting} waiting</span>` : ''}
+                                </div>
+                                <p class="text-gray-600 text-sm mb-3">${m.description || 'No description'}</p>
+                                <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+                                    <span><i class="far fa-calendar mr-1"></i>${formatDate(m.date)} at ${m.time}</span>
+                                    <span><i class="far fa-clock mr-1"></i>${m.duration} mins</span>
+                                    <span><i class="fas fa-users mr-1"></i>${m.invitedMembers?.length || 0} invited</span>
+                                    <span><i class="fas fa-check-circle mr-1"></i>${approved} joined</span>
+                                    <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">ID: ${m.roomId}</span>
+                                </div>
                             </div>
-                            <h3 class="font-bold text-nba-navy text-lg mb-2">${meeting.title}</h3>
-                            <p class="text-sm text-gray-600 mb-4 line-clamp-2">${meeting.description}</p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-sm text-gray-500">
-                                    <i class="far fa-clock mr-1"></i>${meeting.time}
-                                </span>
-                                <button onclick="joinMeeting('${meeting.id}', '${meeting.title.replace(/'/g, "\\'")}')" 
-                                        class="px-4 py-2 ${isLive || !isPast ? 'bg-nba-navy text-white hover:bg-nba-darknavy' : 'bg-gray-200 text-gray-600 cursor-not-allowed'} rounded-lg transition"
-                                        ${isPast ? 'disabled' : ''}>
-                                    ${isLive ? 'Join Now' : isPast ? 'Ended' : 'Join'}
+                            <div class="flex gap-2 ml-4">
+                                ${isScheduled ? `
+                                    <button onclick="openMeetingControl('${m.id}')" class="px-4 py-2 bg-nba-navy text-white rounded-lg hover:bg-nba-darknavy transition text-sm">
+                                        <i class="fas fa-cog mr-1"></i>Control
+                                    </button>
+                                ` : isLive ? `
+                                    <button onclick="joinAsHost('${m.id}')" class="px-4 py-2 bg-nba-green text-white rounded-lg hover:bg-green-700 transition text-sm">
+                                        <i class="fas fa-video mr-1"></i>Join
+                                    </button>
+                                    <button onclick="openMeetingControl('${m.id}')" class="px-4 py-2 bg-nba-orange text-white rounded-lg hover:bg-orange-700 transition text-sm">
+                                        <i class="fas fa-user-clock mr-1"></i>Manage
+                                    </button>
+                                ` : `
+                                    <button onclick="viewMeetingReport('${m.id}')" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition text-sm">
+                                        <i class="fas fa-chart-bar mr-1"></i>Report
+                                    </button>
+                                `}
+                                <button onclick="copyMeetingLink('${m.roomId}')" class="px-3 py-2 border border-gray-300 rounded-lg hover:border-nba-gold hover:text-nba-gold transition" title="Copy link">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                                <button onclick="deleteMeeting('${m.id}')" class="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition" title="Delete">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         </div>
-                        <div class="bg-nba-lightgray px-6 py-3 text-xs text-gray-600 flex items-center justify-between">
-                            <span>Room: ${meeting.id}</span>
-                            <button onclick="copyRoomLink('${meeting.id}')" class="text-nba-navy hover:text-nba-gold transition">
-                                <i class="fas fa-copy mr-1"></i>Copy Link
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openMeetingControl(meetingId) {
+            const meeting = meetings.find(m => m.id === meetingId);
+            if (!meeting) return;
+
+            currentMeetingId = meetingId;
+            document.getElementById('controlMeetingTitle').textContent = meeting.title;
+            document.getElementById('controlMeetingId').textContent = 'Room: ' + meeting.roomId;
+            document.getElementById('controlMeetingLink').value = `https://meet.jit.si/${meeting.roomId}`;
+            
+            renderWaitingList();
+            document.getElementById('meetingControlModal').classList.add('active');
+        }
+
+        function closeMeetingControlModal() {
+            document.getElementById('meetingControlModal').classList.remove('active');
+            currentMeetingId = null;
+        }
+
+        function renderWaitingList() {
+            if (!currentMeetingId) return;
+
+            const waiting = joinRequests.filter(r => r.meetingId === currentMeetingId && r.status === 'waiting');
+            const approved = joinRequests.filter(r => r.meetingId === currentMeetingId && r.status === 'approved');
+
+            document.getElementById('waitingCount').textContent = waiting.length;
+            document.getElementById('approvedCount').textContent = approved.length;
+
+            document.getElementById('waitingList').innerHTML = waiting.length ? waiting.map(r => `
+                <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-orange-200 slide-in">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-nba-orange/20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-nba-orange"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-sm">${r.memberName}</p>
+                            <p class="text-xs text-gray-500">${new Date(r.timestamp).toLocaleTimeString()}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="approveMember('${r.id}')" class="px-3 py-1 bg-nba-green text-white rounded text-sm hover:bg-green-700">
+                            <i class="fas fa-check mr-1"></i>Approve
+                        </button>
+                        <button onclick="rejectMember('${r.id}')" class="px-3 py-1 bg-nba-red text-white rounded text-sm hover:bg-red-700">
+                            <i class="fas fa-times mr-1"></i>Reject
+                        </button>
+                    </div>
+                </div>
+            `).join('') : '<p class="text-gray-500 text-center py-4">No one waiting</p>';
+
+            document.getElementById('approvedList').innerHTML = approved.length ? approved.map(r => `
+                <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-green-200">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-nba-green/20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-nba-green"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-sm">${r.memberName}</p>
+                            <span class="text-xs text-green-600">Approved</span>
+                        </div>
+                    </div>
+                    <button onclick="removeFromMeeting('${r.id}')" class="text-red-600 hover:text-red-800">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            `).join('') : '<p class="text-gray-500 text-center py-4">No approved participants yet</p>';
+        }
+
+        function approveMember(requestId) {
+            const request = joinRequests.find(r => r.id === requestId);
+            if (request) {
+                request.status = 'approved';
+                request.approvedAt = new Date().toISOString();
+                localStorage.setItem('nba_join_requests', JSON.stringify(joinRequests));
+                renderWaitingList();
+                showToast(`${request.memberName} approved to join`, 'success');
+            }
+        }
+
+        function rejectMember(requestId) {
+            const request = joinRequests.find(r => r.id === requestId);
+            if (request) {
+                request.status = 'rejected';
+                localStorage.setItem('nba_join_requests', JSON.stringify(joinRequests));
+                renderWaitingList();
+                showToast(`${request.memberName} rejected`, 'error');
+            }
+        }
+
+        function removeFromMeeting(requestId) {
+            joinRequests = joinRequests.filter(r => r.id !== requestId);
+            localStorage.setItem('nba_join_requests', JSON.stringify(joinRequests));
+            renderWaitingList();
+            showToast('Participant removed', 'info');
+        }
+
+        // ==================== REDIRECT TO MEETING ROOM FUNCTIONS ====================
+
+        function startMeetingNow() {
+            const meeting = meetings.find(m => m.id === currentMeetingId);
+            if (meeting) {
+                meeting.status = 'live';
+                meeting.startedAt = new Date().toISOString();
+                localStorage.setItem('nba_meetings', JSON.stringify(meetings));
+                
+                if (!meeting.requireApproval) {
+                    meeting.invitedMembers.forEach(memberId => {
+                        const member = demoMembers.find(m => m.id === memberId);
+                        if (member && !joinRequests.find(r => r.meetingId === meeting.id && r.memberId === memberId)) {
+                            joinRequests.push({
+                                id: Date.now() + '-' + memberId,
+                                meetingId: meeting.id,
+                                memberId: memberId,
+                                memberName: member.name,
+                                status: 'approved',
+                                timestamp: new Date().toISOString(),
+                                approvedAt: new Date().toISOString()
+                            });
+                        }
+                    });
+                    localStorage.setItem('nba_join_requests', JSON.stringify(joinRequests));
+                }
+                
+                renderWaitingList();
+                renderAdminMeetings();
+                updateAdminStats();
+                showToast('Meeting started! Opening meeting room...', 'success');
+                
+                // Redirect to meeting room after short delay
+                setTimeout(() => {
+                    const encodedTitle = encodeURIComponent(meeting.title);
+                    const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${encodeURIComponent(currentUser.name || 'Host')}&host=1&title=${encodedTitle}&uid=${currentUser.id}`;
+                    window.location.href = redirectUrl;
+                }, 1000);
+            }
+        }
+
+        function joinAsHost(meetingId) {
+            const meeting = meetings.find(m => m.id === meetingId);
+            if (!meeting) return;
+
+            closeMeetingControlModal();
+            
+            // Redirect to meeting room
+            const encodedTitle = encodeURIComponent(meeting.title);
+            const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${encodeURIComponent(currentUser.name || 'Host')}&host=1&title=${encodedTitle}&uid=${currentUser.id}`;
+            window.location.href = redirectUrl;
+        }
+
+        function endMeetingAdmin() {
+            if (confirm('Are you sure you want to end this meeting for all participants?')) {
+                const meeting = meetings.find(m => m.id === currentMeetingId);
+                if (meeting) {
+                    meeting.status = 'ended';
+                    meeting.endedAt = new Date().toISOString();
+                    localStorage.setItem('nba_meetings', JSON.stringify(meetings));
+                    
+                    joinRequests = joinRequests.filter(r => r.meetingId !== currentMeetingId);
+                    localStorage.setItem('nba_join_requests', JSON.stringify(joinRequests));
+                    
+                    closeMeetingControlModal();
+                    renderAdminMeetings();
+                    updateAdminStats();
+                    showToast('Meeting ended', 'info');
+                }
+            }
+        }
+
+        function deleteMeeting(meetingId) {
+            if (confirm('Delete this meeting permanently?')) {
+                meetings = meetings.filter(m => m.id !== meetingId);
+                joinRequests = joinRequests.filter(r => r.meetingId !== meetingId);
+                invitations = invitations.filter(i => i.meetingId !== meetingId);
+                
+                localStorage.setItem('nba_meetings', JSON.stringify(meetings));
+                localStorage.setItem('nba_join_requests', JSON.stringify(joinRequests));
+                localStorage.setItem('nba_invitations', JSON.stringify(invitations));
+                
+                renderAdminMeetings();
+                updateAdminStats();
+                showToast('Meeting deleted', 'success');
+            }
+        }
+
+        function updateAdminStats() {
+            document.getElementById('adminStatsTotal').textContent = meetings.length;
+            document.getElementById('adminStatsLive').textContent = meetings.filter(m => m.status === 'live').length;
+        }
+
+        function copyMeetingLink(roomId) {
+            const link = `https://meet.jit.si/${roomId}`;
+            navigator.clipboard.writeText(link);
+            showToast('Meeting link copied!', 'success');
+        }
+
+        function copyControlLink() {
+            const link = document.getElementById('controlMeetingLink').value;
+            navigator.clipboard.writeText(link);
+            showToast('Link copied!', 'success');
+        }
+
+        // ==================== MEMBER FUNCTIONS ====================
+
+        function renderMemberInvitations() {
+            const myInvitations = invitations.filter(i => i.memberId === currentUser.id && i.status === 'pending');
+            const container = document.getElementById('memberInvitations');
+            
+            if (myInvitations.length === 0) {
+                document.getElementById('invitationsSection').classList.add('hidden');
+                return;
+            }
+            
+            document.getElementById('invitationsSection').classList.remove('hidden');
+            
+            container.innerHTML = myInvitations.map(inv => {
+                const meeting = meetings.find(m => m.id === inv.meetingId);
+                if (!meeting) return '';
+                
+                return `
+                    <div class="bg-nba-gold/10 border-2 border-nba-gold rounded-xl p-4 flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-nba-navy">${meeting.title}</h4>
+                            <p class="text-sm text-gray-600">${formatDate(meeting.date)} at ${meeting.time}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="acceptInvitation('${inv.id}')" class="px-4 py-2 bg-nba-navy text-white rounded-lg text-sm hover:bg-nba-darknavy">
+                                Accept
+                            </button>
+                            <button onclick="declineInvitation('${inv.id}')" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:border-nba-red hover:text-nba-red">
+                                Decline
                             </button>
                         </div>
                     </div>
@@ -336,138 +960,268 @@
             }).join('');
         }
 
+        function acceptInvitation(invitationId) {
+            const inv = invitations.find(i => i.id === invitationId);
+            if (inv) {
+                inv.status = 'accepted';
+                localStorage.setItem('nba_invitations', JSON.stringify(invitations));
+                renderMemberInvitations();
+                renderMemberMeetings();
+                showToast('Invitation accepted!', 'success');
+            }
+        }
+
+        function declineInvitation(invitationId) {
+            const inv = invitations.find(i => i.id === invitationId);
+            if (inv) {
+                inv.status = 'declined';
+                localStorage.setItem('nba_invitations', JSON.stringify(invitations));
+                renderMemberInvitations();
+                showToast('Invitation declined', 'info');
+            }
+        }
+
+        function renderMemberMeetings() {
+            const container = document.getElementById('memberMeetingsList');
+            
+            const myMeetingIds = invitations
+                .filter(i => i.memberId === currentUser.id && i.status === 'accepted')
+                .map(i => i.meetingId);
+            
+            const myMeetings = meetings.filter(m => 
+                myMeetingIds.includes(m.id) || 
+                m.invitedMembers?.includes(currentUser.id) ||
+                m.type === 'general'
+            );
+
+            if (myMeetings.length === 0) {
+                container.innerHTML = '<div class="col-span-3 text-center py-8 text-gray-500">No available meetings. Check your invitations or join by ID.</div>';
+                return;
+            }
+
+            container.innerHTML = myMeetings.map(m => {
+                const isLive = m.status === 'live';
+                const isScheduled = m.status === 'scheduled';
+                
+                const myRequest = joinRequests.find(r => r.meetingId === m.id && r.memberId === currentUser.id);
+                const isWaiting = myRequest?.status === 'waiting';
+                const isApproved = myRequest?.status === 'approved';
+
+                return `
+                    <div class="meeting-card bg-white rounded-xl shadow-lg overflow-hidden ${isLive ? 'ring-2 ring-nba-green' : ''} ${isWaiting ? 'ring-2 ring-nba-orange' : ''}">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold ${isLive ? 'bg-nba-green text-white' : isScheduled ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}">
+                                    ${isLive ? '● LIVE NOW' : m.status.toUpperCase()}
+                                </span>
+                                ${isWaiting ? '<span class="px-3 py-1 rounded-full text-xs font-bold bg-nba-orange text-white animate-pulse">WAITING</span>' : ''}
+                                ${isApproved ? '<span class="px-3 py-1 rounded-full text-xs font-bold bg-nba-green text-white"><i class="fas fa-check mr-1"></i>APPROVED</span>' : ''}
+                            </div>
+                            <h3 class="font-bold text-nba-navy text-lg mb-2">${m.title}</h3>
+                            <p class="text-sm text-gray-600 mb-4 line-clamp-2">${m.description || ''}</p>
+                            <div class="space-y-1 text-sm text-gray-500 mb-4">
+                                <p><i class="far fa-calendar mr-2"></i>${formatDate(m.date)} at ${m.time}</p>
+                                <p><i class="far fa-clock mr-2"></i>${m.duration} minutes</p>
+                            </div>
+                            
+                            ${isLive ? `
+                                ${isApproved ? `
+                                    <button onclick="joinApprovedMeeting('${m.id}')" class="w-full py-3 bg-nba-green text-white rounded-lg font-semibold hover:bg-green-700 transition">
+                                        <i class="fas fa-video mr-2"></i>Join Meeting
+                                    </button>
+                                ` : isWaiting ? `
+                                    <button disabled class="w-full py-3 bg-nba-orange/50 text-white rounded-lg font-semibold cursor-not-allowed">
+                                        <i class="fas fa-clock mr-2"></i>Waiting for approval...
+                                    </button>
+                                ` : `
+                                    <button onclick="requestToJoin('${m.id}')" class="w-full py-3 bg-nba-navy text-white rounded-lg font-semibold hover:bg-nba-darknavy transition">
+                                        <i class="fas fa-hand-paper mr-2"></i>Request to Join
+                                    </button>
+                                `}
+                            ` : isScheduled ? `
+                                <button onclick="requestToJoin('${m.id}')" class="w-full py-3 border-2 border-nba-navy text-nba-navy rounded-lg font-semibold hover:bg-nba-navy hover:text-white transition">
+                                    <i class="fas fa-bell mr-2"></i>Register Interest
+                                </button>
+                            ` : `
+                                <button disabled class="w-full py-3 bg-gray-100 text-gray-400 rounded-lg font-semibold cursor-not-allowed">
+                                    Meeting Ended
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function requestToJoin(meetingId) {
+            const meeting = meetings.find(m => m.id === meetingId);
+            if (!meeting) return;
+
+            const existing = joinRequests.find(r => r.meetingId === meetingId && r.memberId === currentUser.id);
+            if (existing) {
+                if (existing.status === 'waiting') {
+                    showToast('You are already in the waiting list', 'info');
+                } else if (existing.status === 'approved') {
+                    showToast('You are already approved! Click Join Meeting.', 'success');
+                }
+                return;
+            }
+
+            const request = {
+                id: Date.now().toString(),
+                meetingId: meetingId,
+                memberId: currentUser.id,
+                memberName: currentUser.name || currentUser.email,
+                status: 'waiting',
+                timestamp: new Date().toISOString()
+            };
+
+            joinRequests.push(request);
+            localStorage.setItem('nba_join_requests', JSON.stringify(joinRequests));
+
+            if (!meeting.requireApproval && meeting.status === 'live') {
+                approveMember(request.id);
+                showToast('You have been automatically approved! Join now.', 'success');
+            } else {
+                showToast('Join request sent. Waiting for admin approval...', 'info');
+                document.getElementById('waitingBanner').classList.remove('hidden');
+                document.getElementById('waitingMeetingName').textContent = meeting.title;
+            }
+
+            renderMemberMeetings();
+        }
+
+        function cancelJoinRequest() {
+            joinRequests = joinRequests.filter(r => !(r.memberId === currentUser.id && r.status === 'waiting'));
+            localStorage.setItem('nba_join_requests', JSON.stringify(joinRequests));
+            document.getElementById('waitingBanner').classList.add('hidden');
+            renderMemberMeetings();
+            showToast('Join request cancelled', 'info');
+        }
+
+        function joinApprovedMeeting(meetingId) {
+            const meeting = meetings.find(m => m.id === meetingId);
+            if (!meeting) return;
+
+            document.getElementById('waitingBanner').classList.add('hidden');
+            
+            // Redirect to meeting room
+            const encodedTitle = encodeURIComponent(meeting.title);
+            const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${encodeURIComponent(currentUser.name || 'Member')}&title=${encodedTitle}&uid=${currentUser.id}`;
+            window.location.href = redirectUrl;
+        }
+
+        function showJoinByIdModal() {
+            document.getElementById('joinByIdModal').classList.add('active');
+        }
+
+        function closeJoinByIdModal() {
+            document.getElementById('joinByIdModal').classList.remove('active');
+        }
+
+        function requestJoinById() {
+            const roomId = document.getElementById('joinRoomId').value.trim();
+            if (!roomId) {
+                showToast('Please enter a meeting ID', 'error');
+                return;
+            }
+
+            const meeting = meetings.find(m => m.roomId === roomId);
+            if (!meeting) {
+                showToast('Meeting not found. Please check the ID.', 'error');
+                return;
+            }
+
+            closeJoinByIdModal();
+            requestToJoin(meeting.id);
+        }
+
+        // ==================== UTILITIES ====================
+
         function formatDate(dateStr) {
             return new Date(dateStr).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' });
         }
 
-        // Join meeting
-        function joinMeeting(roomId, title) {
-            if (activeApi) {
-                activeApi.dispose();
-            }
-            
-            currentRoom = roomId;
-            document.getElementById('activeMeetingTitle').textContent = title;
-            document.getElementById('activeMeetingId').textContent = 'Room: ' + roomId;
-            document.getElementById('activeMeetingSection').classList.remove('hidden');
-            
-            const domain = 'meet.jit.si';
-            const options = {
-                roomName: roomId,
-                width: '100%',
-                height: '100%',
-                parentNode: document.getElementById('jitsiContainer'),
-                configOverwrite: {
-                    startWithAudioMuted: true,
-                    prejoinPageEnabled: true,
-                    disableDeepLinking: false
-                },
-                interfaceConfigOverwrite: {
-                    TOOLBAR_BUTTONS: [
-                        'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
-                        'fodeviceselection', 'hangup', 'chat', 'recording', 'etherpad',
-                        'settings', 'raisehand', 'videoquality', 'filmstrip', 'tileview',
-                        'mute-everyone', 'security'
-                    ],
-                    SHOW_JITSI_WATERMARK: false,
-                    SHOW_WATERMARK_FOR_GUESTS: false
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function startAdminPolling() {
+            pollingInterval = setInterval(() => {
+                if (currentMeetingId) {
+                    renderWaitingList();
                 }
-            };
-            
-            activeApi = new JitsiMeetExternalAPI(domain, options);
-            
-            document.getElementById('activeMeetingSection').scrollIntoView({ behavior: 'smooth' });
+                renderAdminMeetings();
+            }, 5000);
         }
 
-        // Join custom room
-        function joinCustomRoom() {
-            const room = document.getElementById('roomInput').value.trim();
-            if (!room) {
-                startInstantMeeting();
-                return;
-            }
-            joinMeeting(room, 'Custom Meeting');
+        function startMemberPolling() {
+            pollingInterval = setInterval(() => {
+                const myWaiting = joinRequests.find(r => 
+                    r.memberId === currentUser.id && r.status === 'waiting'
+                );
+                
+                if (myWaiting) {
+                    const updated = joinRequests.find(r => r.id === myWaiting.id);
+                    if (updated?.status === 'approved') {
+                        showToast('You have been approved! You can now join the meeting.', 'success');
+                        document.getElementById('waitingBanner').classList.add('hidden');
+                        renderMemberMeetings();
+                    }
+                }
+                
+                renderMemberMeetings();
+            }, 5000);
         }
 
-        // Start instant meeting
-        function startInstantMeeting() {
-            const roomId = 'nba-awka-instant-' + Math.random().toString(36).substring(2, 8);
-            joinMeeting(roomId, 'Instant Meeting');
+        // Placeholder functions for missing admin actions
+        function showMembersModal() {
+            showToast('Members management - Feature coming soon', 'info');
         }
 
-        // End meeting
-        function endMeeting() {
-            if (activeApi) {
-                activeApi.executeCommand('hangup');
-                setTimeout(() => {
-                    activeApi.dispose();
-                    activeApi = null;
-                }, 1000);
-            }
-            document.getElementById('activeMeetingSection').classList.add('hidden');
-            currentRoom = null;
+        function showInvitationsModal() {
+            showToast('Invitations management - Feature coming soon', 'info');
         }
 
-        // Copy meeting link
-        function copyMeetingLink() {
-            if (!currentRoom) return;
-            const link = `https://meet.jit.si/${currentRoom}`;
-            navigator.clipboard.writeText(link).then(() => {
-                alert('Meeting link copied to clipboard!\n\nShare this link with participants.');
-            });
+        function showReportsModal() {
+            showToast('Reports - Feature coming soon', 'info');
         }
 
-        function copyRoomLink(roomId) {
-            const link = `https://meet.jit.si/${roomId}`;
-            navigator.clipboard.writeText(link).then(() => {
-                alert('Room link copied to clipboard!');
-            });
+        function viewMeetingReport(meetingId) {
+            showToast('Meeting report - Feature coming soon', 'info');
         }
 
-        // Modal functions
-        function showAddMeetingModal() {
-            document.getElementById('addMeetingModal').classList.add('active');
+        function inviteMoreMembers() {
+            showToast('Invite more members - Feature coming soon', 'info');
         }
 
-        function closeAddMeetingModal() {
-            document.getElementById('addMeetingModal').classList.remove('active');
-        }
-
-        function saveMeeting(event) {
-            event.preventDefault();
-            
-            const newMeeting = {
-                id: document.getElementById('meetingRoom').value.trim() || 'nba-awka-' + Date.now(),
-                title: document.getElementById('meetingTitle').value,
-                date: document.getElementById('meetingDate').value,
-                time: document.getElementById('meetingTime').value,
-                description: document.getElementById('meetingDesc').value,
-                status: 'upcoming'
-            };
-            
-            meetings.push(newMeeting);
-            meetings.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
-            localStorage.setItem('nba_meetings', JSON.stringify(meetings));
-            
-            renderMeetings();
-            closeAddMeetingModal();
-            event.target.reset();
-            alert('Meeting scheduled successfully!');
+        function muteAllParticipants() {
+            showToast('Mute all - Feature coming soon', 'info');
         }
 
         // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
-            if (activeApi) {
-                activeApi.dispose();
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
             }
         });
 
-        // Close modal on outside click
-        window.onclick = function(event) {
-            if (event.target.id === 'addMeetingModal') {
-                closeAddMeetingModal();
+        // Handle visibility change to pause/resume polling
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            } else if (!document.hidden && currentUser) {
+                if (currentUser.type === 'admin') {
+                    startAdminPolling();
+                } else {
+                    startMemberPolling();
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>
