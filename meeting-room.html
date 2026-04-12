@@ -6,397 +6,62 @@
     <title>Meeting Room | NBA Awka</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://meet.jit.si/external_api.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        nba: {
-                            gold: '#D4AF37',
-                            navy: '#1B365D',
-                            darknavy: '#0F1F33'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body { margin: 0; overflow: hidden; background: #1a1a1a; }
-        #jitsi-container { width: 100vw; height: 100vh; }
-        .loading-overlay {
-            position: fixed; inset: 0; background: #1B365D; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: white; transition: opacity 0.3s;
-        }
-        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+        body { margin: 0; background: #1B365D; font-family: 'Inter', sans-serif; color: white; }
+        .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; text-align: center; }
         .spinner {
             width: 60px; height: 60px; border: 4px solid #D4AF37;
             border-top-color: transparent; border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 20px;
+            animation: spin 1s linear infinite; margin: 0 auto 30px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translate(-50%, -10px); } 
-            to { opacity: 1; transform: translate(-50%, 0); } 
+        .btn { 
+            display: inline-block; padding: 15px 40px; background: #D4AF37; 
+            color: #1B365D; text-decoration: none; border-radius: 30px; 
+            font-weight: bold; margin-top: 20px;
         }
-        
-        .meeting-toolbar {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(27, 54, 93, 0.95); backdrop-filter: blur(10px);
-            padding: 12px 24px; border-radius: 50px; display: flex; gap: 16px;
-            z-index: 100; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
-        .tool-btn {
-            width: 50px; height: 50px; border-radius: 50%; border: none;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 20px; transition: all 0.3s; color: white;
-        }
-        .tool-btn:hover { transform: scale(1.1); }
-        .tool-btn.secondary { background: rgba(255,255,255,0.2); }
-        .tool-btn.danger { background: #dc2626; }
-        .tool-btn.gold { background: #D4AF37; color: #1B365D; }
-        
-        .meeting-info {
-            position: fixed; top: 20px; left: 20px;
-            background: rgba(0,0,0,0.6); color: white;
-            padding: 12px 20px; border-radius: 30px;
-            display: flex; align-items: center; gap: 12px;
-            z-index: 100; backdrop-filter: blur(5px);
-        }
-        .live-badge {
-            background: #dc2626; color: white; padding: 4px 12px;
-            border-radius: 20px; font-size: 12px; font-weight: 600;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        
-        .bypass-btn {
-            margin-top: 20px;
-            padding: 12px 24px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid #D4AF37;
-            color: #D4AF37;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        .bypass-btn:hover {
-            background: #D4AF37;
-            color: #1B365D;
-        }
+        .btn:hover { background: #B8960C; }
     </style>
 </head>
-<body class="bg-gray-900 overflow-hidden">
-
-    <!-- Loading Screen -->
-    <div class="loading-overlay" id="loading">
-        <div class="spinner"></div>
-        <h2 class="text-xl font-semibold mb-2">Joining Meeting...</h2>
-        <p class="text-gray-300 mb-4" id="loading-text">Connecting to secure room</p>
-        <button onclick="openInJitsiDirectly()" class="bypass-btn hidden" id="bypassBtn">
-            <i class="fas fa-external-link-alt mr-2"></i>Open in Jitsi Instead
-        </button>
-    </div>
-
-    <!-- Meeting Info Header -->
-    <div class="meeting-info">
-        <span class="live-badge">● LIVE</span>
-        <div>
-            <h3 class="font-semibold text-sm" id="meeting-title">NBA Awka Meeting</h3>
-            <p class="text-xs text-gray-300" id="participant-count">Connecting...</p>
-        </div>
-    </div>
-
-    <!-- Jitsi Container -->
-    <div id="jitsi-container"></div>
-
-    <!-- Custom Toolbar -->
-    <div class="meeting-toolbar">
-        <button onclick="toggleAudio()" id="btn-audio" class="tool-btn secondary" title="Toggle microphone">
-            <i class="fas fa-microphone"></i>
-        </button>
-        <button onclick="toggleVideo()" id="btn-video" class="tool-btn secondary" title="Toggle camera">
-            <i class="fas fa-video"></i>
-        </button>
-        <button onclick="toggleScreenShare()" id="btn-screen" class="tool-btn secondary" title="Share screen">
-            <i class="fas fa-desktop"></i>
-        </button>
-        <button onclick="toggleChat()" id="btn-chat" class="tool-btn secondary" title="Toggle chat">
-            <i class="fas fa-comments"></i>
-        </button>
-        <button onclick="showParticipants()" id="btn-participants" class="tool-btn secondary" title="Participants">
-            <i class="fas fa-users"></i>
-        </button>
-        <button onclick="leaveMeeting()" class="tool-btn danger" title="Leave meeting">
-            <i class="fas fa-phone-slash"></i>
-        </button>
+<body>
+    <div class="container">
+        <div class="spinner" id="spinner"></div>
+        <h1>Launching NBA Awka Meeting...</h1>
+        <p>Please wait while we prepare your secure meeting room</p>
+        <a href="#" id="joinBtn" class="btn" style="display:none;">
+            <i class="fas fa-video"></i> Click to Join Meeting
+        </a>
     </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        // FIXED: Support both 'room' and 'id' parameters for compatibility
-        const roomId = urlParams.get('room') || urlParams.get('id') || 'nba-awka-default';
+        const roomId = urlParams.get('room') || 'nba-awka-meeting';
         const displayName = urlParams.get('name') || 'Guest';
-        const isHost = urlParams.get('host') === '1';
         const meetingTitle = decodeURIComponent(urlParams.get('title') || 'NBA Awka Meeting');
-        const userId = urlParams.get('uid') || '';
+        
+        // Generate unique Jitsi room name
+        const jitsiRoom = `NBA-Awka-${roomId}`;
+        
+        // Build Jitsi URL with all parameters
+        const jitsiUrl = `https://meet.jit.si/${jitsiRoom}` +
+            `#userInfo.displayName="${encodeURIComponent(displayName)}"` +
+            `&config.prejoinPageEnabled=false` +
+            `&config.startWithAudioMuted=false` +
+            `&config.startWithVideoMuted=false` +
+            `&interfaceConfig.SHOW_JITSI_WATERMARK=false` +
+            `&interfaceConfig.SHOW_WATERMARK_FOR_GUESTS=false` +
+            `&interfaceConfig.DEFAULT_BACKGROUND="#1B365D"` +
+            `&interfaceConfig.TOOLBAR_BUTTONS="microphone,camera,closedcaptions,desktop,fullscreen,fodeviceselection,hangup,chat,recording,livestreaming,etherpad,settings,raisehand,videoquality,filmstrip,invite,feedback,stats,shortcuts,tileview,select-background,download"`;
 
-        let jitsiApi = null;
-        let isAudioOn = true;
-        let isVideoOn = true;
-        let loadingTimeout = null;
-        let connectionAttempted = false;
+        // Auto-redirect after 2 seconds, or show button
+        setTimeout(() => {
+            window.location.href = jitsiUrl;
+        }, 2000);
 
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('meeting-title').textContent = meetingTitle;
-            checkAuthentication();
-            
-            // Show bypass button after 8 seconds
-            setTimeout(() => {
-                document.getElementById('bypassBtn').classList.remove('hidden');
-            }, 8000);
-        });
-
-        function checkAuthentication() {
-            // FIXED: Check both admin and member sessions
-            const session = localStorage.getItem('nba_session') || 
-                          sessionStorage.getItem('nba_member_session') || 
-                          sessionStorage.getItem('nba_admin_session');
-            
-            if (!session) {
-                alert('Please login first');
-                window.location.href = 'index.html';
-                return;
-            }
-            initializeJitsi();
-        }
-
-        function initializeJitsi() {
-            if (typeof JitsiMeetExternalAPI === 'undefined') {
-                document.getElementById('loading-text').textContent = 'Error: Jitsi API not loaded';
-                return;
-            }
-
-            const domain = 'meet.jit.si';
-            
-            const options = {
-                roomName: roomId,
-                width: '100%',
-                height: '100%',
-                parentNode: document.getElementById('jitsi-container'),
-                userInfo: {
-                    displayName: displayName
-                },
-                
-                configOverwrite: {
-                    prejoinPageEnabled: false,
-                    startWithAudioMuted: false,
-                    startWithVideoMuted: false,
-                    enableWelcomePage: false,
-                    enableClosePage: false,
-                    readOnlyName: true,
-                    disableProfile: true,
-                    defaultLogoUrl: '',
-                    toolbarButtons: [],
-                    SHOW_CHROME_EXTENSION_BANNER: false,
-                    useTurnUdp: true,
-                    useTurnTcp: true,
-                    openBridgeChannel: 'websocket',
-                },
-                
-                interfaceConfigOverwrite: {
-                    TOOLBAR_BUTTONS: [],
-                    SHOW_JITSI_WATERMARK: false,
-                    SHOW_WATERMARK_FOR_GUESTS: false,
-                    SHOW_CHROME_EXTENSION_BANNER: false,
-                    MOBILE_APP_PROMO: false,
-                    DEFAULT_LOCAL_DISPLAY_NAME: displayName,
-                    DEFAULT_BACKGROUND: '#1B365D'
-                }
-            };
-
-            try {
-                connectionAttempted = true;
-                jitsiApi = new JitsiMeetExternalAPI(domain, options);
-
-                jitsiApi.addEventListener('videoConferenceJoined', () => {
-                    clearTimeout(loadingTimeout);
-                    document.getElementById('loading').classList.add('hidden');
-                    updateParticipantCount();
-                    
-                    setTimeout(() => {
-                        try {
-                            jitsiApi.executeCommand('setTileView', true);
-                        } catch(e) {}
-                    }, 1500);
-                });
-
-                jitsiApi.addEventListener('participantJoined', updateParticipantCount);
-                jitsiApi.addEventListener('participantLeft', updateParticipantCount);
-
-                jitsiApi.addEventListener('audioMuteStatusChanged', (data) => {
-                    isAudioOn = !data.muted;
-                    updateButtonState('btn-audio', isAudioOn, 'fa-microphone', 'fa-microphone-slash');
-                });
-
-                jitsiApi.addEventListener('videoMuteStatusChanged', (data) => {
-                    isVideoOn = !data.muted;
-                    updateButtonState('btn-video', isVideoOn, 'fa-video', 'fa-video-slash');
-                });
-
-                jitsiApi.addEventListener('readyToClose', () => {
-                    window.location.href = 'index.html';
-                });
-
-                jitsiApi.addEventListener('errorOccurred', (error) => {
-                    console.error('Jitsi error:', error);
-                    if (error.error === 'conference.connectionError' || 
-                        error.error === 'connection.passwordRequired' ||
-                        error.error === 'conference.focusDisconnected') {
-                        document.getElementById('loading-text').textContent = 'Retrying connection...';
-                    }
-                });
-
-                if (isHost) {
-                    setTimeout(() => {
-                        try {
-                            jitsiApi.executeCommand('password', 'nba-awka-host');
-                        } catch (e) {
-                            console.log('Password set failed:', e);
-                        }
-                    }, 5000);
-                }
-
-                loadingTimeout = setTimeout(() => {
-                    if (!document.getElementById('loading').classList.contains('hidden')) {
-                        document.getElementById('loading').innerHTML = `
-                            <div class="text-center px-4">
-                                <p class="mb-4 text-lg">Connection taking too long</p>
-                                <p class="text-sm text-gray-300 mb-4">The embedded meeting is having trouble connecting</p>
-                                <div class="flex gap-3 justify-center flex-wrap">
-                                    <button onclick="openInJitsiDirectly()" class="px-4 py-2 bg-nba-gold text-nba-navy rounded-lg font-semibold">
-                                        <i class="fas fa-external-link-alt mr-2"></i>Open in Jitsi
-                                    </button>
-                                    <button onclick="retryConnection()" class="px-4 py-2 border border-white text-white rounded-lg">
-                                        Retry Embed
-                                    </button>
-                                </div>
-                                <br>
-                                <a href="index.html" class="text-sm text-gray-400 underline hover:text-white">Return to Dashboard</a>
-                            </div>
-                        `;
-                    }
-                }, 30000);
-
-            } catch (error) {
-                console.error('Init failed:', error);
-                document.getElementById('loading-text').textContent = 'Failed to initialize';
-            }
-        }
-
-        function retryConnection() {
-            document.getElementById('loading').innerHTML = `
-                <div class="spinner"></div>
-                <h2 class="text-xl font-semibold mb-2">Retrying...</h2>
-                <p class="text-gray-300" id="loading-text">Connecting to secure room</p>
-                <button onclick="openInJitsiDirectly()" class="bypass-btn hidden" id="bypassBtn">
-                    <i class="fas fa-external-link-alt mr-2"></i>Open in Jitsi Instead
-                </button>
-            `;
-            
-            setTimeout(() => {
-                document.getElementById('bypassBtn').classList.remove('hidden');
-            }, 8000);
-            
-            if (jitsiApi) {
-                jitsiApi.dispose();
-                jitsiApi = null;
-            }
-            
-            setTimeout(initializeJitsi, 1000);
-        }
-
-        function openInJitsiDirectly() {
-            const jitsiUrl = `https://meet.jit.si/${roomId}#userInfo.displayName="${encodeURIComponent(displayName)}"&config.prejoinPageEnabled=false`;
-            window.open(jitsiUrl, '_blank');
-            
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 2000);
-        }
-
-        function updateParticipantCount() {
-            try {
-                const count = jitsiApi.getNumberOfParticipants();
-                document.getElementById('participant-count').textContent = 
-                    `${count} participant${count !== 1 ? 's' : ''}`;
-            } catch (e) {
-                document.getElementById('participant-count').textContent = 'Connected';
-            }
-        }
-
-        function toggleAudio() {
-            if (!jitsiApi) return;
-            jitsiApi.executeCommand('toggleAudio');
-        }
-
-        function toggleVideo() {
-            if (!jitsiApi) return;
-            jitsiApi.executeCommand('toggleVideo');
-        }
-
-        function updateButtonState(btnId, isOn, onIcon, offIcon) {
-            const btn = document.getElementById(btnId);
-            const icon = btn.querySelector('i');
-            if (isOn) {
-                icon.className = `fas ${onIcon}`;
-                btn.classList.remove('danger');
-                btn.classList.add('secondary');
-            } else {
-                icon.className = `fas ${offIcon}`;
-                btn.classList.remove('secondary');
-                btn.classList.add('danger');
-            }
-        }
-
-        function toggleScreenShare() {
-            if (!jitsiApi) return;
-            jitsiApi.executeCommand('toggleShareScreen');
-        }
-
-        function toggleChat() {
-            if (!jitsiApi) return;
-            jitsiApi.executeCommand('toggleChat');
-        }
-
-        function showParticipants() {
-            if (!jitsiApi) return;
-            jitsiApi.executeCommand('toggleParticipantsPane');
-        }
-
-        function leaveMeeting() {
-            if (confirm('Leave meeting?')) {
-                clearTimeout(loadingTimeout);
-                if (jitsiApi) {
-                    try {
-                        jitsiApi.executeCommand('hangup');
-                        jitsiApi.dispose();
-                    } catch(e) {}
-                }
-                window.location.href = 'index.html';
-            }
-        }
-
-        window.addEventListener('beforeunload', (e) => {
-            if (jitsiApi) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
+        // Show manual join button as fallback
+        document.getElementById('joinBtn').href = jitsiUrl;
+        document.getElementById('joinBtn').style.display = 'inline-block';
+        document.getElementById('spinner').style.display = 'none';
     </script>
 </body>
 </html>
