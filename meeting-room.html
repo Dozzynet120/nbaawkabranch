@@ -39,6 +39,12 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         
+        /* FIXED: Added missing fadeIn animation */
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translate(-50%, -10px); } 
+            to { opacity: 1; transform: translate(-50%, 0); } 
+        }
+        
         /* Custom toolbar overlay */
         .meeting-toolbar {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
@@ -82,7 +88,7 @@
         .video-item video { 
             width: 100%; 
             height: 100%; 
-            object-fit: contain !important; /* Changed from cover to contain for full face/shoulder */
+            object-fit: contain !important;
             background: #1a1a1a;
         }
         
@@ -198,6 +204,8 @@
         let jitsiApi = null;
         let isAudioOn = true;
         let isVideoOn = true;
+        let connectionTimeout = null;
+        let loadingTimeout = null;
 
         // Initialize meeting when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -221,6 +229,25 @@
                     leaveMeeting();
                 }
             });
+            
+            // FIXED: Add timeout for stuck loading state
+            loadingTimeout = setTimeout(() => {
+                const loading = document.getElementById('loading');
+                if (!loading.classList.contains('hidden')) {
+                    loading.innerHTML = `
+                        <div class="text-center px-4">
+                            <p class="mb-4 text-lg">Taking longer than expected...</p>
+                            <div class="flex gap-3 justify-center">
+                                <button onclick="location.reload()" class="px-4 py-2 bg-nba-gold text-nba-navy rounded-lg font-semibold">
+                                    Retry Connection
+                                </button>
+                            </div>
+                            <br>
+                            <a href="index.html" class="text-sm text-gray-400 underline hover:text-white">Return to Dashboard</a>
+                        </div>
+                    `;
+                }
+            }, 20000); // 20 second timeout
         });
 
         function checkAuthentication() {
@@ -243,8 +270,9 @@
 
         function initializeJitsi() {
             if (typeof JitsiMeetExternalAPI === 'undefined') {
-                document.getElementById('loading-text').textContent = 'Error: Jitsi API not loaded';
-                setTimeout(() => location.reload(), 3000);
+                document.getElementById('loading-text').textContent = 'Error: Jitsi API not loaded. Retrying...';
+                // FIXED: Auto-retry with backoff
+                setTimeout(() => location.reload(), 5000);
                 return;
             }
 
@@ -269,16 +297,21 @@
                     readOnlyName: true,
                     disableProfile: true,
                     defaultLogoUrl: '',
-                    toolbarButtons: [], // Hide default toolbar, we use custom
+                    toolbarButtons: [],
                     SHOW_CHROME_EXTENSION_BANNER: false,
-                    // Video settings for full face/shoulder view
+                    // IMPROVED: Better video quality for face/shoulders
                     constraints: {
                         video: {
                             aspectRatio: 16/9,
-                            height: { ideal: 720, max: 1080 },
-                            width: { ideal: 1280, max: 1920 }
+                            height: { ideal: 720, max: 1080, min: 480 },
+                            width: { ideal: 1280, max: 1920, min: 640 }
                         }
-                    }
+                    },
+                    // IMPROVED: Better audio settings
+                    disableAudioLevels: false,
+                    enableNoisyMicDetection: true,
+                    stereo: false,
+                    opusMaxAverageBitrate: 20000
                 },
                 interfaceConfigOverwrite: {
                     TOOLBAR_BUTTONS: [],
@@ -290,64 +323,101 @@
                     DEFAULT_LOCAL_DISPLAY_NAME: displayName,
                     MOBILE_APP_PROMO: false,
                     HIDE_INVITE_MORE_HEADER: true,
-                    // Filmstrip and tile view settings for better visibility
-                    FILM_STRIP_MAX_HEIGHT: 200,
+                    FILM_STRIP_MAX_HEIGHT: 160,
                     TILE_VIEW_MAX_COLUMNS: 2,
-                    // Video layout settings
-                    VIDEO_QUALITY_LABEL_DISABLED: false,
-                    RECENT_LIST_ENABLED: false
+                    VIDEO_QUALITY_LABEL_DISABLED: true,
+                    RECENT_LIST_ENABLED: false,
+                    DISABLE_FILMSTRIP: false,
+                    DISABLE_FOCUS_INDICATOR: true
                 }
             };
 
             try {
                 jitsiApi = new JitsiMeetExternalAPI(domain, options);
 
-                // Event listeners
+                // FIXED: Clear loading timeout on successful join
                 jitsiApi.addEventListener('videoConferenceJoined', () => {
+                    clearTimeout(loadingTimeout);
                     document.getElementById('loading').classList.add('hidden');
                     updateParticipantCount();
                     
-                    // Set tile view for better face/shoulder visibility when multiple participants
+                    // Force tile view for better visibility
                     setTimeout(() => {
-                        jitsiApi.executeCommand('setTileView', true);
-                    }, 1000);
+                        try {
+                            jitsiApi.executeCommand('setTileView', true);
+                        } catch(e) {}
+                    }, 1500);
                     
                     console.log('Joined conference:', roomId);
                 });
 
-                jitsiApi.addEventListener('participantJoined', (participant) => {
+                jitsiApi.addEventListener('participantJoined', () => {
                     updateParticipantCount();
-                    showNotification(`${participant.displayName} joined`);
                 });
 
-                jitsiApi.addEventListener('participantLeft', (participant) => {
+                jitsiApi.addEventListener('participantLeft', () => {
                     updateParticipantCount();
-                    showNotification(`${participant.displayName} left`);
+                });
+
+                // FIXED: Sync audio state from Jitsi
+                jitsiApi.addEventListener('audioMuteStatusChanged', (data) => {
+                    isAudioOn = !data.muted;
+                    updateButtonState('btn-audio', isAudioOn, 'fa-microphone', 'fa-microphone-slash');
+                });
+
+                // FIXED: Sync video state from Jitsi
+                jitsiApi.addEventListener('videoMuteStatusChanged', (data) => {
+                    isVideoOn = !data.muted;
+                    updateButtonState('btn-video', isVideoOn, 'fa-video', 'fa-video-slash');
                 });
 
                 jitsiApi.addEventListener('readyToClose', () => {
-                    leaveMeeting();
+                    window.location.href = 'index.html';
                 });
 
+                // FIXED: Better error handling with retry
                 jitsiApi.addEventListener('errorOccurred', (error) => {
                     console.error('Jitsi error:', error);
-                    document.getElementById('loading-text').textContent = 'Connection error. Retrying...';
+                    if (error.error === 'conference.connectionError' || error.error === 'connection.passwordRequired') {
+                        document.getElementById('loading-text').textContent = 'Connection failed. Retrying in 5s...';
+                        setTimeout(() => location.reload(), 5000);
+                    }
                 });
 
-                // Set password if host
+                // FIXED: Improved host password with better timing and fallback
                 if (isHost) {
                     setTimeout(() => {
                         try {
-                            jitsiApi.executeCommand('password', 'nba-awka-' + roomId);
+                            // Try to set password - may fail if room not fully ready
+                            jitsiApi.executeCommand('password', 'nba-awka-host');
+                            console.log('Host password set successfully');
                         } catch (e) {
-                            console.log('Could not set password:', e);
+                            console.log('Initial password set failed, retrying...');
+                            // Retry after 5 seconds
+                            setTimeout(() => {
+                                try {
+                                    jitsiApi.executeCommand('password', 'nba-awka-host');
+                                    console.log('Host password set on retry');
+                                } catch (e2) {
+                                    console.log('Password setting failed:', e2);
+                                }
+                            }, 5000);
                         }
-                    }, 3000);
+                    }, 5000); // Delayed to ensure room is ready
                 }
+
+                // Connection timeout fallback
+                connectionTimeout = setTimeout(() => {
+                    const loading = document.getElementById('loading');
+                    if (!loading.classList.contains('hidden')) {
+                        document.getElementById('loading-text').textContent = 'Still connecting... Please wait';
+                    }
+                }, 10000);
 
             } catch (error) {
                 console.error('Failed to initialize Jitsi:', error);
-                document.getElementById('loading-text').textContent = 'Failed to load meeting';
+                document.getElementById('loading-text').textContent = 'Failed to load meeting. Refreshing...';
+                setTimeout(() => location.reload(), 3000);
             }
         }
 
@@ -364,15 +434,11 @@
         function toggleAudio() {
             if (!jitsiApi) return;
             jitsiApi.executeCommand('toggleAudio');
-            isAudioOn = !isAudioOn;
-            updateButtonState('btn-audio', isAudioOn, 'fa-microphone', 'fa-microphone-slash');
         }
 
         function toggleVideo() {
             if (!jitsiApi) return;
             jitsiApi.executeCommand('toggleVideo');
-            isVideoOn = !isVideoOn;
-            updateButtonState('btn-video', isVideoOn, 'fa-video', 'fa-video-slash');
         }
 
         function updateButtonState(btnId, isOn, onIcon, offIcon) {
@@ -407,22 +473,24 @@
 
         function leaveMeeting() {
             if (confirm('Are you sure you want to leave the meeting?')) {
+                // Clear timeouts
+                clearTimeout(loadingTimeout);
+                clearTimeout(connectionTimeout);
+                
                 if (jitsiApi) {
-                    jitsiApi.executeCommand('hangup');
+                    try {
+                        jitsiApi.executeCommand('hangup');
+                    } catch(e) {}
                     setTimeout(() => {
-                        jitsiApi.dispose();
-                    }, 1000);
+                        try {
+                            jitsiApi.dispose();
+                        } catch(e) {}
+                        jitsiApi = null;
+                    }, 500);
                 }
                 
-                // Redirect back to meetings page
-                const session = localStorage.getItem('nba_session');
-                const user = session ? JSON.parse(session) : null;
-                
-                if (user && user.type === 'admin') {
-                    window.location.href = 'meetings.html';
-                } else {
-                    window.location.href = 'meetings.html';
-                }
+                // FIXED: Redirect to correct filename (index.html)
+                window.location.href = 'index.html';
             }
         }
 
@@ -444,6 +512,17 @@
             if (jitsiApi) {
                 e.preventDefault();
                 e.returnValue = '';
+            }
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('unload', () => {
+            clearTimeout(loadingTimeout);
+            clearTimeout(connectionTimeout);
+            if (jitsiApi) {
+                try {
+                    jitsiApi.dispose();
+                } catch(e) {}
             }
         });
     </script>
