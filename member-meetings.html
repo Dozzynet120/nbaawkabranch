@@ -194,23 +194,34 @@
         let selectedMeeting = null;
         let currentView = 'all';
 
+        // ==================== FIXED: Helper function to get proper display name ====================
+        function getDisplayName(user) {
+            if (!user) return 'Guest';
+            
+            // Priority: fullName > name > firstName + lastName > firstName > email
+            if (user.fullName) return user.fullName;
+            if (user.name) return user.name;
+            if (user.firstName && user.lastName) return `${user.firstName} ${user.lastName}`;
+            if (user.firstName) return user.firstName;
+            if (user.email) {
+                // Extract name from email as fallback
+                return user.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            }
+            return 'Member';
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Load member session - check both local and session storage
             const session = localStorage.getItem('nba_session') || sessionStorage.getItem('nba_member_session');
+            
             if (session) {
                 currentMember = JSON.parse(session);
-                document.getElementById('member-name').textContent = currentMember.firstName || currentMember.name || 'Member';
+                // FIXED: Use getDisplayName helper for consistent name display
+                document.getElementById('member-name').textContent = getDisplayName(currentMember);
             } else {
-                // Demo mode
-                currentMember = {
-                    email: 'demo@member.com',
-                    firstName: 'Demo',
-                    lastName: 'Member',
-                    enrollment: 'NBA/AWK/12345',
-                    id: 'demo-member'
-                };
-                sessionStorage.setItem('nba_member_session', JSON.stringify(currentMember));
-                document.getElementById('member-name').textContent = 'Demo Member';
+                // No session - redirect to login page instead of demo mode
+                window.location.href = 'index.html';
+                return;
             }
 
             loadMeetings();
@@ -458,7 +469,8 @@
                 document.getElementById('join-meeting-time').classList.remove('text-red-600', 'font-semibold');
             }
 
-            document.getElementById('display-name').value = `${currentMember?.firstName || currentMember?.name || ''} ${currentMember?.lastName || ''}`.trim();
+            // FIXED: Use getDisplayName helper for pre-filling the display name
+            document.getElementById('display-name').value = getDisplayName(currentMember);
             
             document.getElementById('join-modal').classList.remove('hidden');
             document.getElementById('join-modal').classList.add('flex');
@@ -470,7 +482,7 @@
             selectedMeeting = null;
         }
 
-        // FIXED: Corrected confirmJoin function with proper URL parameters
+        // FIXED: Corrected confirmJoin function with proper URL parameters and display name
         function confirmJoin() {
             const displayName = document.getElementById('display-name').value.trim();
             const withAudio = document.getElementById('join-audio').checked;

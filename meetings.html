@@ -526,10 +526,26 @@
                 localStorage.setItem('nba_session', JSON.stringify(currentUser));
                 document.getElementById('loginModal').classList.remove('active');
                 initializeApp();
-                showToast(`Welcome, ${currentUser.name || currentUser.email}!`, 'success');
+                showToast(`Welcome, ${getDisplayName(currentUser)}!`, 'success');
             } else {
                 showToast('Invalid credentials. Try demo accounts below.', 'error');
             }
+        }
+
+        // ==================== FIXED: Helper function to get proper display name ====================
+        function getDisplayName(user) {
+            if (!user) return 'Guest';
+            
+            // Priority: fullName > name > firstName + lastName > firstName > email
+            if (user.fullName) return user.fullName;
+            if (user.name) return user.name;
+            if (user.firstName && user.lastName) return `${user.firstName} ${user.lastName}`;
+            if (user.firstName) return user.firstName;
+            if (user.email) {
+                // Extract name from email as fallback
+                return user.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            }
+            return 'Member';
         }
 
         function logout() {
@@ -541,7 +557,9 @@
 
         function initializeApp() {
             document.getElementById('authCheck').classList.add('hidden');
-            document.getElementById('userDisplay').textContent = currentUser.name || currentUser.email;
+            
+            // FIXED: Use getDisplayName helper for consistent name display
+            document.getElementById('userDisplay').textContent = getDisplayName(currentUser);
             document.getElementById('userRole').textContent = currentUser.type === 'admin' ? 'Administrator' : 'Member';
 
             meetings = JSON.parse(localStorage.getItem('nba_meetings')) || [];
@@ -862,7 +880,9 @@
                 
                 setTimeout(() => {
                     const encodedTitle = encodeURIComponent(meeting.title);
-                    const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${encodeURIComponent(currentUser.name || 'Host')}&host=1&title=${encodedTitle}&uid=${currentUser.id}`;
+                    // FIXED: Use getDisplayName for consistent name formatting
+                    const hostName = encodeURIComponent(getDisplayName(currentUser));
+                    const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${hostName}&host=1&title=${encodedTitle}&uid=${currentUser.id}`;
                     window.location.href = redirectUrl;
                 }, 1000);
             }
@@ -875,7 +895,9 @@
             closeMeetingControlModal();
             
             const encodedTitle = encodeURIComponent(meeting.title);
-            const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${encodeURIComponent(currentUser.name || 'Host')}&host=1&title=${encodedTitle}&uid=${currentUser.id}`;
+            // FIXED: Use getDisplayName for consistent name formatting
+            const hostName = encodeURIComponent(getDisplayName(currentUser));
+            const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${hostName}&host=1&title=${encodedTitle}&uid=${currentUser.id}`;
             window.location.href = redirectUrl;
         }
 
@@ -1076,11 +1098,12 @@
                 return;
             }
 
+            // FIXED: Use getDisplayName for consistent name in join requests
             const request = {
                 id: Date.now().toString(),
                 meetingId: meetingId,
                 memberId: currentUser.id,
-                memberName: currentUser.name || currentUser.email,
+                memberName: getDisplayName(currentUser),
                 status: 'waiting',
                 timestamp: new Date().toISOString()
             };
@@ -1115,7 +1138,9 @@
             document.getElementById('waitingBanner').classList.add('hidden');
             
             const encodedTitle = encodeURIComponent(meeting.title);
-            const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${encodeURIComponent(currentUser.name || 'Member')}&title=${encodedTitle}&uid=${currentUser.id}`;
+            // FIXED: Use getDisplayName for consistent name formatting
+            const memberName = encodeURIComponent(getDisplayName(currentUser));
+            const redirectUrl = `meeting-room.html?room=${meeting.roomId}&name=${memberName}&title=${encodedTitle}&uid=${currentUser.id}`;
             window.location.href = redirectUrl;
         }
 
